@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
-import { WhirlingDervish, ChatIcon, BooksIcon, InspirationIcon } from '@/components/ui/icons';
+// Removed unused icon imports
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
 import { buttonHover } from '@/lib/design-system/motion';
 
@@ -40,7 +40,7 @@ function AnimatedStep({ number, text, index }: StepProps) {
       opacity: 1,
       x: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 24,
         delay: index * 0.15,
@@ -54,7 +54,7 @@ function AnimatedStep({ number, text, index }: StepProps) {
       scale: 1,
       rotate: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 20,
         delay: index * 0.15 + 0.1,
@@ -88,47 +88,27 @@ function AnimatedStep({ number, text, index }: StepProps) {
 }
 
 // =============================================================================
-// ANIMATED ILLUSTRATION
+// FEATURE ILLUSTRATION
 // =============================================================================
 
-function AnimatedIllustration() {
+function FeatureIllustration() {
   const prefersReducedMotion = useReducedMotion();
 
   const containerVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
+    hidden: { opacity: 0, scale: 0.95 },
     visible: {
       opacity: 1,
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.16, 1, 0.3, 1] as const,
         staggerChildren: 0.2,
         delayChildren: 0.3,
       },
     },
   };
 
-  const bubbleVariants = {
-    hidden: { opacity: 0, scale: 0 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 15,
-      },
-    },
-  };
-
-  const floatAnimation = prefersReducedMotion ? {} : {
-    y: [0, -8, 0],
-    transition: {
-      duration: 3,
-      repeat: Infinity,
-      ease: 'easeInOut',
-    },
-  };
+  // Removed unused animation variants
 
   return (
     <motion.div 
@@ -138,56 +118,16 @@ function AnimatedIllustration() {
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
     >
-      <motion.div 
-        className="illustration-box"
+      <motion.img
+        src="/img/home/how-it-works-feature.webp"
+        alt="Person thinking about Rumi's wisdom"
+        className="feature-image"
         whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      >
-        {/* Whirling Dervish with subtle rotation */}
-        <motion.div
-          animate={prefersReducedMotion ? undefined : {
-            rotate: [0, 2, 0, -2, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        >
-          <WhirlingDervish className="illustration-person" aria-hidden="true" />
-        </motion.div>
-        
-        {/* Floating bubbles with stagger */}
-        <motion.div 
-          className="illustration-bubble bubble-1"
-          variants={bubbleVariants}
-          animate={floatAnimation}
-        >
-          <ChatIcon aria-hidden="true" />
-        </motion.div>
-        
-        <motion.div 
-          className="illustration-bubble bubble-2"
-          variants={bubbleVariants}
-          animate={{
-            ...floatAnimation,
-            transition: { ...floatAnimation.transition, delay: 1 },
-          }}
-        >
-          <BooksIcon aria-hidden="true" />
-        </motion.div>
-        
-        <motion.div 
-          className="illustration-bubble bubble-3"
-          variants={bubbleVariants}
-          animate={{
-            ...floatAnimation,
-            transition: { ...floatAnimation.transition, delay: 2 },
-          }}
-        >
-          <InspirationIcon aria-hidden="true" />
-        </motion.div>
-      </motion.div>
+        loading="lazy"
+        width={400}
+        height={300}
+      />
     </motion.div>
   );
 }
@@ -268,7 +208,7 @@ function AnimatedTitle({ title }: { title: string }) {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     },
   };
@@ -279,7 +219,7 @@ function AnimatedTitle({ title }: { title: string }) {
       scaleX: 1,
       transition: {
         duration: 0.8,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.16, 1, 0.3, 1] as const,
         delay: 0.3,
       },
     },
@@ -330,7 +270,7 @@ export default function HowItWorks() {
         
         <div className="how-it-works-content">
           {/* Animated Illustration */}
-          <AnimatedIllustration />
+          <FeatureIllustration />
 
           {/* Animated Steps */}
           <div className="how-it-works-steps">

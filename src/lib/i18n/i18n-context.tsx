@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { Language, translations, Translations } from './translations';
 
 interface I18nContextType {
@@ -13,7 +13,17 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en');
+  // Lazy initialization to avoid setState in effect
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window === 'undefined') return 'en';
+    const stored = localStorage.getItem('rumi-language') as Language | null;
+    if (stored && ['fa', 'en', 'kr'].includes(stored)) {
+      document.documentElement.lang = stored;
+      document.documentElement.dir = stored === 'fa' ? 'rtl' : 'ltr';
+      return stored;
+    }
+    return 'en';
+  });
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
@@ -23,13 +33,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
     }
   };
-
-  useEffect(() => {
-    const stored = localStorage.getItem('rumi-language') as Language | null;
-    if (stored && ['fa', 'en', 'kr'].includes(stored)) {
-      setLanguage(stored);
-    }
-  }, []);
 
   const value: I18nContextType = {
     language,

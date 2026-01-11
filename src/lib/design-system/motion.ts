@@ -5,7 +5,7 @@
  * Provides consistent, performant, and accessible animations.
  */
 
-import { Variants, Transition, TargetAndTransition } from 'framer-motion';
+import { Variants, Transition } from 'framer-motion';
 
 // =============================================================================
 // SPRING CONFIGURATIONS

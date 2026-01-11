@@ -3,10 +3,9 @@
 import { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
-import Link from 'next/link';
 import { ChatIcon, BooksIcon, LanguageIcon, InspirationIcon } from '@/components/ui/icons';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
-import { staggerContainer, staggerChild } from '@/lib/design-system/motion';
+// Removed unused imports: staggerContainer, staggerChild
 
 // =============================================================================
 // FEATURE DATA

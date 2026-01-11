@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 aboutProject/
+screenshots/
+generate-pdf.md
+Weekly_Progress_Report.html
+Weekly_Progress_Report.pdf

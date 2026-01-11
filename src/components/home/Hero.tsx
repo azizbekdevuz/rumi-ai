@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { ChevronRightIcon } from '@/components/ui/icons';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
-import { fadeUp, staggerChild, buttonHover } from '@/lib/design-system/motion';
+import { buttonHover } from '@/lib/design-system/motion';
 
 // =============================================================================
 // ANIMATED TEXT REVEAL
@@ -173,13 +173,15 @@ export default function Hero() {
           >
             {t.hero.quoteTranslation}
           </motion.p>
-          
-          {/* CTA Button - with hover/tap animations */}
-          <motion.div
-            variants={ctaVariants}
-            initial="hidden"
-            animate="visible"
-          >
+        </motion.div>
+        
+        {/* CTA Button - centered separately */}
+        <motion.div
+          className="flex justify-center w-full"
+          variants={ctaVariants}
+          initial="hidden"
+          animate="visible"
+        >
             <motion.div
               variants={buttonHover}
               initial="rest"
@@ -214,11 +216,10 @@ export default function Hero() {
                   whileHover={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 />
-              </Link>
+          </Link>
             </motion.div>
-          </motion.div>
         </motion.div>
-      </div>
+        </div>
 
       {/* Decorative floating elements */}
       {!prefersReducedMotion && (
@@ -262,7 +263,7 @@ export default function Hero() {
               delay: 2,
             }}
           />
-        </div>
+      </div>
       )}
     </section>
   );
