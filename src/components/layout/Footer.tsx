@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
-import { useTheme } from '@/lib/theme/theme-context';
-import { Language } from '@/lib/i18n/translations';
 import { RumiLogo } from '@/components/ui/icons';
 import { Heart, Github, Twitter, Mail } from 'lucide-react';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
@@ -71,46 +69,38 @@ function FooterLink({ href, children, external }: FooterLinkProps) {
 }
 
 // =============================================================================
-// ANIMATED BUTTON GROUP
+// ANIMATED BUTTON GROUP (Removed - unused)
 // =============================================================================
 
-interface ButtonGroupProps {
-  items: Array<{ key: string; label: string; isActive: boolean; onClick: () => void }>;
-  ariaLabel: string;
-}
-
-function AnimatedButtonGroup({ items, ariaLabel }: ButtonGroupProps) {
-  const prefersReducedMotion = useReducedMotion();
+// function _AnimatedButtonGroup({ items, ariaLabel }: ButtonGroupProps) {
+//   const prefersReducedMotion = useReducedMotion();
   
-  return (
-    <div className="footer-language" role="group" aria-label={ariaLabel}>
-      {items.map((item) => (
-        <motion.button
-          key={item.key}
-          onClick={item.onClick}
-          className={`footer-lang-btn ${item.isActive ? 'active' : ''}`}
-          aria-pressed={item.isActive}
-          whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
-          whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
-          transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
-        >
-          {item.label}
-        </motion.button>
-      ))}
-    </div>
-  );
-}
+//   return (
+//     <div className="footer-language" role="group" aria-label={ariaLabel}>
+//       {items.map((item) => (
+//         <motion.button
+//           key={item.key}
+//           onClick={item.onClick}
+//           className={`footer-lang-btn ${item.isActive ? 'active' : ''}`}
+//           aria-pressed={item.isActive}
+//           whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+//           whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
+//           transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
+//         >
+//           {item.label}
+//         </motion.button>
+//       ))}
+//     </div>
+//   );
+// }
 
 // =============================================================================
 // MAIN FOOTER
 // =============================================================================
 
 export default function Footer() {
-  const { language, setLanguage, t } = useI18n();
-  const { theme, toggleTheme } = useTheme();
+  const { language, t } = useI18n();
   const prefersReducedMotion = useReducedMotion();
-
-  const languages: Language[] = ['fa', 'en', 'kr'];
 
   const content = {
     en: {
