@@ -54,7 +54,7 @@ function AnimatedLanguageSwitch({ languages, currentLang, onSelect }: LanguageSw
   const prefersReducedMotion = useReducedMotion();
   
   return (
-    <div className="language-switch" role="group" aria-label="Language selection">
+    <>
       {languages.map((lang) => (
         <motion.button
           key={lang}
@@ -69,7 +69,7 @@ function AnimatedLanguageSwitch({ languages, currentLang, onSelect }: LanguageSw
           {lang.toUpperCase()}
         </motion.button>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -185,7 +185,7 @@ function MobileMenu({
           animate="open"
           exit="closed"
         >
-          {links.map((link, index) => (
+          {links.map((link) => (
             <motion.div key={link.href} variants={itemVariants}>
               <Link href={link.href} className="mobile-nav-link" onClick={onClose}>
                 {link.label}
@@ -402,15 +402,15 @@ export default function Navbar() {
               <span className="hidden lg:inline">{feedbackLabel[language] || feedbackLabel.en}</span>
             </motion.button>
 
-            {/* Language Switch */}
-            <AnimatedLanguageSwitch
-              languages={languages}
-              currentLang={language}
-              onSelect={setLanguage}
-            />
-
-            {/* Theme Toggle */}
-            <AnimatedThemeToggle theme={theme} onToggle={toggleTheme} />
+            {/* Language Switch + Theme Toggle (unified pill) */}
+            <div className="language-switch">
+              <AnimatedLanguageSwitch
+                languages={languages}
+                currentLang={language}
+                onSelect={setLanguage}
+              />
+              <AnimatedThemeToggle theme={theme} onToggle={toggleTheme} />
+            </div>
 
             {/* Auth Button */}
             {isAuthenticated ? (
