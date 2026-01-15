@@ -16,6 +16,7 @@ import { motion as motionTokens } from '@/lib/design-system/motion';
 import { useReducedMotion } from '@/lib/hooks';
 
 export default function AboutPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t, language, dir } = useI18n();
   const direction = dir;
   const reducedMotion = useReducedMotion();
@@ -153,7 +154,6 @@ export default function AboutPage() {
 
   const fadeUpVariants = reducedMotion ? motionTokens.variants.reducedMotion : motionTokens.variants.fadeUp;
   const staggerVariants = reducedMotion ? motionTokens.variants.reducedMotion : motionTokens.variants.staggerContainer;
-  const cardVariants = reducedMotion ? motionTokens.variants.reducedMotion : motionTokens.variants.cardHover;
 
   return (
     <main className="about-page" dir={direction}>
@@ -326,7 +326,7 @@ export default function AboutPage() {
               variants={fadeUpVariants}
               transition={{ delay: 0.2 }}
             >
-              "{c.quote.text}"
+              &ldquo;{c.quote.text}&rdquo;
             </motion.blockquote>
             <motion.cite 
               className="text-xl font-medium not-italic block"
