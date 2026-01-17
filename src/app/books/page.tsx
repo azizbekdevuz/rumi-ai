@@ -6,7 +6,7 @@ import { books, searchBooks, Book } from '@/lib/data/books';
 import Link from 'next/link';
 
 export default function BooksPage() {
-  const { t, language } = useI18n();
+  const { language } = useI18n();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBook, setSelectedBook] = useState<string>('all');
   const [results, setResults] = useState<Book[]>(books);
@@ -111,7 +111,7 @@ export default function BooksPage() {
         {/* Search Results Info */}
         {searchQuery && (
           <div className="search-info">
-            Showing {results.length} result{results.length !== 1 ? 's' : ''} for "{searchQuery}"
+            Showing {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{searchQuery}&rdquo;
           </div>
         )}
       </div>
