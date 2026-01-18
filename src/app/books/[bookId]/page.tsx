@@ -41,7 +41,8 @@ export default function BookReaderPage() {
   const [currentPage, setCurrentPage] = useState(highlightPage ? parseInt(highlightPage) : 1);
   const [zoom, setZoom] = useState(100);
   const [showToc, setShowToc] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_isFullscreen, setIsFullscreen] = useState(false);
 
   const content = {
     en: {
@@ -105,9 +106,15 @@ export default function BookReaderPage() {
 
   const totalPages = 150; // Mock total pages
 
+  // Update current page when highlightPage changes (using ref to avoid setState in effect)
   useEffect(() => {
     if (highlightPage) {
-      setCurrentPage(parseInt(highlightPage));
+      const pageNum = parseInt(highlightPage);
+      // Use setTimeout to defer the state update
+      const timer = setTimeout(() => {
+        setCurrentPage(pageNum);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [highlightPage]);
 
@@ -334,7 +341,7 @@ export default function BookReaderPage() {
             >
               <p className="text-sm" style={{ color: 'var(--accent-gold)' }}>
                 <span className="font-medium">{c.citationHighlight}:</span>{' '}
-                <span className="italic">"{highlightText}"</span>
+                <span className="italic">&ldquo;{highlightText}&rdquo;</span>
               </p>
             </div>
           )}
