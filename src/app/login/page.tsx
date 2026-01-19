@@ -10,6 +10,7 @@ import { motion as motionTokens } from '@/lib/design-system/motion';
 import { useReducedMotion } from '@/lib/hooks';
 
 export default function LoginPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t, language, dir } = useI18n();
   const direction = dir;
   const router = useRouter();
