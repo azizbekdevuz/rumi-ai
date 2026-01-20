@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function ProfilePage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t, language, dir, setLanguage } = useI18n();
   const direction = dir;
   const { theme, toggleTheme } = useTheme();
