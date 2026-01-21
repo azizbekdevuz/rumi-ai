@@ -7,6 +7,7 @@ import { useI18n } from '@/lib/i18n/i18n-context';
 import { Mail, Lock, Eye, EyeOff, Feather, ArrowRight, ArrowLeft, User } from 'lucide-react';
 
 export default function SignupPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t, language, dir } = useI18n();
   const direction = dir;
   const router = useRouter();
