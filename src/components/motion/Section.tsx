@@ -3,7 +3,7 @@
 import { forwardRef, HTMLAttributes, ReactNode } from 'react';
 import { motion, Variants } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
-import { tweens, easings } from '@/lib/design-system/motion';
+import { easings } from '@/lib/design-system/motion';
 
 // =============================================================================
 // TYPES
