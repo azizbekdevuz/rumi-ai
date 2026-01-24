@@ -33,7 +33,23 @@ export default function Background() {
 
   return (
     <div ref={containerRef} className="background-wrapper" aria-hidden="true">
-      {/* Base gradient layer */}
+      {/* Watercolor texture base - fixed background image */}
+      <div className="bg-image-layer" />
+      
+      {/* Animated gradient overlay for motion and depth */}
+      <motion.div 
+        className="bg-gradient-overlay"
+        animate={prefersReducedMotion ? undefined : {
+          opacity: [0.85, 0.92, 0.85],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+      
+      {/* Additional gradient base layer */}
       <div className="bg-gradient-base" />
       
       {/* Clouds / mist effect - slowest parallax */}
