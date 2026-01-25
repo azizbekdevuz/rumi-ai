@@ -47,8 +47,7 @@ const baseStyles = `
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: `
-    bg-[var(--accent-teal)] text-white
-    hover:bg-[var(--accent-teal-dark)]
+    text-white
     focus-visible:ring-[var(--accent-teal)]
   `,
   secondary: `
@@ -63,7 +62,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     focus-visible:ring-[var(--accent-teal)]
   `,
   gold: `
-    text-white
+    text-[#3d2817]
     focus-visible:ring-[var(--accent-gold)]
   `,
   outline: `
@@ -114,21 +113,32 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       tap: { scale: prefersReducedMotion ? 1 : 0.98 },
     };
 
-    // Special styles for gold variant (gradient)
-    const goldGradientStyle = variant === 'gold' ? {
-      background: 'linear-gradient(135deg, #E8C15D 0%, #D4A84B 50%, #C49539 100%)',
-    } : {};
-
-    // Shadow styles
-    const getShadowStyle = () => {
+    // Special styles for gradient variants - 3D realistic appearance
+    const getVariantStyle = () => {
       if (variant === 'primary') {
         return {
-          boxShadow: '0 4px 14px rgba(27, 123, 107, 0.25)',
+          background: 'linear-gradient(180deg, #248f8f 0%, #1B7B6B 50%, #156358 100%)',
+          boxShadow: `
+            0 1px 0 rgba(255, 255, 255, 0.2) inset,
+            0 2px 4px rgba(0, 0, 0, 0.15),
+            0 6px 12px rgba(27, 123, 107, 0.3),
+            0 12px 24px rgba(27, 123, 107, 0.2)
+          `,
+          border: '1px solid rgba(21, 99, 88, 0.8)',
         };
       }
       if (variant === 'gold') {
         return {
-          boxShadow: '0 4px 14px rgba(212, 168, 75, 0.35)',
+          background: 'linear-gradient(180deg, #E8C15D 0%, #D4A84B 50%, #B8923D 100%)',
+          boxShadow: `
+            0 1px 0 rgba(255, 255, 255, 0.4) inset,
+            0 0 0 2px rgba(184, 146, 61, 0.5),
+            0 3px 6px rgba(0, 0, 0, 0.2),
+            0 8px 16px rgba(201, 146, 44, 0.4),
+            0 16px 32px rgba(201, 146, 44, 0.3)
+          `,
+          border: '1px solid rgba(184, 146, 61, 0.8)',
+          textShadow: '0 1px 0 rgba(255, 255, 255, 0.3)',
         };
       }
       return {};
@@ -145,10 +155,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           ${widthClass}
           ${className}
         `.replace(/\s+/g, ' ').trim()}
-        style={{
-          ...goldGradientStyle,
-          ...getShadowStyle(),
-        }}
+        style={getVariantStyle()}
         variants={motionVariants}
         initial="rest"
         whileHover="hover"
@@ -157,14 +164,26 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || isLoading}
         {...(props as HTMLMotionProps<'button'>)}
       >
-        {/* Glow effect overlay for primary/gold */}
+        {/* Glossy top highlight for 3D effect */}
+        {(variant === 'primary' || variant === 'gold') && (
+          <span
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%)',
+              borderRadius: 'inherit',
+            }}
+          />
+        )}
+        
+        {/* Glow effect overlay on hover */}
         {(variant === 'primary' || variant === 'gold') && (
           <motion.span
-            className="absolute inset-0 opacity-0"
+            className="absolute inset-0 opacity-0 pointer-events-none"
             style={{
               background: variant === 'gold' 
                 ? 'radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%)'
                 : 'radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, transparent 70%)',
+              borderRadius: 'inherit',
             }}
             variants={{
               rest: { opacity: 0 },
