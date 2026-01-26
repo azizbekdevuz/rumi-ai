@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Language } from '@/lib/i18n/translations';
-import { suggestedPrompts, getPromptsForCountryAndLanguage } from '@/lib/data/suggested-prompts';
+import { getPromptsForCountryAndLanguage } from '@/lib/data/suggested-prompts';
 import { Country } from '@/types/chat';
 
 interface SuggestedPromptsProps {
