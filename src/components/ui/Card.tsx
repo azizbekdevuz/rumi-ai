@@ -70,6 +70,20 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       children,
       interactive = true,
       glowColor = 'var(--accent-teal)',
+      // Exclude animation props that conflict with motion.div
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onAnimationStart: _onAnimationStart,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onAnimationEnd: _onAnimationEnd,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onAnimationIteration: _onAnimationIteration,
+      // Exclude drag props that conflict with motion.div
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onDrag: _onDrag,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onDragStart: _onDragStart,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onDragEnd: _onDragEnd,
       ...props
     },
     ref
