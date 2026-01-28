@@ -108,7 +108,7 @@ export default function ChatMessage({
             animate="animate"
             transition={{ delay: 0.1, ...motionTokens.transitionPresets.reveal }}
           >
-            <h4 id={`verse-label-${message.id}`} className="verse-label">Rumi's Verse</h4>
+            <h4 id={`verse-label-${message.id}`} className="verse-label">Rumi&apos;s Verse</h4>
             <p className="verse-text-fa" lang="fa" dir="rtl">
               {assistantMessage.verse.fa}
             </p>
