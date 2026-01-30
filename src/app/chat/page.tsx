@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { ChatMessage as ChatMessageType, AssistantMessage, SourceScope, Citation } from '../../types/chat';
-import ChatMessage from '@/features/chat/components/ChatMessage';
 import CitationModal from '@/features/chat/components/CitationModal';
 import ReportModal from '@/features/chat/components/ReportModal';
 import SuggestedPrompts from '@/features/chat/components/SuggestedPrompts';
-import { RumiLogo, SendIcon, LoaderIcon } from '@/components/ui/icons';
+import ChatPageShell from '@/features/chat/components/ChatPageShell';
+import ChatPanel from '@/features/chat/components/ChatPanel';
+import ChatHeader from '@/features/chat/components/ChatHeader';
+import MessageList from '@/features/chat/components/MessageList';
+import Composer from '@/features/chat/components/Composer';
+import UtilityBar from '@/features/chat/components/UtilityBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { motion as motionTokens } from '@/lib/design-system/motion';
 import { useReducedMotion } from '@/lib/hooks';
@@ -17,25 +21,12 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sourceScope, setSourceScope] = useState<SourceScope>('books');
+  const [citeEnabled, setCiteEnabled] = useState(true);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
   const [reportMessageId, setReportMessageId] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Auto-focus input on page load
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  const reducedMotion = useReducedMotion();
 
   const simulateStreaming = async (response: ChatMessageType): Promise<AssistantMessage> => {
     return new Promise((resolve) => {
@@ -88,7 +79,6 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Failed to send message:', error);
-      // Add error message
       setMessages((prev) => [
         ...prev,
         {
@@ -104,38 +94,16 @@ export default function ChatPage() {
       ]);
     } finally {
       setIsLoading(false);
-      inputRef.current?.focus();
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
     }
   };
 
   const handlePromptClick = (prompt: string) => {
     setInput(prompt);
-    inputRef.current?.focus();
   };
 
-  const handleFeedback = (messageId: string, type: 'up' | 'down') => {
-    console.log(`Feedback for ${messageId}: ${type}`);
-    // TODO: Send feedback to backend
+  const handleReport = () => {
+    setReportMessageId('current');
   };
-
-  const handleReport = (messageId: string) => {
-    setReportMessageId(messageId);
-  };
-
-  const reducedMotion = useReducedMotion();
-
-  const scopeOptions: { value: SourceScope; label: string }[] = [
-    { value: 'books', label: t.chat?.scopeBooks || 'My Sources Only' },
-    { value: 'web_books', label: t.chat?.scopeWebBooks || 'Web + Books' },
-    { value: 'web', label: t.chat?.scopeWeb || 'Web Only' },
-  ];
 
   const emptyStateVariants = reducedMotion
     ? motionTokens.variants.reducedMotion
@@ -145,60 +113,16 @@ export default function ChatPage() {
         exit: { opacity: 0, y: -20 },
       };
 
-  const loadingVariants = reducedMotion
-    ? motionTokens.variants.reducedMotion
-    : {
-        initial: { opacity: 0, scale: 0.95 },
-        animate: { opacity: 1, scale: 1 },
-        exit: { opacity: 0, scale: 0.95 },
-      };
-
   return (
-    <div className="chat-page">
-      <a href="#chat-input" className="skip-link" style={{ left: '140px' }}>
-        Skip to chat input
-      </a>
+    <ChatPageShell>
+      <div className="chat-page-container">
+        <ChatPanel>
+          <ChatHeader citeEnabled={citeEnabled} onCiteToggle={setCiteEnabled} />
 
-      <div className="chat-container" ref={chatContainerRef}>
-        {/* Source Scope Toggle */}
-        <motion.div 
-          className="chat-controls"
-          initial={reducedMotion ? {} : { opacity: 0, y: -10 }}
-          animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, ...motionTokens.transitionPresets.reveal }}
-        >
-          <div className="source-scope-toggle" role="radiogroup" aria-label="Source selection">
-            {scopeOptions.map((option, index) => (
-              <motion.button
-                key={option.value}
-                className={`scope-btn ${sourceScope === option.value ? 'active' : ''}`}
-                onClick={() => setSourceScope(option.value)}
-                role="radio"
-                aria-checked={sourceScope === option.value}
-                whileHover={reducedMotion ? {} : { scale: 1.02 }}
-                whileTap={reducedMotion ? {} : { scale: 0.98 }}
-                initial={reducedMotion ? {} : { opacity: 0, y: -5 }}
-                animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + index * 0.05 }}
-              >
-                {option.label}
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Chat Messages */}
-        <div 
-          className="chat-messages" 
-          role="log" 
-          aria-label="Chat conversation"
-          aria-live="polite"
-          aria-relevant="additions"
-        >
           <AnimatePresence mode="wait">
-            {messages.length === 0 && (
-              <motion.div 
-                className="chat-empty"
+            {messages.length === 0 ? (
+              <motion.div
+                className="chat-empty-state"
                 key="empty-state"
                 variants={emptyStateVariants}
                 initial="initial"
@@ -206,24 +130,39 @@ export default function ChatPage() {
                 exit="exit"
                 transition={motionTokens.transitionPresets.reveal}
               >
-                <motion.div 
-                  className="empty-icon"
+                <motion.div
+                  className="chat-empty-icon"
                   initial={reducedMotion ? {} : { scale: 0, rotate: -180 }}
                   animate={reducedMotion ? {} : { scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
                 >
-                  <RumiLogo />
+                  <svg
+                    width="80"
+                    height="80"
+                    viewBox="0 0 48 48"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2" opacity="0.3" />
+                    <path
+                      d="M24 8C24 8 18 14 18 20C18 26 24 30 24 30C24 30 30 26 30 20C30 14 24 8 24 8Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </motion.div>
-                <motion.h2 
-                  className="empty-title"
+                <motion.h2
+                  className="chat-empty-title"
                   initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
                   animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
                   {t.chat?.emptyTitle || 'Ask Rumi for Guidance'}
                 </motion.h2>
-                <motion.p 
-                  className="empty-text"
+                <motion.p
+                  className="chat-empty-text"
                   initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
                   animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -238,119 +177,47 @@ export default function ChatPage() {
                   <SuggestedPrompts language={language} onPromptClick={handlePromptClick} />
                 </motion.div>
               </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {messages.map((message) => (
-              <ChatMessage
-                key={message.id}
-                message={message}
+            ) : (
+              <MessageList
+                key="message-list"
+                messages={messages}
+                citeEnabled={citeEnabled}
+                isLoading={isLoading}
                 onCitationClick={setSelectedCitation}
-                onFeedback={handleFeedback}
-                onReport={handleReport}
+                language={language}
               />
-            ))}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {isLoading && (
-              <motion.div 
-                className="chat-message assistant-message" 
-                aria-label="Rumi is thinking"
-                key="loading-indicator"
-                variants={loadingVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              >
-                <motion.div 
-                  className="message-avatar"
-                  animate={reducedMotion ? {} : { rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  <RumiLogo />
-                </motion.div>
-                <div className="message-content">
-                  <div className="typing-indicator" role="status" aria-label="Loading response">
-                    <motion.span
-                      animate={{ y: [0, -8, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-                    />
-                    <motion.span
-                      animate={{ y: [0, -8, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }}
-                    />
-                    <motion.span
-                      animate={{ y: [0, -8, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }}
-                    />
-                  </div>
-                </div>
-              </motion.div>
             )}
           </AnimatePresence>
 
-          <div ref={messagesEndRef} />
-        </div>
+          <Composer
+            value={input}
+            onChange={setInput}
+            onSend={handleSend}
+            isLoading={isLoading}
+            placeholder={t.chat?.inputPlaceholder || "I'm struggling with letting go of someone I love."}
+          />
 
-        {/* Input Area */}
-        <motion.div 
-          className="chat-input-container" 
-          id="chat-input"
-          initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
-          animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, ...motionTokens.transitionPresets.reveal }}
-        >
-          <div className="chat-input-wrapper">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={t.chat?.inputPlaceholder || 'Describe your struggle or ask a question...'}
-              className="chat-input"
-              rows={2}
-              aria-label="Chat message input"
-              disabled={isLoading}
-            />
-            <motion.button
-              onClick={handleSend}
-              className="send-button"
-              disabled={!input.trim() || isLoading}
-              aria-label="Send message"
-              whileHover={reducedMotion || !input.trim() || isLoading ? {} : { scale: 1.05 }}
-              whileTap={reducedMotion || !input.trim() || isLoading ? {} : { scale: 0.95 }}
-            >
-              {isLoading ? (
-                <motion.span
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  style={{ display: 'flex' }}
-                >
-                  <LoaderIcon />
-                </motion.span>
-              ) : (
-                <motion.span
-                  initial={false}
-                  animate={input.trim() ? { x: 2 } : { x: 0 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  style={{ display: 'flex' }}
-                >
-                  <SendIcon />
-                </motion.span>
-              )}
-            </motion.button>
-          </div>
-        </motion.div>
+          <UtilityBar
+            onSend={handleSend}
+            onReport={handleReport}
+            canSend={!!input.trim() && !isLoading}
+          />
+        </ChatPanel>
+
+        {/* Footer */}
+        <footer className="chat-page-footer">
+          <a href="/privacy" className="chat-footer-link">
+            Privacy Policy
+          </a>
+          <span className="chat-footer-separator">|</span>
+          <a href="/contact" className="chat-footer-link">
+            Contact Us
+          </a>
+        </footer>
       </div>
 
       {/* Citation Modal */}
-      <CitationModal 
-        citation={selectedCitation} 
-        onClose={() => setSelectedCitation(null)} 
-      />
+      <CitationModal citation={selectedCitation} onClose={() => setSelectedCitation(null)} />
 
       {/* Report Modal */}
       <ReportModal
@@ -358,13 +225,6 @@ export default function ChatPage() {
         onClose={() => setReportMessageId(null)}
         messageId={reportMessageId || undefined}
       />
-
-      <style jsx>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
+    </ChatPageShell>
   );
 }
