@@ -13,7 +13,7 @@ interface ReportModalProps {
 type ReportCategory = 'incorrect' | 'offensive' | 'ocr_error' | 'other';
 
 export default function ReportModal({ isOpen, onClose, messageId }: ReportModalProps) {
-  const { language, dir } = useI18n();
+  const { dir } = useI18n();
   const direction = dir;
   const [category, setCategory] = useState<ReportCategory>('incorrect');
   const [description, setDescription] = useState('');
