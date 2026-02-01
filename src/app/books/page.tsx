@@ -1,120 +1,124 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useI18n } from '@/lib/i18n/i18n-context';
-import { books, searchBooks, Book } from '@/lib/data/books';
+import { books, searchBooks } from '@/lib/data/books';
+import { sampleVerses } from '@/lib/data/verses';
+import BooksPageShell from '@/features/books/components/BooksPageShell';
+import BooksPanel from '@/features/books/components/BooksPanel';
+import BooksSearchBar from '@/features/books/components/BooksSearchBar';
+import ThemeDropdown, { Theme } from '@/features/books/components/ThemeDropdown';
+import BooksTabs, { BookTab } from '@/features/books/components/BooksTabs';
+import BookCard from '@/features/books/components/BookCard';
+import VerseCarousel from '@/features/books/components/VerseCarousel';
 import Link from 'next/link';
 
 export default function BooksPage() {
   const { language } = useI18n();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBook, setSelectedBook] = useState<string>('all');
-  const [results, setResults] = useState<Book[]>(books);
+  const [activeTab, setActiveTab] = useState<BookTab>('all');
+  const [selectedTheme, setSelectedTheme] = useState<Theme>('all');
 
-  const handleSearch = (query: string, bookFilter: string) => {
-    setSearchQuery(query);
-    setSelectedBook(bookFilter);
+  // Filter books based on tab
+  const filteredBooks = useMemo(() => {
+    let result = books;
 
-    if (!query.trim() && bookFilter === 'all') {
-      setResults(books);
-    } else {
-      setResults(searchBooks(query, bookFilter === 'all' ? undefined : bookFilter));
+    // Filter by tab
+    if (activeTab !== 'all') {
+      const tabIdMap: Record<BookTab, string> = {
+        'all': 'all',
+        'masnavi': 'masnavi',
+        'divan-e-shams': 'divan-e-shams',
+        'fihi-ma-fihi': 'fihi-ma-fihi',
+      };
+      result = result.filter((book) => book.id === tabIdMap[activeTab]);
     }
-  };
 
-  const getLocalizedTitle = (book: Book) => {
-    if (language === 'fa') return book.titleFa;
-    if (language === 'kr') return book.titleKr;
-    return book.title;
-  };
+    // Filter by search query
+    if (searchQuery.trim()) {
+      result = searchBooks(searchQuery, activeTab === 'all' ? undefined : activeTab);
+    }
 
-  const getLocalizedDescription = (book: Book) => {
-    if (language === 'fa') return book.descriptionFa;
-    if (language === 'kr') return book.descriptionKr;
-    return book.description;
-  };
+    return result;
+  }, [activeTab, searchQuery]);
+
+  // Filter verses based on search and theme (for carousel)
+  const filteredVerses = useMemo(() => {
+    let result = sampleVerses;
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const lowerQuery = searchQuery.toLowerCase();
+      result = result.filter(
+        (verse) =>
+          verse.fa.includes(searchQuery) ||
+          verse.en.toLowerCase().includes(lowerQuery) ||
+          verse.book.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    // Theme filtering (simplified - in real app would use verse metadata)
+    // For now, just return all verses if theme is 'all', otherwise filter by book
+    if (selectedTheme !== 'all') {
+      // This is a placeholder - real implementation would use verse theme tags
+      result = result;
+    }
+
+    return result;
+  }, [searchQuery, selectedTheme]);
 
   return (
-    <div className="books-page">
-      <div className="books-container">
-        <header className="books-header">
-          <h1 className="books-title">Library</h1>
-          <p className="books-subtitle">Explore the works of Rumi</p>
-        </header>
-
-        {/* Search Section */}
-        <div className="books-search">
-          <div className="search-input-wrapper">
-            <input
-              type="text"
-              placeholder="Search books, topics, or keywords..."
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value, selectedBook)}
-              className="search-input"
-              aria-label="Search books"
-            />
-            <span className="search-icon">🔍</span>
-          </div>
-
-          <div className="book-filter">
-            <label htmlFor="book-select" className="filter-label">
-              Filter by book:
-            </label>
-            <select
-              id="book-select"
-              value={selectedBook}
-              onChange={(e) => handleSearch(searchQuery, e.target.value)}
-              className="book-select"
-            >
-              <option value="all">All Books</option>
-              {books.map((book) => (
-                <option key={book.id} value={book.id}>
-                  {getLocalizedTitle(book)}
-                </option>
-              ))}
-            </select>
-          </div>
+    <BooksPageShell>
+      <BooksPanel>
+        {/* Search + Filters Row */}
+        <div className="books-controls-row">
+          <BooksSearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search Rumi's poetry…"
+          />
+          <ThemeDropdown
+            selectedTheme={selectedTheme}
+            onThemeChange={setSelectedTheme}
+          />
         </div>
 
-        {/* Results */}
-        <div className="books-results">
-          {results.length === 0 ? (
-            <div className="books-empty">
-              <div className="empty-icon">📚</div>
-              <h3 className="empty-title">No books found</h3>
-              <p className="empty-text">Try adjusting your search or filter.</p>
+        {/* Tabs Row */}
+        <BooksTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* Book Card Grid */}
+        <div className="books-grid-container">
+          {filteredBooks.length === 0 ? (
+            <div className="books-empty-state">
+              <div className="books-empty-icon">📚</div>
+              <h3 className="books-empty-title">No books found</h3>
+              <p className="books-empty-text">Try adjusting your search or filter.</p>
             </div>
           ) : (
             <div className="books-grid">
-              {results.map((book) => (
-                <Link
-                  key={book.id}
-                  href={`/books/${book.id}`}
-                  className="book-card"
-                >
-                  <div className="book-icon">{book.icon}</div>
-                  <div className="book-info">
-                    <h3 className="book-card-title">{getLocalizedTitle(book)}</h3>
-                    <p className="book-author">{book.author}</p>
-                    <p className="book-description">{getLocalizedDescription(book)}</p>
-                    <div className="book-meta">
-                      <span className="book-category">{book.category}</span>
-                      <span className="book-pages">{book.pages} pages</span>
-                    </div>
-                  </div>
-                </Link>
+              {filteredBooks.map((book) => (
+                <BookCard key={book.id} book={book} language={language} />
               ))}
             </div>
           )}
         </div>
 
-        {/* Search Results Info */}
-        {searchQuery && (
-          <div className="search-info">
-            Showing {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{searchQuery}&rdquo;
-          </div>
+        {/* Timeless Poetry Section */}
+        {filteredVerses.length > 0 && (
+          <VerseCarousel verses={filteredVerses} language={language} />
         )}
-      </div>
-    </div>
+
+        {/* Footer Links */}
+        <div className="books-footer-links">
+          <Link href="/privacy" className="books-footer-link">
+            Privacy Policy
+          </Link>
+          <span className="books-footer-separator">|</span>
+          <Link href="/contact" className="books-footer-link">
+            Contact Us
+          </Link>
+        </div>
+      </BooksPanel>
+    </BooksPageShell>
   );
 }

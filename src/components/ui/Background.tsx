@@ -1,38 +1,19 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
 
 /**
  * Background component that creates an atmospheric Persian-inspired backdrop
- * with mosque silhouettes, subtle patterns, warm earthy gradients,
- * and premium parallax effects on scroll.
+ * with mosque silhouettes, subtle patterns, warm earthy gradients.
+ * Optimized: Removed scroll-based parallax for better performance.
+ * Visual appearance maintained with CSS-only animations.
  */
 export default function Background() {
   const prefersReducedMotion = useReducedMotion();
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  const { scrollYProgress } = useScroll();
-  
-  // Create smooth parallax transforms at different speeds
-  const cloudsY = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, -50]),
-    { stiffness: 100, damping: 30 }
-  );
-  
-  const birdsY = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, -80]),
-    { stiffness: 100, damping: 30 }
-  );
-  
-  const mosquesY = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, -30]),
-    { stiffness: 100, damping: 30 }
-  );
 
   return (
-    <div ref={containerRef} className="background-wrapper" aria-hidden="true">
+    <div className="background-wrapper" aria-hidden="true">
       {/* Watercolor texture base - fixed background image */}
       <div className="bg-image-layer" />
       
@@ -52,11 +33,8 @@ export default function Background() {
       {/* Additional gradient base layer */}
       <div className="bg-gradient-base" />
       
-      {/* Clouds / mist effect - slowest parallax */}
-      <motion.div 
-        className="bg-clouds"
-        style={{ y: prefersReducedMotion ? 0 : cloudsY }}
-      >
+      {/* Clouds / mist effect - CSS-only subtle movement */}
+      <div className="bg-clouds">
         <motion.div 
           className="cloud cloud-1"
           animate={prefersReducedMotion ? undefined : {
@@ -90,14 +68,13 @@ export default function Background() {
             ease: 'linear',
           }}
         />
-      </motion.div>
+      </div>
 
-      {/* Floating birds with parallax - medium speed */}
-      <motion.svg
+      {/* Floating birds - CSS-only subtle movement */}
+      <svg
         className="bg-birds"
         viewBox="0 0 200 100"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ y: prefersReducedMotion ? 0 : birdsY }}
       >
         <motion.g
           animate={prefersReducedMotion ? undefined : {
@@ -116,16 +93,15 @@ export default function Background() {
           <path d="M140 35 Q145 30 150 35 Q155 30 160 35" stroke="currentColor" strokeWidth="1.5" fill="none" />
           <path d="M170 50 Q175 45 180 50 Q185 45 190 50" stroke="currentColor" strokeWidth="1.5" fill="none" />
         </motion.g>
-      </motion.svg>
+      </svg>
 
-      {/* Architectural silhouette - left side - subtle parallax */}
-      <motion.svg
+      {/* Architectural silhouette - left side */}
+      <svg
         className="bg-architecture bg-architecture-left"
         viewBox="0 0 400 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="xMinYMax slice"
-        style={{ y: prefersReducedMotion ? 0 : mosquesY }}
       >
         {/* Mosque dome */}
         <path
@@ -150,16 +126,15 @@ export default function Background() {
         <ellipse cx="280" cy="150" rx="8" ry="6" fill="currentColor" />
         {/* Additional building */}
         <path d="M320 300V260L340 240L360 260V300" fill="currentColor" />
-      </motion.svg>
+      </svg>
 
       {/* Architectural silhouette - right side */}
-      <motion.svg
+      <svg
         className="bg-architecture bg-architecture-right"
         viewBox="0 0 400 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="xMaxYMax slice"
-        style={{ y: prefersReducedMotion ? 0 : mosquesY }}
       >
         {/* Main dome */}
         <path
@@ -175,7 +150,7 @@ export default function Background() {
         <ellipse cx="120" cy="170" rx="8" ry="6" fill="currentColor" />
         {/* Golden dome accent */}
         <ellipse cx="300" cy="90" rx="25" ry="18" fill="currentColor" className="golden-dome" />
-      </motion.svg>
+      </svg>
 
       {/* Subtle geometric pattern overlay */}
       <div className="bg-pattern" />
