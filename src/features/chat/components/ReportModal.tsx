@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { CloseIcon } from '@/components/ui/icons';
+import { useState, useEffect, useRef } from 'react';
+import { useI18n } from '@/lib/i18n/i18n-context';
+import { X } from 'lucide-react';
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -12,49 +13,37 @@ interface ReportModalProps {
 type ReportCategory = 'incorrect' | 'offensive' | 'ocr_error' | 'other';
 
 export default function ReportModal({ isOpen, onClose, messageId }: ReportModalProps) {
+  const { language, dir } = useI18n();
+  const direction = dir;
   const [category, setCategory] = useState<ReportCategory>('incorrect');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const firstFocusableRef = useRef<HTMLButtonElement>(null);
 
-  // Focus trap and keyboard handling
+  // Focus trap
   useEffect(() => {
     if (isOpen) {
-      closeButtonRef.current?.focus();
-      
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          onClose();
-        }
-        
-        // Focus trap
-        if (e.key === 'Tab' && modalRef.current) {
-          const focusableElements = modalRef.current.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-          );
-          const firstElement = focusableElements[0] as HTMLElement;
-          const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-          if (e.shiftKey && document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement?.focus();
-          } else if (!e.shiftKey && document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement?.focus();
-          }
-        }
-      };
-
-      document.addEventListener('keydown', handleKeyDown);
+      firstFocusableRef.current?.focus();
       document.body.style.overflow = 'hidden';
-
-      return () => {
-        document.removeEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = '';
-      };
+    } else {
+      document.body.style.overflow = '';
     }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // Escape key handler
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,16 +62,20 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
 
       setSubmitted(true);
       setTimeout(() => {
-        onClose();
-        setSubmitted(false);
-        setCategory('incorrect');
-        setDescription('');
+        handleClose();
       }, 2000);
     } catch (error) {
       console.error('Failed to submit report:', error);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleClose = () => {
+    setSubmitted(false);
+    setDescription('');
+    setCategory('incorrect');
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -95,56 +88,76 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
   ];
 
   return (
-    <div 
-      className="modal-overlay" 
+    <div
+      className="modal-overlay"
+      dir={direction}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) handleClose();
       }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="report-modal-title"
     >
-      <div 
+      <div
         ref={modalRef}
-        className="modal-content" 
-        onClick={(e) => e.stopPropagation()}
+        className="modal-content"
         style={{ animationName: 'modal-slide-up', animationDuration: '200ms' }}
       >
+        {/* Header */}
         <div className="modal-header">
-          <h3 id="report-modal-title" className="modal-title">
-            Report Issue
-          </h3>
-          <button 
-            ref={closeButtonRef}
-            className="modal-close" 
-            onClick={onClose} 
-            aria-label="Close modal"
+          <div>
+            <h2
+              id="report-modal-title"
+              className="modal-title"
+            >
+              Report Issue
+            </h2>
+          </div>
+          <button
+            ref={firstFocusableRef}
+            onClick={handleClose}
+            className="modal-close"
+            aria-label="Close"
           >
-            <CloseIcon />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
+        {/* Content */}
         <div className="modal-body">
           {submitted ? (
-            <div style={{ textAlign: 'center', padding: '24px' }}>
+            <div className="text-center py-10">
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>✓</div>
-              <p style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
+              <h3 
+                className="text-2xl font-serif font-bold mb-4"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 Thank you for your feedback!
-              </p>
-              <p style={{ color: 'var(--text-secondary)' }}>
+              </h3>
+              <p 
+                className="mb-8 text-base leading-relaxed max-w-sm mx-auto"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 Your report helps us improve Rumi AI.
               </p>
+              <button
+                onClick={handleClose}
+                className="py-4 px-8 rounded-[var(--radius-lg)] font-semibold transition-all hover:shadow-lg"
+                style={{
+                  background: 'var(--gradient-teal)',
+                  color: 'var(--text-inverse)'
+                }}
+              >
+                Close
+              </button>
             </div>
           ) : (
-            <form className="feedback-form" onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="feedback-form">
+              {/* Issue Type */}
               <div>
                 <label 
-                  style={{ 
-                    display: 'block', 
-                    marginBottom: '8px',
-                    fontWeight: 500,
-                    fontSize: '14px',
-                  }}
+                  className="block text-sm font-semibold mb-3"
+                  style={{ color: 'var(--text-primary)' }}
                 >
                   What type of issue is this?
                 </label>
@@ -153,8 +166,13 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
                     <button
                       key={cat.value}
                       type="button"
-                      className={`category-btn ${category === cat.value ? 'active' : ''}`}
                       onClick={() => setCategory(cat.value)}
+                      className="category-btn"
+                      style={{
+                        borderColor: category === cat.value ? 'var(--accent-teal)' : 'var(--border-color)',
+                        background: category === cat.value ? 'var(--accent-teal-light)' : 'var(--bg-secondary)',
+                        color: category === cat.value ? 'var(--accent-teal)' : 'var(--text-secondary)'
+                      }}
                       aria-pressed={category === cat.value}
                     >
                       {cat.label}
@@ -163,15 +181,12 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
                 </div>
               </div>
 
+              {/* Description */}
               <div>
                 <label 
                   htmlFor="report-description"
-                  style={{ 
-                    display: 'block', 
-                    marginBottom: '8px',
-                    fontWeight: 500,
-                    fontSize: '14px',
-                  }}
+                  className="block text-sm font-semibold mb-3"
+                  style={{ color: 'var(--text-primary)' }}
                 >
                   Please describe the issue
                 </label>
@@ -185,30 +200,31 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
                 />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  style={{
-                    padding: '10px 20px',
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-md)',
-                    color: 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    fontWeight: 500,
-                  }}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="feedback-submit"
-                  disabled={isSubmitting || !description.trim()}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit Report'}
-                </button>
-              </div>
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting || !description.trim()}
+                className="feedback-submit flex items-center justify-center gap-3"
+                style={{
+                  opacity: (isSubmitting || !description.trim()) ? 0.6 : 1,
+                  cursor: (isSubmitting || !description.trim()) ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div 
+                      className="w-5 h-5 rounded-full animate-spin"
+                      style={{ 
+                        border: '2px solid rgba(255,255,255,0.3)', 
+                        borderTopColor: 'white'
+                      }}
+                    />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit Report'
+                )}
+              </button>
             </form>
           )}
         </div>

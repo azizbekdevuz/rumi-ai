@@ -3569,6 +3569,7 @@ body:has(.chat-page-shell) .background-wrapper {
     max-height: calc(100vh - 2 * var(--space-4));
     margin: var(--space-4) auto;
     width: calc(100% - 2 * var(--space-4));
+    max-width: calc(100% - 2 * var(--space-4));
   }
   
   .modal-header,
@@ -3578,6 +3579,12 @@ body:has(.chat-page-shell) .background-wrapper {
   
   .modal-title {
     font-size: 20px;
+  }
+  
+  /* Ensure modal body scrolls on mobile */
+  .modal-body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
