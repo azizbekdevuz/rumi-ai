@@ -97,7 +97,9 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
   return (
     <div 
       className="modal-overlay" 
-      onClick={onClose}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="report-modal-title"
@@ -106,6 +108,7 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
         ref={modalRef}
         className="modal-content" 
         onClick={(e) => e.stopPropagation()}
+        style={{ animationName: 'modal-slide-up', animationDuration: '200ms' }}
       >
         <div className="modal-header">
           <h3 id="report-modal-title" className="modal-title">

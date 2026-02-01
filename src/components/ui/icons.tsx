@@ -28,6 +28,7 @@ import {
   Copy,
   Check,
   Loader2,
+  MessageSquareDiff,
   type LucideProps,
 } from 'lucide-react';
 
@@ -115,4 +116,5 @@ export {
   Copy as CopyIcon,
   Check as CheckIcon,
   Loader2 as LoaderIcon,
+  MessageSquareDiff as MsgSquareIcon,
 };

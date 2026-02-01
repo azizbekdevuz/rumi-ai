@@ -15,6 +15,7 @@ import UtilityBar from '@/features/chat/components/UtilityBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { motion as motionTokens } from '@/lib/design-system/motion';
 import { useReducedMotion } from '@/lib/hooks';
+import { MsgSquareIcon } from '@/components/ui/icons';
 
 export default function ChatPage() {
   const { language, t } = useI18n();
@@ -136,22 +137,7 @@ export default function ChatPage() {
                   animate={reducedMotion ? {} : { scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
                 >
-                  <svg
-                    width="80"
-                    height="80"
-                    viewBox="0 0 48 48"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2" opacity="0.3" />
-                    <path
-                      d="M24 8C24 8 18 14 18 20C18 26 24 30 24 30C24 30 30 26 30 20C30 14 24 8 24 8Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <MsgSquareIcon className="w-20 h-20" />
                 </motion.div>
                 <motion.h2
                   className="chat-empty-title"
