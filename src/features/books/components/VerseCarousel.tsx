@@ -127,7 +127,7 @@ export default function VerseCarousel({ verses, language }: VerseCarouselProps) 
       </div>
 
       {/* Dot Pagination */}
-2      {maxIndex > 0 && (
+      {maxIndex > 0 && (
         <div className="books-verse-carousel-dots" role="tablist" aria-label="Verse carousel pagination">
           {Array.from({ length: maxIndex + 1 }).map((_, index) => (
             <button
