@@ -45,16 +45,4 @@ export function useReducedMotion(): boolean {
   return prefersReducedMotion;
 }
 
-/**
- * Returns appropriate motion variants based on reduced motion preference.
- * Automatically switches to minimal animations when user prefers reduced motion.
- */
-export function useAccessibleMotion<T>(
-  fullMotion: T,
-  reducedMotion: T
-): T {
-  const prefersReducedMotion = useReducedMotion();
-  return prefersReducedMotion ? reducedMotion : fullMotion;
-}
-
 export default useReducedMotion;

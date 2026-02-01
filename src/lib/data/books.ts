@@ -93,10 +93,6 @@ export interface Book {
     },
   ];
   
-  export function getBookById(id: string): Book | undefined {
-    return books.find((book) => book.id === id);
-  }
-  
   export function searchBooks(query: string, bookFilter?: string): Book[] {
     const lowerQuery = query.toLowerCase();
     
