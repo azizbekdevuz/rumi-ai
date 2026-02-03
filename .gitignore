@@ -1,5 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# --------------------------------- frontend ---------------------------------
+
 # dependencies
 /node_modules
 /.pnp
@@ -31,7 +33,8 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+.env
+.env.local
 
 # vercel
 .vercel
@@ -45,3 +48,64 @@ screenshots/
 generate-pdf.md
 Weekly_Progress_Report.html
 Weekly_Progress_Report.pdf
+
+# --------------------------------- backend ---------------------------------
+
+# Python
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/*.so
+backend/.Python
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+
+# Virtual environments
+backend/venv/
+backend/env/
+backend/ENV/
+
+# IDE
+backend/.vscode/
+backend/.idea/
+backend/*.swp
+backend/*.swo
+
+# Environment variables
+backend/.env
+backend/.env.local
+
+# Database
+backend/*.db
+backend/*.sqlite
+
+# Logs
+backend/logs/
+backend/*.log
+
+# Media files
+backend/media/
+backend/uploads/
+
+# Alembic
+backend/alembic/versions/*.pyc
+
+# Docker
+backend/.dockerignore
+
+# OS
+backend/.DS_Store
+backend/Thumbs.db
