@@ -1,599 +1,335 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { useTheme } from '@/lib/theme/theme-context';
-import {
-  User,
-  Mail,
-  Globe,
-  Moon,
-  Sun,
-  Bell,
-  Shield,
-  LogOut,
-  ChevronRight,
-  ChevronLeft,
-  Save,
-  History,
-  Heart,
-  BookMarked,
-} from 'lucide-react';
+import { useReducedMotion } from '@/lib/hooks';
+import { ChevronRight, ChevronLeft, Sun, Moon } from 'lucide-react';
+import ProfilePageShell from '@/features/profile/components/ProfilePageShell';
+import ProfileSidebar, { type ProfileSection } from '@/features/profile/components/ProfileSidebar';
+import SegmentedControl from '@/features/profile/components/SegmentedControl';
+import ToggleSwitch from '@/features/profile/components/ToggleSwitch';
+import styles from './profile.module.css';
 
 export default function ProfilePage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { t, language, dir, setLanguage } = useI18n();
+  const { language, dir, setLanguage } = useI18n();
   const direction = dir;
   const { theme, toggleTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'history'>('profile');
+  const reducedMotion = useReducedMotion();
+  const [activeSection, setActiveSection] = useState<ProfileSection>('account');
+  const [emailUpdates, setEmailUpdates] = useState(true);
+  const [accountDeletion, setAccountDeletion] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const ChevronIcon = direction === 'rtl' ? ChevronLeft : ChevronRight;
+  // Mock user data - in real app, fetch from API
+  const user = {
+    name: 'Mohammad Niaraki',
+    email: 'mohammad.niaraki@email.com',
+    avatar: null,
+  };
 
   const content = {
     en: {
-      title: 'Profile & Settings',
-      tabs: {
-        profile: 'Profile',
-        preferences: 'Preferences',
-        history: 'History',
-      },
-      profile: {
-        title: 'Personal Information',
-        name: 'Full Name',
-        email: 'Email',
-        bio: 'Bio',
-        bioPlaceholder: 'Tell us about yourself...',
-        save: 'Save Changes',
-      },
-      preferences: {
-        title: 'App Preferences',
-        language: 'Language',
+      title: 'Your Profile',
+      breadcrumb: 'Home / Profile',
+      accountSettings: 'Account Settings',
+      chatHistory: 'Chat History',
+      savedQuotes: 'Saved Quotes',
+      preferredLanguage: 'Preferred Language',
         theme: 'Theme',
-        themeLight: 'Light',
-        themeDark: 'Dark',
-        notifications: 'Notifications',
-        notificationsDesc: 'Receive daily wisdom notifications',
-        privacy: 'Privacy',
-        privacyDesc: 'Manage your data and privacy settings',
-      },
-      history: {
-        title: 'Your Activity',
-        conversations: 'Recent Conversations',
-        favorites: 'Favorite Verses',
-        bookmarks: 'Bookmarked Books',
-        noHistory: 'No activity yet. Start exploring!',
-      },
-      logout: 'Sign Out',
+      light: 'Light',
+      dark: 'Dark',
+      saveChanges: 'Save Changes',
+      consentPrivacy: 'Consent & Privacy',
+      emailUpdates: 'Receive Email Updates',
+      emailUpdatesDesc: 'Get occasional updates and special offers.',
+      accountDeletion: 'Account Deletion Request',
+      accountDeletionDesc: 'Request account to be permanently deleted.',
+      privacyPolicy: 'Privacy Policy',
+      contactUs: 'Contact Us',
+      noHistory: 'No chat history yet. Start a conversation!',
+      noQuotes: 'No saved quotes yet. Save verses you love!',
+      saved: 'Changes saved successfully',
     },
     fa: {
-      title: 'پروفایل و تنظیمات',
-      tabs: {
-        profile: 'پروفایل',
-        preferences: 'ترجیحات',
-        history: 'تاریخچه',
-      },
-      profile: {
-        title: 'اطلاعات شخصی',
-        name: 'نام کامل',
-        email: 'ایمیل',
-        bio: 'بیوگرافی',
-        bioPlaceholder: 'درباره خودتان بگویید...',
-        save: 'ذخیره تغییرات',
-      },
-      preferences: {
-        title: 'ترجیحات برنامه',
-        language: 'زبان',
+      title: 'پروفایل شما',
+      breadcrumb: 'خانه / پروفایل',
+      accountSettings: 'تنظیمات حساب',
+      chatHistory: 'تاریخچه چت',
+      savedQuotes: 'نقل‌قول‌های ذخیره شده',
+      preferredLanguage: 'زبان ترجیحی',
         theme: 'تم',
-        themeLight: 'روشن',
-        themeDark: 'تاریک',
-        notifications: 'اعلان‌ها',
-        notificationsDesc: 'دریافت اعلان‌های حکمت روزانه',
-        privacy: 'حریم خصوصی',
-        privacyDesc: 'مدیریت داده‌ها و تنظیمات حریم خصوصی',
-      },
-      history: {
-        title: 'فعالیت شما',
-        conversations: 'مکالمات اخیر',
-        favorites: 'ابیات مورد علاقه',
-        bookmarks: 'کتاب‌های نشان‌شده',
-        noHistory: 'هنوز فعالیتی نیست. شروع به کاوش کنید!',
-      },
-      logout: 'خروج',
+      light: 'روشن',
+      dark: 'تاریک',
+      saveChanges: 'ذخیره تغییرات',
+      consentPrivacy: 'رضایت و حریم خصوصی',
+      emailUpdates: 'دریافت به‌روزرسانی‌های ایمیل',
+      emailUpdatesDesc: 'دریافت به‌روزرسانی‌ها و پیشنهادات ویژه.',
+      accountDeletion: 'درخواست حذف حساب',
+      accountDeletionDesc: 'درخواست حذف دائمی حساب.',
+      privacyPolicy: 'سیاست حفظ حریم خصوصی',
+      contactUs: 'تماس با ما',
+      noHistory: 'هنوز تاریخچه چتی وجود ندارد. گفتگو را شروع کنید!',
+      noQuotes: 'هنوز نقل‌قولی ذخیره نشده است. ابیاتی که دوست دارید را ذخیره کنید!',
+      saved: 'تغییرات با موفقیت ذخیره شد',
     },
     kr: {
-      title: '프로필 및 설정',
-      tabs: {
-        profile: '프로필',
-        preferences: '환경설정',
-        history: '기록',
-      },
-      profile: {
-        title: '개인 정보',
-        name: '이름',
-        email: '이메일',
-        bio: '소개',
-        bioPlaceholder: '자신에 대해 알려주세요...',
-        save: '변경 사항 저장',
-      },
-      preferences: {
-        title: '앱 환경설정',
-        language: '언어',
+      title: '프로필',
+      breadcrumb: '홈 / 프로필',
+      accountSettings: '계정 설정',
+      chatHistory: '채팅 기록',
+      savedQuotes: '저장된 인용구',
+      preferredLanguage: '선호 언어',
         theme: '테마',
-        themeLight: '라이트',
-        themeDark: '다크',
-        notifications: '알림',
-        notificationsDesc: '일일 지혜 알림 받기',
-        privacy: '개인정보',
-        privacyDesc: '데이터 및 개인정보 설정 관리',
-      },
-      history: {
-        title: '활동 내역',
-        conversations: '최근 대화',
-        favorites: '좋아하는 시구',
-        bookmarks: '북마크한 책',
-        noHistory: '아직 활동이 없습니다. 탐색을 시작하세요!',
-      },
-      logout: '로그아웃',
+      light: '라이트',
+      dark: '다크',
+      saveChanges: '변경 사항 저장',
+      consentPrivacy: '동의 및 개인정보',
+      emailUpdates: '이메일 업데이트 받기',
+      emailUpdatesDesc: '가끔 업데이트와 특별 제안을 받으세요.',
+      accountDeletion: '계정 삭제 요청',
+      accountDeletionDesc: '계정을 영구적으로 삭제하도록 요청합니다.',
+      privacyPolicy: '개인정보 처리방침',
+      contactUs: '문의하기',
+      noHistory: '아직 채팅 기록이 없습니다. 대화를 시작하세요!',
+      noQuotes: '아직 저장된 인용구가 없습니다. 좋아하는 시구를 저장하세요!',
+      saved: '변경 사항이 성공적으로 저장되었습니다',
     },
   };
 
   const c = content[language] || content.en;
 
-  // Mock user data
-  const user = {
-    name: 'Ali Karimi',
-    email: 'ali@example.com',
-    avatar: null,
+  const languageOptions = [
+    { value: 'fa', label: 'FA' },
+    { value: 'en', label: 'EN' },
+    { value: 'kr', label: 'KR' },
+  ];
+
+  const themeOptions = [
+    { value: 'light', label: c.light, icon: <Sun className="w-4 h-4" /> },
+    { value: 'dark', label: c.dark, icon: <Moon className="w-4 h-4" /> },
+  ];
+
+  const handleSave = async () => {
+    // TODO: Call API to save settings
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
 
-  const [name, setName] = useState(user.name);
-  const [bio, setBio] = useState('');
-  const [notifications, setNotifications] = useState(true);
+  const handleLanguageChange = (value: string) => {
+    setLanguage(value as 'en' | 'fa' | 'kr');
+  };
+
+  const handleThemeChange = (value: string) => {
+    if (value === 'dark' && theme === 'light') {
+      toggleTheme();
+    } else if (value === 'light' && theme === 'dark') {
+      toggleTheme();
+    }
+  };
 
   return (
-    <main className="profile-page" dir={direction}>
-      <div className="profile-container">
-        {/* Header */}
-        <div className="mb-10">
-          <h1 
-            className="text-4xl font-serif font-bold"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            {c.title}
-          </h1>
-        </div>
-
-        {/* Profile Card */}
-        <div 
-          className="rounded-[var(--radius-xl)] overflow-hidden"
-          style={{ 
-            background: 'var(--bg-tertiary)', 
-            boxShadow: 'var(--shadow-lg)',
-            border: '1px solid var(--border-color)'
-          }}
+    <ProfilePageShell>
+      <div className="profile-page-content" dir={direction}>
+        {/* Hero Title Block */}
+        <motion.div
+          className="profile-hero"
+          initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+          animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
         >
-          {/* User Info Header */}
-          <div 
-            className="p-8"
-            style={{ 
-              borderBottom: '1px solid var(--border-color)',
-              background: 'linear-gradient(135deg, var(--accent-teal-light) 0%, transparent 50%)'
-            }}
-          >
-            <div className="flex items-center gap-6">
-              <div 
-                className="w-24 h-24 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: 'var(--accent-teal-light)', border: '3px solid var(--accent-teal)' }}
-              >
-                <User className="w-12 h-12 text-[var(--accent-teal)]" />
+          <h1 className="profile-hero-title">{c.title}</h1>
+          <div className="profile-breadcrumb">
+            {direction === 'rtl' ? (
+              <ChevronLeft className="profile-breadcrumb-icon" />
+            ) : (
+              <ChevronRight className="profile-breadcrumb-icon" />
+            )}
+            <span>{c.breadcrumb}</span>
+        </div>
+        </motion.div>
+
+        {/* Main Profile Panel */}
+        <motion.div
+          className={styles.profileMainPanel}
+          initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+          animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {/* Panel Header Section */}
+          <div className="profile-panel-header">
+            <div className="profile-avatar-wrapper">
+              {user.avatar ? (
+                <Image 
+                  src={user.avatar} 
+                  alt={user.name} 
+                  className={styles.profileAvatarImage} 
+                  width={96} 
+                  height={96} 
+                  priority
+                />
+              ) : (
+                <div className="profile-avatar-placeholder">
+                  <Image 
+                    src="/img/chat/default-avatar-male.webp" 
+                    alt={user.name} 
+                    width={96} 
+                    height={96} 
+                    className={styles.profileAvatarImage}
+                    priority
+                  />
               </div>
-              <div>
-                <h2 
-                  className="text-2xl font-semibold mb-1"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  {user.name}
-                </h2>
-                <p className="text-base" style={{ color: 'var(--text-secondary)' }}>{user.email}</p>
+              )}
               </div>
+            <div className="profile-header-info">
+              <h2 className="profile-user-name">{user.name}</h2>
+              <p className="profile-user-email">{user.email}</p>
             </div>
           </div>
+          <div className={styles.profileHeaderDivider} />
 
-          {/* Tabs */}
-          <div 
-            className="flex"
-            style={{ borderBottom: '2px solid var(--border-color)' }}
-          >
-            {(['profile', 'preferences', 'history'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className="flex-1 py-5 px-6 text-base font-semibold transition-all"
-                style={{
-                  color: activeTab === tab ? 'var(--accent-teal)' : 'var(--text-secondary)',
-                  borderBottom: activeTab === tab ? '3px solid var(--accent-teal)' : '3px solid transparent',
-                  background: activeTab === tab ? 'var(--accent-teal-light)' : 'transparent',
-                  marginBottom: '-2px'
-                }}
-              >
-                {c.tabs[tab]}
-              </button>
-            ))}
-          </div>
+          {/* Panel Content */}
+          <div className="profile-panel-content">
+            {/* Left Sidebar Navigation */}
+            <ProfileSidebar
+              activeSection={activeSection}
+              onSectionChange={setActiveSection}
+              labels={{
+                account: c.accountSettings,
+                history: c.chatHistory,
+                quotes: c.savedQuotes,
+              }}
+            />
 
-          {/* Tab Content */}
-          <div className="p-8">
-            {activeTab === 'profile' && (
-              <div className="space-y-8">
-                <h3 
-                  className="text-xl font-semibold"
-                  style={{ color: 'var(--text-primary)' }}
+            {/* Main Content Area - Inner Surface */}
+            <div className={styles.profileContentArea}>
+              {activeSection === 'account' && (
+                <motion.div
+                  initial={reducedMotion ? {} : { opacity: 0, x: 20 }}
+                  animate={reducedMotion ? {} : { opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  {c.profile.title}
-                </h3>
+                  <h3 className={styles.profileSectionTitle}>{c.accountSettings}</h3>
+                  <div className={styles.profileSectionDivider} />
 
-                <div className="space-y-6">
-                  <div>
-                    <label 
-                      className="block text-sm font-semibold mb-3"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
-                      {c.profile.name}
-                    </label>
-                    <div className="relative">
-                      <User 
-                        className="absolute top-1/2 -translate-y-1/2 w-5 h-5"
-                        style={{ 
-                          color: 'var(--text-muted)',
-                          [direction === 'rtl' ? 'right' : 'left']: '18px'
-                        }}
+                  <div className="profile-settings-group">
+                    {/* Preferred Language Selector */}
+                    <div className="profile-setting-item">
+                      <label className={styles.profileSettingLabel}>{c.preferredLanguage}</label>
+                      <SegmentedControl
+                        options={languageOptions}
+                        value={language}
+                        onChange={handleLanguageChange}
                       />
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="form-input"
-                        style={{ 
-                          [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '52px',
-                          width: '100%'
-                        }}
-                      />
-                    </div>
                   </div>
 
-                  <div>
-                    <label 
-                      className="block text-sm font-semibold mb-3"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
-                      {c.profile.email}
-                    </label>
-                    <div className="relative">
-                      <Mail 
-                        className="absolute top-1/2 -translate-y-1/2 w-5 h-5"
-                        style={{ 
-                          color: 'var(--text-muted)',
-                          [direction === 'rtl' ? 'right' : 'left']: '18px'
-                        }}
-                      />
-                      <input
-                        type="email"
-                        value={user.email}
-                        disabled
-                        className="form-input cursor-not-allowed"
-                        style={{ 
-                          [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '52px',
-                          opacity: 0.5,
-                          background: 'var(--bg-secondary)',
-                          width: '100%'
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label 
-                      className="block text-sm font-semibold mb-3"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
-                      {c.profile.bio}
-                    </label>
-                    <textarea
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      placeholder={c.profile.bioPlaceholder}
-                      rows={5}
-                      className="form-input resize-none"
-                      style={{ width: '100%' }}
+                    {/* Theme Selector */}
+                    <div className="profile-setting-item">
+                      <label className={styles.profileSettingLabel}>{c.theme}</label>
+                      <SegmentedControl
+                        options={themeOptions}
+                        value={theme}
+                        onChange={handleThemeChange}
                     />
                   </div>
 
-                  <button 
-                    className="py-4 px-8 rounded-[var(--radius-lg)] font-semibold flex items-center gap-3 transition-all hover:shadow-lg"
-                    style={{
-                      background: 'var(--gradient-teal)',
-                      color: 'var(--text-inverse)'
-                    }}
-                  >
-                    <Save className="w-5 h-5" />
-                    {c.profile.save}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'preferences' && (
-              <div className="space-y-8">
-                <h3 
-                  className="text-xl font-semibold"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  {c.preferences.title}
-                </h3>
-
-                <div className="space-y-5">
-                  {/* Language */}
-                  <div 
-                    className="flex items-center justify-between p-5 rounded-[var(--radius-lg)]"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ background: 'var(--accent-teal-light)' }}
+                    {/* Save Changes Button */}
+                    <div className="profile-save-button-wrapper">
+                      <motion.button
+                        type="button"
+                        onClick={handleSave}
+                        className={styles.profileSaveButton}
+                        whileHover={reducedMotion ? undefined : {}}
+                        whileTap={reducedMotion ? undefined : {}}
+                        transition={{ duration: 0.15 }}
                       >
-                        <Globe className="w-5 h-5 text-[var(--accent-teal)]" />
-                      </div>
-                      <span 
-                        className="font-semibold text-base"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        {c.preferences.language}
-                      </span>
-                    </div>
-                    <select
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value as 'en' | 'fa' | 'kr')}
-                      className="py-3 px-5 rounded-[var(--radius-md)] focus:outline-none cursor-pointer"
-                      style={{
-                        border: '2px solid var(--border-color)',
-                        background: 'var(--bg-tertiary)',
-                        color: 'var(--text-primary)',
-                        fontSize: '15px'
-                      }}
-                    >
-                      <option value="en">English</option>
-                      <option value="fa">فارسی</option>
-                      <option value="kr">한국어</option>
-                    </select>
-                  </div>
-
-                  {/* Theme */}
-                  <div 
-                    className="flex items-center justify-between p-5 rounded-[var(--radius-lg)]"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ background: 'var(--accent-teal-light)' }}
-                      >
-                        {theme === 'dark' ? (
-                          <Moon className="w-5 h-5 text-[var(--accent-teal)]" />
-                        ) : (
-                          <Sun className="w-5 h-5 text-[var(--accent-teal)]" />
+                        {c.saveChanges}
+                      </motion.button>
+                      {saveSuccess && (
+                        <motion.div
+                          className="profile-save-success"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                        >
+                          {c.saved}
+                        </motion.div>
                         )}
                       </div>
-                      <span 
-                        className="font-semibold text-base"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        {c.preferences.theme}
-                      </span>
-                    </div>
-                    <button
-                      onClick={toggleTheme}
-                      className="py-3 px-5 rounded-[var(--radius-md)] transition-colors cursor-pointer"
-                      style={{
-                        border: '2px solid var(--border-color)',
-                        background: 'var(--bg-tertiary)',
-                        color: 'var(--text-primary)',
-                        fontSize: '15px'
-                      }}
-                    >
-                      {theme === 'dark' ? c.preferences.themeDark : c.preferences.themeLight}
-                    </button>
                   </div>
 
-                  {/* Notifications */}
-                  <div 
-                    className="flex items-center justify-between p-5 rounded-[var(--radius-lg)] gap-4"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                  >
-                    <div className="flex items-center gap-4 flex-1">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ background: 'var(--accent-teal-light)' }}
-                      >
-                        <Bell className="w-5 h-5 text-[var(--accent-teal)]" />
-                      </div>
-                      <div>
-                        <span 
-                          className="font-semibold text-base block mb-1"
-                          style={{ color: 'var(--text-primary)' }}
-                        >
-                          {c.preferences.notifications}
-                        </span>
-                        <span 
-                          className="text-sm"
-                          style={{ color: 'var(--text-muted)' }}
-                        >
-                          {c.preferences.notificationsDesc}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setNotifications(!notifications)}
-                      className="w-14 h-7 rounded-full transition-colors flex-shrink-0"
-                      style={{
-                        background: notifications ? 'var(--accent-teal)' : 'var(--border-color)'
-                      }}
-                    >
-                      <div
-                        className="w-6 h-6 rounded-full bg-white shadow transform transition-transform"
-                        style={{
-                          transform: notifications
-                            ? direction === 'rtl' ? 'translateX(-28px)' : 'translateX(28px)'
-                            : direction === 'rtl' ? 'translateX(-2px)' : 'translateX(2px)'
-                        }}
+                  {/* Consent & Privacy Section */}
+                  <div className={styles.profileConsentSection}>
+                    <h4 className={styles.profileConsentTitle}>{c.consentPrivacy}</h4>
+                    <div className={styles.profileConsentDivider} />
+                    <div className="profile-consent-content">
+                      <ToggleSwitch
+                        checked={emailUpdates}
+                        onChange={setEmailUpdates}
+                        label={c.emailUpdates}
+                        helperText={c.emailUpdatesDesc}
                       />
-                    </button>
-                  </div>
-
-                  {/* Privacy */}
-                  <button 
-                    className="w-full flex items-center justify-between p-5 rounded-[var(--radius-lg)] transition-all hover:shadow-md"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ background: 'var(--accent-teal-light)' }}
-                      >
-                        <Shield className="w-5 h-5 text-[var(--accent-teal)]" />
-                      </div>
-                      <div className="text-start">
-                        <span 
-                          className="font-semibold text-base block mb-1"
-                          style={{ color: 'var(--text-primary)' }}
-                        >
-                          {c.preferences.privacy}
-                        </span>
-                        <span 
-                          className="text-sm"
-                          style={{ color: 'var(--text-muted)' }}
-                        >
-                          {c.preferences.privacyDesc}
-                        </span>
-                      </div>
-                    </div>
-                    <ChevronIcon 
-                      className="w-5 h-5"
-                      style={{ color: 'var(--text-muted)' }}
-                    />
-                  </button>
+                      <ToggleSwitch
+                        checked={accountDeletion}
+                        onChange={setAccountDeletion}
+                        label={c.accountDeletion}
+                        helperText={c.accountDeletionDesc}
+                      />
                 </div>
               </div>
-            )}
+                </motion.div>
+              )}
 
-            {activeTab === 'history' && (
-              <div className="space-y-8">
-                <h3 
-                  className="text-xl font-semibold"
-                  style={{ color: 'var(--text-primary)' }}
+              {activeSection === 'history' && (
+                <motion.div
+                  initial={reducedMotion ? {} : { opacity: 0, x: 20 }}
+                  animate={reducedMotion ? {} : { opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  {c.history.title}
-                </h3>
-
-                <div className="space-y-5">
-                  {/* Conversations */}
-                  <button 
-                    className="w-full flex items-center justify-between p-5 rounded-[var(--radius-lg)] transition-all hover:shadow-md"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ background: 'var(--accent-teal-light)' }}
-                      >
-                        <History className="w-5 h-5 text-[var(--accent-teal)]" />
+                  <h3 className={styles.profileSectionTitle}>{c.chatHistory}</h3>
+                  <div className={styles.profileSectionDivider} />
+                  <div className="profile-empty-state">
+                    <p>{c.noHistory}</p>
                       </div>
-                      <span 
-                        className="font-semibold text-base"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        {c.history.conversations}
-                      </span>
-                    </div>
-                    <ChevronIcon 
-                      className="w-5 h-5"
-                      style={{ color: 'var(--text-muted)' }}
-                    />
-                  </button>
+                </motion.div>
+              )}
 
-                  {/* Favorites */}
-                  <button 
-                    className="w-full flex items-center justify-between p-5 rounded-[var(--radius-lg)] transition-all hover:shadow-md"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ background: 'var(--accent-teal-light)' }}
-                      >
-                        <Heart className="w-5 h-5 text-[var(--accent-teal)]" />
+              {activeSection === 'quotes' && (
+                <motion.div
+                  initial={reducedMotion ? {} : { opacity: 0, x: 20 }}
+                  animate={reducedMotion ? {} : { opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h3 className={styles.profileSectionTitle}>{c.savedQuotes}</h3>
+                  <div className={styles.profileSectionDivider} />
+                  <div className="profile-empty-state">
+                    <p>{c.noQuotes}</p>
                       </div>
-                      <span 
-                        className="font-semibold text-base"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        {c.history.favorites}
-                      </span>
-                    </div>
-                    <ChevronIcon 
-                      className="w-5 h-5"
-                      style={{ color: 'var(--text-muted)' }}
-                    />
-                  </button>
-
-                  {/* Bookmarks */}
-                  <button 
-                    className="w-full flex items-center justify-between p-5 rounded-[var(--radius-lg)] transition-all hover:shadow-md"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ background: 'var(--accent-teal-light)' }}
-                      >
-                        <BookMarked className="w-5 h-5 text-[var(--accent-teal)]" />
-                      </div>
-                      <span 
-                        className="font-semibold text-base"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        {c.history.bookmarks}
-                      </span>
-                    </div>
-                    <ChevronIcon 
-                      className="w-5 h-5"
-                      style={{ color: 'var(--text-muted)' }}
-                    />
-                  </button>
+                </motion.div>
+              )}
                 </div>
               </div>
-            )}
-          </div>
+        </motion.div>
 
-          {/* Logout */}
-          <div 
-            className="p-8"
-            style={{ borderTop: '2px solid var(--border-color)' }}
-          >
-            <button 
-              className="w-full py-4 px-6 rounded-[var(--radius-lg)] font-semibold flex items-center justify-center gap-3 transition-all hover:bg-red-50"
-              style={{
-                border: '2px solid rgba(198, 40, 40, 0.3)',
-                color: 'var(--error)',
-                background: 'transparent'
-              }}
-            >
-              <LogOut className="w-5 h-5" />
-              {c.logout}
-            </button>
+        {/* Footer Links */}
+        <motion.div
+          className="profile-footer-links"
+          initial={reducedMotion ? {} : { opacity: 0 }}
+          animate={reducedMotion ? {} : { opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Link href="/privacy" className="profile-footer-link">
+            {c.privacyPolicy}
+          </Link>
+          <span className="profile-footer-separator">|</span>
+          <Link href="/contact" className="profile-footer-link">
+            {c.contactUs}
+          </Link>
+        </motion.div>
           </div>
-        </div>
-      </div>
-    </main>
+    </ProfilePageShell>
   );
 }

@@ -1,0 +1,598 @@
+/* ============================================
+   PROFILE PAGE - Pixel-Perfect Parchment Materials
+   Integrated with Watercolor Cloud Background
+   ============================================ */
+
+/* A) OUTER MAIN PANEL - Translucent Parchment Floating Over Clouds */
+.profileMainPanel {
+  /* Warm translucent fill - background visible through */
+  background: 
+    /* Ultra-subtle grain (static, very light) */
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.004) 1px, rgba(0, 0, 0, 0.004) 2px),
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0, 0, 0, 0.004) 1px, rgba(0, 0, 0, 0.004) 2px),
+    /* Internal vignette (top brighter, bottom deeper) */
+    linear-gradient(to bottom,
+      rgba(255, 253, 248, 0.42) 0%,
+      rgba(248, 245, 237, 0.38) 50%,
+      rgba(240, 235, 224, 0.35) 100%
+    ),
+    /* Warm parchment base - allows cloud background to show */
+    rgba(248, 245, 237, 0.38);
+  
+  background-size: 2px 2px, 2px 2px, 100% 100%, 100% 100%;
+  
+  /* Thin warm border line */
+  border: 1px solid rgba(212, 168, 75, 0.12);
+  border-radius: var(--radius-xl);
+  
+  /* Very soft diffused outer shadow */
+  box-shadow: 
+    0 12px 48px rgba(45, 42, 36, 0.10),
+    0 24px 80px rgba(45, 42, 36, 0.06);
+  
+  overflow: hidden;
+  position: relative;
+}
+
+/* Top highlight (inset, very soft) */
+.profileMainPanel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.12) 1%,
+    rgba(255, 255, 255, 0.06) 3%,
+    transparent 8%
+  );
+  pointer-events: none;
+  border-radius: var(--radius-xl);
+  z-index: 1;
+}
+
+/* Bottom vignette (inset, very soft) */
+.profileMainPanel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.02) 0%,
+    rgba(0, 0, 0, 0.01) 5%,
+    transparent 15%
+  );
+  pointer-events: none;
+  border-radius: var(--radius-xl);
+  z-index: 1;
+}
+
+[data-theme='dark'] .profileMainPanel {
+  background: 
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.01) 1px, rgba(0, 0, 0, 0.01) 2px),
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0, 0, 0, 0.01) 1px, rgba(0, 0, 0, 0.01) 2px),
+    linear-gradient(to bottom,
+      rgba(46, 54, 74, 0.55) 0%,
+      rgba(36, 47, 61, 0.50) 50%,
+      rgba(30, 40, 55, 0.45) 100%
+    ),
+    rgba(36, 47, 61, 0.50);
+  border-color: rgba(232, 188, 92, 0.18);
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.35),
+    0 24px 80px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .profileMainPanel::before {
+  background: linear-gradient(to bottom,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.03) 1%,
+    rgba(255, 255, 255, 0.015) 3%,
+    transparent 8%
+  );
+}
+
+[data-theme='dark'] .profileMainPanel::after {
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.08) 5%,
+    transparent 15%
+  );
+}
+
+/* B) INNER CONTENT SURFACE - Panel Within Panel */
+.profileContentArea {
+  flex: 1;
+  min-width: 0;
+  
+  /* Slightly more opaque OR stronger border for nesting */
+  background: 
+    /* Subtle grain */
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.003) 1px, rgba(0, 0, 0, 0.003) 2px),
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0, 0, 0, 0.003) 1px, rgba(0, 0, 0, 0.003) 2px),
+    /* Inner surface - slightly more opaque */
+    rgba(248, 245, 237, 0.45);
+  
+  background-size: 2px 2px, 2px 2px, 100% 100%;
+  
+  /* Subtle border to show nesting */
+  border: 1px solid rgba(212, 168, 75, 0.08);
+  border-radius: var(--radius-lg);
+  margin: var(--space-4);
+  padding: var(--space-6);
+  
+  /* Inner highlight */
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.03);
+  
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme='dark'] .profileContentArea {
+  background: 
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.008) 1px, rgba(0, 0, 0, 0.008) 2px),
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0, 0, 0, 0.008) 1px, rgba(0, 0, 0, 0.008) 2px),
+    rgba(36, 47, 61, 0.55);
+  border-color: rgba(232, 188, 92, 0.12);
+}
+
+/* C) PROFILE HEADER AREA */
+.profileAvatarImage {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* Soft ring/halo */
+  border: 3px solid rgba(212, 168, 75, 0.2);
+  box-shadow: 
+    /* Realistic shadow */
+    0 4px 16px rgba(45, 42, 36, 0.15),
+    0 8px 24px rgba(45, 42, 36, 0.10),
+    /* Inner highlight */
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  /* Transparent edge blends with cloud background */
+  background: rgba(248, 245, 237, 0.3);
+}
+
+.profileHeaderDivider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 168, 75, 0.08) 15%,
+    rgba(212, 168, 75, 0.12) 50%,
+    rgba(212, 168, 75, 0.08) 85%,
+    transparent 100%
+  );
+  margin: 0 var(--space-8);
+}
+
+[data-theme='dark'] .profileHeaderDivider {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(232, 188, 92, 0.10) 15%,
+    rgba(232, 188, 92, 0.15) 50%,
+    rgba(232, 188, 92, 0.10) 85%,
+    transparent 100%
+  );
+}
+
+.profileSectionDivider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 168, 75, 0.06) 10%,
+    rgba(212, 168, 75, 0.10) 50%,
+    rgba(212, 168, 75, 0.06) 90%,
+    transparent 100%
+  );
+  margin-bottom: var(--space-8);
+}
+
+[data-theme='dark'] .profileSectionDivider {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(232, 188, 92, 0.08) 10%,
+    rgba(232, 188, 92, 0.12) 50%,
+    rgba(232, 188, 92, 0.08) 90%,
+    transparent 100%
+  );
+}
+
+/* D) LEFT SIDEBAR TABS - Translucent Plaque Integration */
+.profileSidebarItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  position: relative;
+}
+
+.profileSidebarItem:hover {
+  background: rgba(27, 123, 107, 0.06);
+  color: var(--accent-teal);
+}
+
+/* Active tab - Translucent gold plaque (NOT flat) */
+.profileSidebarItemActive {
+  /* Warm gold tint but still translucent */
+  background: 
+    /* Subtle grain */
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.002) 1px, rgba(0, 0, 0, 0.002) 2px),
+    /* Soft gradient */
+    linear-gradient(135deg,
+      rgba(240, 200, 100, 0.32) 0%,
+      rgba(212, 168, 75, 0.28) 50%,
+      rgba(196, 150, 60, 0.24) 100%
+    );
+  
+  background-size: 2px 2px, 100% 100%;
+  
+  color: var(--text-primary);
+  
+  /* Inner highlight */
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.06),
+    /* Very subtle outer shadow */
+    0 1px 2px rgba(212, 168, 75, 0.12);
+  
+  /* Thin border */
+  border: 1px solid rgba(212, 168, 75, 0.25);
+  font-weight: 600;
+}
+
+.profileSidebarIcon {
+  flex-shrink: 0;
+  color: inherit;
+  opacity: 0.85;
+}
+
+.profileSidebarLabel {
+  flex: 1;
+}
+
+/* E) SEGMENTED CONTROLS - Inset Groove + Gold Enamel */
+.profileSegmentedControl {
+  display: inline-flex;
+  gap: 0;
+  
+  /* Inset groove track - pressed into surface */
+  background: 
+    /* Inset shadows for groove */
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.25),
+    /* Parchment base */
+    rgba(248, 245, 237, 0.58);
+  
+  border: 1px solid rgba(212, 168, 75, 0.18);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  position: relative;
+}
+
+[data-theme='dark'] .profileSegmentedControl {
+  background: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.06),
+    rgba(36, 47, 61, 0.68);
+  border-color: rgba(232, 188, 92, 0.22);
+}
+
+.profileSegmentedOption {
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+}
+
+.profileSegmentedOption:hover {
+  color: var(--text-primary);
+}
+
+/* Selected segment - Small gold enamel plaque (embedded) */
+.profileSegmentedOptionSelected {
+  /* Gold enamel with bevel */
+  background: 
+    /* Subtle grain */
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.01) 1px, rgba(0, 0, 0, 0.01) 2px),
+    /* Vertical gradient */
+    linear-gradient(180deg,
+      rgba(240, 200, 100, 1) 0%,
+      rgba(212, 168, 75, 1) 50%,
+      rgba(196, 150, 60, 1) 100%
+    );
+  
+  background-size: 2px 2px, 100% 100%;
+  
+  color: var(--text-primary);
+  
+  /* Bevel effect - embedded appearance */
+  box-shadow: 
+    /* Outer soft shadow (slight raise) */
+    0 2px 6px rgba(212, 168, 75, 0.25),
+    /* Inner highlights */
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 2px 3px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.08);
+  
+  /* Slightly raised */
+  transform: translateY(-0.5px);
+}
+
+.profileSegmentedIcon {
+  display: flex;
+  align-items: center;
+  color: inherit;
+  opacity: 0.9;
+}
+
+/* F) GOLD ENAMEL BUTTON - Save Changes */
+.profileSaveButton {
+  padding: var(--space-4) var(--space-10);
+  
+  /* Gold enamel with vertical gradient */
+  background: 
+    /* Subtle grain */
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.01) 1px, rgba(0, 0, 0, 0.01) 2px),
+    /* Vertical gradient (brighter top, deeper bottom) */
+    linear-gradient(180deg,
+      rgba(240, 200, 100, 1) 0%,
+      rgba(212, 168, 75, 1) 50%,
+      rgba(196, 150, 60, 1) 100%
+    );
+  
+  background-size: 2px 2px, 100% 100%;
+  
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  
+  /* Bevel + highlight + shadow system */
+  box-shadow: 
+    /* Outer soft shadow */
+    0 4px 16px rgba(212, 168, 75, 0.30),
+    0 8px 24px rgba(212, 168, 75, 0.20),
+    /* Inner depth */
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 2px 4px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.12),
+    /* Thin darker edge line */
+    0 0 0 1px rgba(196, 150, 60, 0.3);
+  
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+.profileSaveButton:hover {
+  box-shadow: 
+    0 6px 20px rgba(212, 168, 75, 0.35),
+    0 12px 32px rgba(212, 168, 75, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(196, 150, 60, 0.35);
+  transform: translateY(-1px);
+}
+
+.profileSaveButton:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 2px 8px rgba(212, 168, 75, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 2px 4px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(196, 150, 60, 0.25);
+}
+
+/* G) CONSENT & PRIVACY BOX - Inner Surface */
+.profileConsentSection {
+  /* Own subtle inner surface */
+  background: 
+    /* Subtle grain */
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.003) 1px, rgba(0, 0, 0, 0.003) 2px),
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0, 0, 0, 0.003) 1px, rgba(0, 0, 0, 0.003) 2px),
+    /* Slightly different opacity */
+    rgba(248, 245, 237, 0.48);
+  
+  background-size: 2px 2px, 2px 2px, 100% 100%;
+  
+  border: 1px solid rgba(212, 168, 75, 0.10);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  margin-top: var(--space-8);
+  
+  /* Inner highlight */
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.03);
+  
+  position: relative;
+}
+
+.profileConsentSection::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(255, 255, 255, 0.20) 0%,
+    rgba(255, 255, 255, 0.10) 1%,
+    transparent 5%
+  );
+  pointer-events: none;
+  border-radius: var(--radius-lg);
+  z-index: 1;
+}
+
+[data-theme='dark'] .profileConsentSection {
+  background: 
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.008) 1px, rgba(0, 0, 0, 0.008) 2px),
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0, 0, 0, 0.008) 1px, rgba(0, 0, 0, 0.008) 2px),
+    rgba(36, 47, 61, 0.58);
+  border-color: rgba(232, 188, 92, 0.12);
+}
+
+[data-theme='dark'] .profileConsentSection::before {
+  background: linear-gradient(to bottom,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.025) 1%,
+    transparent 5%
+  );
+}
+
+.profileConsentDivider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 168, 75, 0.05) 10%,
+    rgba(212, 168, 75, 0.08) 50%,
+    rgba(212, 168, 75, 0.05) 90%,
+    transparent 100%
+  );
+  margin-bottom: var(--space-6);
+}
+
+[data-theme='dark'] .profileConsentDivider {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(232, 188, 92, 0.08) 10%,
+    rgba(232, 188, 92, 0.12) 50%,
+    rgba(232, 188, 92, 0.08) 90%,
+    transparent 100%
+  );
+}
+
+/* Toggle Switch - Premium Gold Style */
+.profileToggleSwitch {
+  width: 52px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(212, 168, 75, 0.22);
+  
+  /* Embedded into material */
+  background: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.25),
+    rgba(248, 245, 237, 0.52);
+  
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.profileToggleSwitchChecked {
+  /* Warm gold track */
+  background: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.08),
+    linear-gradient(180deg,
+      rgba(240, 200, 100, 0.92) 0%,
+      rgba(212, 168, 75, 0.88) 100%
+    );
+  border-color: rgba(212, 168, 75, 0.35);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(212, 168, 75, 0.18);
+}
+
+.profileToggleKnob {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--text-inverse);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  transition: all var(--transition-fast);
+}
+
+.profileToggleCheck {
+  width: 12px;
+  height: 12px;
+  color: rgba(196, 150, 60, 1);
+  stroke-width: 3;
+}
+
+[data-theme='dark'] .profileToggleSwitch {
+  background: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.06),
+    rgba(36, 47, 61, 0.62);
+  border-color: rgba(232, 188, 92, 0.28);
+}
+
+[data-theme='dark'] .profileToggleSwitchChecked {
+  background: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.15),
+    linear-gradient(180deg,
+      rgba(240, 200, 100, 0.82) 0%,
+      rgba(212, 168, 75, 0.78) 100%
+    );
+}
+
+/* Typography Hierarchy - Editorial */
+.profileSectionTitle {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-4) 0;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+
+.profileSettingLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.profileToggleHelper {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+  opacity: 0.75;
+}
+
+.profileConsentTitle {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-4) 0;
+  letter-spacing: 0.01em;
+}
