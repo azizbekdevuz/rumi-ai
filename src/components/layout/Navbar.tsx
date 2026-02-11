@@ -427,12 +427,7 @@ export default function Navbar() {
               >
                 <Link
                   href="/login"
-                  className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium transition-colors"
-                  style={{
-                    background: 'var(--gradient-teal)',
-                    color: 'var(--text-inverse)',
-                    boxShadow: '0 2px 8px rgba(27, 123, 107, 0.25)',
-                  }}
+                  className="navbar-signin-button"
                 >
                   <LogIn className="w-4 h-4" />
                   <span>{loginLabel[language] || loginLabel.en}</span>
