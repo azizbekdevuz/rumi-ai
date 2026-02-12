@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:13-alpine
+    container_name: rumi_ai_db
+    restart: always
+    environment:
+      POSTGRES_DB: rumi_ai
+      POSTGRES_USER: ${DB_USER:-rumi_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-rumi_password}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-rumi_user} -d rumi_ai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rumi_ai_api
+    restart: always
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-rumi_user}:${DB_PASSWORD:-rumi_password}@db:${DB_PORT:-5432}/rumi_ai
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - DEBUG=${DEBUG:-False}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+      - ./media:/app/media
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # NGINX Reverse Proxy (for production-like setup)
+  nginx:
+    image: nginx:alpine
+    container_name: rumi_ai_nginx
+    restart: always
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./media:/var/media
+    depends_on:
+      - api
+
+  # Adminer (Database Management UI)
+  adminer:
+    image: adminer
+    container_name: rumi_ai_adminer
+    restart: always
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    environment:
+      ADMINER_DESIGN: pepa-linha-dark
+
+volumes:
+  postgres_data:

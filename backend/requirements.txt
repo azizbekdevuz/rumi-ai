@@ -1,0 +1,25 @@
+# RUMI AI Backend Requirements
+# Core Framework
+fastapi>=0.100.0
+uvicorn>=0.20.0
+pydantic[email]>=2.0.0
+pydantic-settings>=2.0.0
+python-multipart>=0.0.6
+
+# Database
+sqlalchemy==1.4.22
+psycopg2-binary==2.9.11
+alembic==1.7.1
+
+# Security
+python-jose[cryptography]==3.3.0
+bcrypt>=4.0.0
+
+# Utilities
+python-dotenv>=0.21.0
+requests>=2.26.0
+httpx==0.19.0
+Pillow>=9.0
+
+# Optional: Task Queue (for async processing)
+# celery[redis]==5.1.2
