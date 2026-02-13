@@ -1,26 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { jsonError } from '@/lib/api/bff';
 
-interface LogoutResponse {
-  success: boolean;
-  message?: string;
-}
+// Ensure Node.js runtime for cookie support
+export const runtime = 'nodejs';
 
-export async function POST(_request: NextRequest) {
+export async function POST() {
   try {
-    // Clear the auth cookie
     const cookieStore = await cookies();
-    cookieStore.delete('rumi_token');
-
-    return NextResponse.json({
-      success: true,
-      message: 'Logout successful',
-    });
+    cookieStore.delete({ name: 'rumi_token', path: '/' });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Logout API route error:', error);
-    return NextResponse.json(
-      { success: false, message: 'Failed to process logout request' },
-      { status: 500 }
+    return jsonError(
+      error instanceof Error ? error.message : 'Failed to process logout',
+      500
     );
   }
 }

@@ -22,7 +22,8 @@ class ChatService:
         user_message: str,
         language: str = "FA",
         verse_id: Optional[UUID] = None,
-        citation_ids: Optional[List[UUID]] = None
+        citation_ids: Optional[List[UUID]] = None,
+        source_scope: str = "books"
     ) -> Dict[str, Any]:
         """
         Process a chat message and generate response.
@@ -55,5 +56,6 @@ class ChatService:
         return {
             "response_text": response.get("text"),
             "verse_id": response.get("verse_id"),
-            "citation_ids": response.get("citation_ids", [])
+            "citation_ids": response.get("citation_ids", []),
+            "retrieved_candidates": response.get("retrieved_candidates", [])
         }

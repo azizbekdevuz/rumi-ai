@@ -6,19 +6,43 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
+from dotenv import load_dotenv
+import os
+import logging
 
+# ------------------------------------------------------------------
+# 1. Load .env FIRST (override=True so the .env always wins
+#    over stale / leftover system env vars)
+# ------------------------------------------------------------------
+load_dotenv(override=True)
+
+# ------------------------------------------------------------------
+# 2. Now import the rest of the application (settings, DB, routers)
+# ------------------------------------------------------------------
 from app.config import settings
 from app.database import engine, Base
 
 # Import routers
 from app.routers import auth, chat, search, books, feedback, citation, user
+from app.routers import chat_stream
 
 # Import middleware
 from app.middleware.rate_limit import rate_limit_middleware
 from app.middleware.request_validator import request_validator_middleware
 
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG if settings.DEBUG else logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# Log key config at startup (never log secrets)
+logger.info("Starting %s v%s", settings.APP_NAME, settings.APP_VERSION)
+logger.info("DEBUG=%s, USE_MOCK=%s, LLM_MODEL=%s", settings.DEBUG, settings.USE_MOCK, settings.LLM_MODEL)
+logger.info("LLM_API_URL=%s, API_KEY present=%s", settings.LLM_API_URL, bool(settings.LLM_API_KEY))
+
 # Note: Database tables are managed by Alembic migrations, not here
-# Alembic will create/update tables based on migration files
 
 # Create FastAPI app
 app = FastAPI(
@@ -29,10 +53,10 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS middleware
+# CORS middleware — use proper origin URLs
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_HOSTS,
+    allow_origins=settings.get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +69,7 @@ app.middleware("http")(rate_limit_middleware)
 # Include routers
 app.include_router(auth.router)
 app.include_router(chat.router)
+app.include_router(chat_stream.router)
 app.include_router(search.router)
 app.include_router(books.router)
 app.include_router(feedback.router)
@@ -87,8 +112,8 @@ async def http_exception_handler(request, exc):
         status_code=exc.status_code,
         content={
             "error": {
-                "code": exc.detail.split(":")[0] if ":" in exc.detail else "HTTP_ERROR",
-                "message": exc.detail,
+                "code": exc.detail.split(":")[0] if isinstance(exc.detail, str) and ":" in exc.detail else "HTTP_ERROR",
+                "message": exc.detail if isinstance(exc.detail, str) else str(exc.detail),
                 "details": {}
             }
         }

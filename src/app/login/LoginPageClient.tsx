@@ -14,6 +14,41 @@ import AuthFormLogin from '@/features/auth/components/AuthFormLogin';
 import AuthFormSignup from '@/features/auth/components/AuthFormSignup';
 import SocialButtonsRow from '@/features/auth/components/SocialButtonsRow';
 
+function toErrorMessage(x: any, fallback: string) {
+    if (!x) return fallback;
+
+    if (typeof x === "string") return x;
+    if (x instanceof Error) return x.message || fallback;
+
+    // Typical API error object cases
+    if (typeof x === "object") {
+        if (typeof x.message === "string") return x.message;
+        if (typeof x.error === "string") return x.error;
+        if (typeof x.detail === "string") return x.detail;
+
+        // Some APIs return details as string/array/object
+        if (typeof x.details === "string") return x.details;
+        if (Array.isArray(x.details)) {
+            const first = x.details.find((v: any) => typeof v === "string");
+            if (first) return first;
+        }
+        if (x.details && typeof x.details === "object") {
+            // try common FastAPI/Pydantic validation format
+            const msg = x.details.msg || x.details.message;
+            if (typeof msg === "string") return msg;
+        }
+
+        // last resort: stringify (but keep it short)
+        try {
+            return JSON.stringify(x);
+        } catch {
+            return fallback;
+        }
+    }
+
+    return fallback;
+}
+
 export default function LoginPageClient() {
     const { language, dir } = useI18n();
     const direction = dir;
@@ -156,16 +191,26 @@ export default function LoginPageClient() {
         setIsLoginLoading(true);
         setLoginError('');
 
-        // Simulate API call - replace with actual auth
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+            });
 
-        // Mock validation
-        if (loginEmail && loginPassword) {
+            const data = await response.json().catch(() => null);
+
+            if (!response.ok || !data?.success) {
+                setLoginError(toErrorMessage(data, c.loginError));
+                return;
+            }
+
             router.push('/chat');
-        } else {
-            setLoginError(c.loginError);
+        } catch (error) {
+            setLoginError(toErrorMessage(error, c.loginError));
+        } finally {
+            setIsLoginLoading(false);
         }
-        setIsLoginLoading(false);
     };
 
     const handleSignupSubmit = async (e: React.FormEvent) => {
@@ -173,31 +218,47 @@ export default function LoginPageClient() {
         setIsSignupLoading(true);
         setSignupError('');
 
-        // Validate passwords match
         if (signupPassword !== confirmPassword) {
-            setSignupError('Passwords do not match');
+            setSignupError("Passwords do not match");
             setIsSignupLoading(false);
             return;
         }
 
-        // Simulate API call - replace with actual auth
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        // Mock validation
-        if (signupEmail && signupPassword.length >= 8 && confirmPassword.length >= 8) {
-            router.push('/chat');
-        } else {
-            setSignupError(c.signupError);
+        if (signupPassword.length < 8) {
+            setSignupError("Password must be at least 8 characters");
+            setIsSignupLoading(false);
+            return;
         }
-        setIsSignupLoading(false);
+
+        try {
+            const response = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: signupEmail, password: signupPassword }),
+            });
+
+            const data = await response.json().catch(() => null);
+
+            if (!response.ok || !data?.success) {
+                setSignupError(toErrorMessage(data, c.signupError));
+                return;
+            }
+
+            router.push('/chat');
+        } catch (error) {
+            setSignupError(toErrorMessage(error, c.signupError));
+        } finally {
+            setIsSignupLoading(false);
+        }
     };
 
     const handleTabChange = (tab: "login" | "signup") => {
         const newUrl = tab === "signup" ? "/login?tab=signup" : "/login";
         router.replace(newUrl, { scroll: false });
-        setLoginError("");
-        setSignupError("");
+        setLoginError('');
+        setSignupError('');
     };
+
 
     return (
         <AuthPageShell>

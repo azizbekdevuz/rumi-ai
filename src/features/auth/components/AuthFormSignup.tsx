@@ -68,7 +68,7 @@ export default function AuthFormSignup({
             exit={{ opacity: 0, y: -10, height: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
-            {error}
+            {typeof error === "string" ? error : "Unknown error occurred, please try again"}
           </motion.div>
         )}
       </AnimatePresence>

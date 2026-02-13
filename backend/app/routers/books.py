@@ -9,10 +9,32 @@ from uuid import UUID
 
 from app.database import get_db
 from app.models import Book, Verse, Citation
-from app.schemas import BookPageResponse, BookPageVerse
+from app.schemas import BookPageResponse, BookPageVerse, BookListResponse, BookResponse
 from app.middleware.auth import get_optional_user
 
 router = APIRouter(prefix="/api/books", tags=["books"])
+
+
+@router.get("", response_model=BookListResponse)
+async def list_books(
+    current_user = Depends(get_optional_user),
+    db: Session = Depends(get_db)
+):
+    """
+    List all available books.
+    Returns books with id, title, title_en, pdf_url, type.
+    """
+    books = db.query(Book).all()
+    return BookListResponse(
+        books=[BookResponse(
+            id=book.id,
+            title=book.title,
+            title_en=book.title_en,
+            pdf_url=book.pdf_url,
+            type=book.type
+        ) for book in books],
+        total=len(books)
+    )
 
 
 @router.get("/{book_id}/pages/{page_number}", response_model=BookPageResponse)

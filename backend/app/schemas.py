@@ -246,6 +246,7 @@ class ChatRequest(BaseModel):
     """Schema for /api/chat POST request."""
     question: str = Field(..., description="User's question or problem")
     language: str = Field("fa", description="Language code: fa, en, or kr")
+    source_scope: Optional[str] = Field("books", description="Source scope: books, web, web_books")
 
 
 class VerseMultilingual(BaseModel):
@@ -263,12 +264,22 @@ class CitationSummary(BaseModel):
     snippet: Optional[str] = None
 
 
+class RetrievedCandidate(BaseModel):
+    """Retrieved candidate for reasoning display."""
+    id: UUID
+    book: Optional[str] = None
+    page_number: Optional[int] = None
+    snippet: Optional[str] = None
+    score: Optional[float] = None
+
+
 class ChatResponse(BaseModel):
     """Schema for /api/chat POST response."""
     verse: VerseMultilingual
     interpretation: str
     advice: str
     citations: List[CitationSummary]
+    retrieved_candidates: Optional[List[RetrievedCandidate]] = None
 
 
 class SearchRequest(BaseModel):

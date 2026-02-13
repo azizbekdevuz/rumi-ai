@@ -4,21 +4,24 @@ Database connection and session management for RUMI AI backend.
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import NullPool
 import os
 from typing import Generator
 
-# Database URL from environment variable
+# Database URL from environment variable (set by load_dotenv in main.py)
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "postgresql://rumi_user:rumi_password@localhost:5432/rumi_ai"
 )
 
 # Create SQLAlchemy engine
+# Use a standard connection pool instead of NullPool so that connections
+# are reused across requests and lazy-loaded attributes still work after
+# session operations like commit / flush.
 engine = create_engine(
     DATABASE_URL,
-    poolclass=NullPool,
     pool_pre_ping=True,
+    pool_size=5,
+    max_overflow=10,
     echo=os.getenv("DEBUG", "False").lower() == "true"
 )
 
