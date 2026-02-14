@@ -1,0 +1,16 @@
+WEEK 1 | Commit 1
+
+CHANGES:
+- Added SQL_ECHO environment variable to control SQLAlchemy engine logging
+- Created shared _session.py helper module for user/session resolution logic
+
+DETAILS:
+- database.py: Before all SQL queries were always logged, causing excessive noise in terminal output
+- database.py: After SQL logging is now controlled via SQL_ECHO env flag (default: off)
+- _session.py: New module providing resolve_or_create_guest() and resolve_or_create_session() functions
+- _session.py: Eliminates duplicated user/session creation code between chat.py and chat_stream.py
+- Centralizes guest user creation and chat session management in a single reusable module
+- resolve_or_create_guest: checks Authorization header, falls back to guest UUID from X-Guest-Id
+- resolve_or_create_session: finds existing session or creates new one, always returns committed session
+
+FILES: backend/app/database.py, backend/app/routers/_session.py
