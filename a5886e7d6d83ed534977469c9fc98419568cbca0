@@ -1,0 +1,19 @@
+WEEK 1 | Commit 2
+
+CHANGES:
+- Fixed critical ForeignKeyViolation error in streaming chat endpoint
+- Added LLM timeout handling with SSE error event emission
+- Session ID now included in streaming done payload for frontend persistence
+
+DETAILS:
+- ROOT CAUSE: ChatSession row was only flushed (not committed) before StreamingResponse began
+- Before: db.flush() only -> when message INSERT ran inside the streaming generator, it referenced
+  a session_id that did not exist in the committed chat_sessions table -> ForeignKeyViolation crash
+- After: Explicit db.commit() after session creation/resolution, before streaming response starts
+- This was the #1 critical bug blocking the entire chat functionality from working
+- Added asyncio.wait_for() with 90-second timeout for LLM API calls
+- On timeout/failure: emits clean SSE error event so frontend stops spinner instead of hanging
+- The done SSE payload now includes session_id so frontend can persist it to localStorage
+- Streaming generator properly handles both successful completion and error paths
+
+FILES: backend/app/routers/chat_stream.py
