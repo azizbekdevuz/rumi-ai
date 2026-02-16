@@ -1,0 +1,15 @@
+WEEK 1 | Commit 3
+
+CHANGES:
+- Refactored non-streaming chat router to use shared _session.py helper functions
+- Ensured consistent session handling between streaming and non-streaming endpoints
+
+DETAILS:
+- Before: chat.py had its own inline user resolution and session creation logic
+- Before: This duplicated code diverged from chat_stream.py, risking inconsistent behavior
+- After: Uses resolve_or_create_guest() and resolve_or_create_session() from _session.py
+- Both /api/chat (non-streaming) and /api/chat/stream now handle users/sessions identically
+- Session IDs are consistently generated and returned across both endpoints
+- Reduces maintenance burden: session logic changes only need to happen in _session.py
+
+FILES: backend/app/routers/chat.py
