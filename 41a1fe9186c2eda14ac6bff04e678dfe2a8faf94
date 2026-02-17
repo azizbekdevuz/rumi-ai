@@ -1,0 +1,18 @@
+WEEK 1 | Commit 4
+
+CHANGES:
+- Enhanced chat_service.py with improved error handling and structured response parsing
+- Improved llm_generation.py with better output handling and error recovery
+- Added new prompt_builder.py module for constructing LLM system/user prompts
+
+DETAILS:
+- chat_service: Better error handling for malformed or incomplete LLM responses
+- chat_service: Structured response parsing for verse, interpretation, advice fields
+- llm_generation: Structured output handling with fallback for unexpected formats
+- llm_generation: Improved timeout and connection error handling
+- prompt_builder: New module that constructs system and user prompts for the LLM
+- prompt_builder: Handles multilingual prompt construction (English, Persian, Korean)
+- prompt_builder: Separates prompt engineering concerns from service/generation logic
+- Cleaner separation of responsibilities: prompt building -> LLM generation -> response parsing
+
+FILES: backend/app/services/chat_service.py, llm_generation.py, prompt_builder.py (new)
