@@ -1,0 +1,18 @@
+WEEK 1 | Commit 5
+
+CHANGES:
+- Updated FeedbackRequest Pydantic schema: session_id and message_id now Optional
+- Changed FeedbackReport SQLAlchemy model: message_id column now nullable=True
+
+DETAILS:
+- Before: session_id was required (UUID) in FeedbackRequest schema
+- Before: message_id did not exist in FeedbackRequest, was hardcoded in router
+- Before: FeedbackReport.message_id was nullable=False in database, preventing null inserts
+- After: session_id is Optional[UUID] = None, can be omitted for general feedback
+- After: message_id is Optional[UUID] = None, added to schema with proper type annotation
+- After: FeedbackReport.message_id column changed to nullable=True in database model
+- This enables the navbar FeedbackModal to submit general feedback without any chat context
+- Message-specific reports from the chat ReportModal still work by providing message_id
+- Updated issue_type field description to list all valid categories
+
+FILES: backend/app/schemas.py, backend/app/models.py
