@@ -242,11 +242,19 @@ class PaginationResponse(BaseModel):
 
 
 # API Endpoint Schemas (matching specification)
+class HistoryTurn(BaseModel):
+    """A single turn in the conversation history."""
+    role: str = Field(..., description="'user' or 'assistant'")
+    content: str = Field(..., description="Message text")
+
+
 class ChatRequest(BaseModel):
     """Schema for /api/chat POST request."""
     question: str = Field(..., description="User's question or problem")
     language: str = Field("fa", description="Language code: fa, en, or kr")
     source_scope: Optional[str] = Field("books", description="Source scope: books, web, web_books")
+    session_id: Optional[UUID] = Field(None, description="Existing chat session ID for multi-turn")
+    history: Optional[List[HistoryTurn]] = Field(None, description="Recent conversation turns (max 6)")
 
 
 class VerseMultilingual(BaseModel):
@@ -275,11 +283,13 @@ class RetrievedCandidate(BaseModel):
 
 class ChatResponse(BaseModel):
     """Schema for /api/chat POST response."""
+    session_id: Optional[UUID] = None
     verse: VerseMultilingual
     interpretation: str
     advice: str
     citations: List[CitationSummary]
     retrieved_candidates: Optional[List[RetrievedCandidate]] = None
+    grounded: bool = Field(True, description="True when response is grounded in retrieved corpus data")
 
 
 class SearchRequest(BaseModel):
@@ -366,9 +376,15 @@ class SettingsResponse(BaseModel):
 
 
 class FeedbackRequest(BaseModel):
-    """Schema for /api/feedback POST request."""
-    session_id: UUID
-    issue_type: str = Field(..., description="Issue type: ocr_error, incorrect_translation, etc.")
+    """Schema for /api/feedback POST request.
+
+    Both ``session_id`` and ``message_id`` are optional so that general
+    feedback (not tied to a specific chat message) can be submitted from
+    the navbar feedback form.
+    """
+    session_id: Optional[UUID] = None
+    message_id: Optional[UUID] = None
+    issue_type: str = Field(..., description="Issue type: ocr_error, incorrect_translation, general, bug, feature, appreciation, etc.")
     comment: Optional[str] = None
 
 
