@@ -1,0 +1,17 @@
+WEEK 1 | Commit 6
+
+CHANGES:
+- Updated create_feedback endpoint to handle optional session_id and message_id
+- Removed mandatory message lookup that blocked general feedback submissions
+
+DETAILS:
+- Before: Endpoint performed mandatory message lookup using session_id + message_id
+- Before: Returned HTTP 404 if message not found, preventing general feedback entirely
+- After: message_id and session_id are read directly from request body (can be None)
+- After: FeedbackReport creation uses feedback_data.message_id directly (nullable)
+- General feedback from navbar FeedbackModal now works without chat session reference
+- Message-specific feedback from chat ReportModal works when message_id is provided
+- Guest user creation still functions for anonymous feedback submissions
+- Error handling preserved for database commit failures
+
+FILES: backend/app/routers/feedback.py
