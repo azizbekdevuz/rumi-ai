@@ -1,0 +1,20 @@
+WEEK 1 | Commit 7
+
+CHANGES:
+- Created TypeScript type definitions for authentication (AuthUser, AuthStatus, AuthMeResponse)
+- Implemented AuthProvider React context with full user state management
+- Added useAuth() hook for consuming auth state across the entire application
+
+DETAILS:
+- auth.ts types: AuthUser { id, email, preferred_lang, theme, created_at }
+- auth.ts types: AuthStatus = 'loading' | 'authenticated' | 'unauthenticated'
+- auth.ts types: AuthMeResponse { authenticated: boolean, user: AuthUser | null }
+- AuthProvider: Fetches GET /api/auth/me on mount to restore session from httpOnly cookie
+- AuthProvider: Manages status transitions: loading -> authenticated OR unauthenticated
+- Exposes via useAuth(): user (AuthUser|null), status, refresh(), logout()
+- refresh(): Re-fetches /api/auth/me to synchronize state after login or signup
+- logout(): Calls POST /api/auth/logout to clear httpOnly cookie, then resets local state
+- Error handling: Network failures gracefully fall back to 'unauthenticated' status
+- Context prevents unnecessary re-renders by memoizing the provider value
+
+FILES: src/types/auth.ts (new), src/lib/auth/auth-context.tsx (new)
