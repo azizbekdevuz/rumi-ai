@@ -1,0 +1,17 @@
+WEEK 1 | Commit 8
+
+CHANGES:
+- New GET /api/auth/me BFF (Backend-for-Frontend) route for checking auth session
+- Bridges frontend AuthProvider with backend /api/user/me endpoint
+
+DETAILS:
+- Reads httpOnly rumi_token cookie from the incoming Next.js request
+- If no token found: immediately returns { authenticated: false, user: null }
+- If token found: forwards to backend GET /api/user/me with Authorization: Bearer header
+- Transforms backend user response into typed AuthMeResponse for frontend consumption
+- If backend returns error (expired/invalid token): returns unauthenticated status
+- Prevents Next.js from caching user data with cache: 'no-store' option
+- This route is called by AuthProvider on every page load/refresh to restore session state
+- Enables seamless session persistence across page navigations without exposing JWT to JS
+
+FILES: src/app/api/auth/me/route.ts (new)
