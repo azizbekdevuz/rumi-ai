@@ -1,0 +1,18 @@
+WEEK 1 | Commit 9
+
+CHANGES:
+- Updated books list and book page BFF routes with consistent error handling
+- Updated citations BFF route to properly proxy to backend citation endpoint
+- All routes now use shared jsonError and parseBackendError helper functions
+
+DETAILS:
+- Books list route (GET /api/books): Added proper auth token forwarding from httpOnly cookie
+- Book page route (GET /api/books/[bookId]/pages/[page]): Consistent error response format
+- Citations route (GET /api/citations/[refId]): Fixed proxy to backend citation endpoint
+- Before: Inconsistent error handling across BFF routes, some missing token forwarding
+- After: All routes use jsonError() helper for standardized error responses
+- After: All routes use parseBackendError() for extracting backend error messages
+- Auth tokens from httpOnly rumi_token cookie forwarded to backend on all requests
+- Proper HTTP status code propagation from backend to frontend
+
+FILES: src/app/api/books/route.ts, src/app/api/books/[bookId]/pages/[page]/route.ts, src/app/api/citations/[refId]/route.ts
