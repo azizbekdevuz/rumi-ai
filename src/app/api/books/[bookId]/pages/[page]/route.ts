@@ -7,10 +7,10 @@ export const runtime = 'nodejs';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { bookId: string; page: string } }
+  { params }: { params: Promise<{ bookId: string; page: string }> }
 ) {
   try {
-    const { bookId, page } = params;
+    const { bookId, page } = await params;
     const cookieStore = await cookies();
     const token = cookieStore.get('rumi_token')?.value;
 
