@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ChatRequest, ChatResponse } from '../../../types/chat';
+import { ChatRequest, ChatResponse, Citation, RetrievedCandidate } from '../../../types/chat';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
 
@@ -9,23 +9,55 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
 // Ensure Node.js runtime for cookie support
 export const runtime = 'nodejs';
 
+/** Shape returned by the Python backend for a single chat turn */
+interface BackendChatResponse {
+  session_id?: string;
+  verse?: { fa?: string; en?: string; kr?: string };
+  interpretation?: string;
+  advice?: string | string[];
+  citations?: BackendCitation[];
+  retrieved_candidates?: BackendCandidate[];
+  grounded?: boolean;
+}
+
+interface BackendCitation {
+  id?: string;
+  book?: string;
+  page_number?: number;
+  snippet?: string;
+}
+
+interface BackendCandidate {
+  id?: string;
+  ref_id?: string;
+  book?: string;
+  page_number?: number;
+}
+
 /**
- * Transform frontend ChatRequest to backend ChatRequest
+ * Transform frontend ChatRequest to backend ChatRequest.
+ * Forwards session_id and history for multi-turn support.
  */
-function transformRequest(frontendRequest: ChatRequest) {
-  return {
+function transformRequest(frontendRequest: ChatRequest): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
     question: frontendRequest.message,
     language: frontendRequest.language,
     source_scope: frontendRequest.sourceScope,
   };
+  if (frontendRequest.sessionId) {
+    payload.session_id = frontendRequest.sessionId;
+  }
+  if (frontendRequest.history && frontendRequest.history.length > 0) {
+    payload.history = frontendRequest.history.slice(-6);
+  }
+  return payload;
 }
 
 /**
  * Transform backend ChatResponse to frontend ChatResponse
  */
-function transformResponse(backendResponse: any): ChatResponse {
+function transformResponse(backendResponse: BackendChatResponse): ChatResponse {
   // Transform advice: backend returns string, frontend expects string[]
-  // Safer parsing: split on newlines, strip leading bullets only
   const raw = backendResponse.advice;
   let adviceArray: string[] = [];
 
@@ -44,29 +76,35 @@ function transformResponse(backendResponse: any): ChatResponse {
   if (adviceArray.length === 0) adviceArray = [""];
 
   // Transform citations: map backend fields to frontend fields
-  // Only include refId (not id) as per frontend type
-  const citations = (backendResponse.citations || []).map((citation: any) => ({
-    refId: citation.id || '',
-    page: citation.page_number || 0,
-    book: citation.book || '',
-    snippet: citation.snippet || '',
+  const citations: Citation[] = (backendResponse.citations ?? []).map((citation) => ({
+    refId: citation.id ?? '',
+    page: citation.page_number ?? 0,
+    book: citation.book ?? '',
+    snippet: citation.snippet ?? '',
+  }));
+
+  // Transform retrieved_candidates
+  const retrievedCandidates: RetrievedCandidate[] = (
+    backendResponse.retrieved_candidates ?? []
+  ).map((candidate) => ({
+    refId: candidate.id ?? candidate.ref_id ?? '',
+    book: candidate.book ?? '',
+    page: candidate.page_number ?? 0,
   }));
 
   return {
     id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    sessionId: backendResponse.session_id,
     verse: {
-      fa: backendResponse.verse?.fa || '',
+      fa: backendResponse.verse?.fa ?? '',
       en: backendResponse.verse?.en,
       kr: backendResponse.verse?.kr,
     },
-    interpretation: backendResponse.interpretation || '',
+    interpretation: backendResponse.interpretation ?? '',
     advice: adviceArray,
-    citations: citations,
-    retrievedCandidates: (backendResponse.retrieved_candidates || []).map((candidate: any) => ({
-      refId: candidate.id || candidate.ref_id || '',
-      book: candidate.book || '',
-      page: candidate.page_number || 0,
-    })),
+    citations,
+    retrievedCandidates,
+    grounded: backendResponse.grounded ?? true,
   };
 }
 

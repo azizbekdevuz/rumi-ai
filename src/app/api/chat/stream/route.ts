@@ -1,10 +1,29 @@
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
-import { ChatRequest } from '../../../../types/chat';
+import { ChatRequest, HistoryTurn } from '../../../../types/chat';
 import { jsonError } from '@/lib/api/bff';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
 export const runtime = 'nodejs';
+
+/** Build the backend-shaped payload from the frontend request */
+function buildBackendPayload(body: ChatRequest): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
+    question: body.message,
+    language: body.language,
+    source_scope: body.sourceScope,
+  };
+  if (body.sessionId) {
+    payload.session_id = body.sessionId;
+  }
+  if (body.history && body.history.length > 0) {
+    payload.history = body.history.slice(-6).map((h: HistoryTurn) => ({
+      role: h.role,
+      content: h.content,
+    }));
+  }
+  return payload;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,11 +45,7 @@ export async function POST(request: NextRequest) {
     const backendResponse = await fetch(`${BACKEND_URL}/api/chat/stream`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        question: body.message,
-        language: body.language,
-        source_scope: body.sourceScope,
-      }),
+      body: JSON.stringify(buildBackendPayload(body)),
     });
 
     if (!backendResponse.ok) {
