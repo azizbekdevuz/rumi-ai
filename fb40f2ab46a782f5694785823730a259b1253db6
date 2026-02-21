@@ -1,0 +1,20 @@
+WEEK 2 | Commit 10
+
+CHANGES:
+- Updated non-streaming chat BFF route with proper request/response data transformation
+- Updated streaming chat BFF route with payload building and session support
+- Both routes now forward auth tokens and include conversation history context
+
+DETAILS:
+- Non-streaming (/api/chat POST): Transforms frontend ChatRequest shape to backend format
+- Response transformation: backend returns advice as string -> frontend needs string array
+- Citation field mapping: backend page_number -> frontend page, backend id -> frontend refId
+- Retrieved candidates mapping for transparency features (grounded responses)
+- Streaming (/api/chat/stream POST): Builds backend payload with session_id and history
+- History slicing: sends last 6 conversation turns for multi-turn context
+- Before: Chat routes had incomplete data transformation causing field mismatches
+- After: Full bidirectional transformation matching both backend and frontend schemas
+- Both routes extract JWT from httpOnly rumi_token cookie for authenticated sessions
+- Error handling with descriptive messages for network failures and backend errors
+
+FILES: src/app/api/chat/route.ts, src/app/api/chat/stream/route.ts
