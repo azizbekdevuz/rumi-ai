@@ -1,0 +1,20 @@
+WEEK 2 | Commit 11
+
+CHANGES:
+- New stream-chat.ts: Isolated SSE (Server-Sent Events) streaming helper for chat
+- Updated chat type definitions with new fields for streaming and multi-turn support
+
+DETAILS:
+- stream-chat.ts: Handles three SSE event types from backend: chunk, done, error
+- Progressive text accumulation with typed callbacks: onChunk, onComplete, onError
+- Transforms backend done payload to frontend AssistantMessage shape automatically
+- Handles advice string-to-array conversion and citation field mapping in done handler
+- Builds fallback message when stream ends without explicit done event (graceful degradation)
+- Network error and HTTP error handling with descriptive error messages for UI display
+- chat.ts types: Added HistoryTurn type for multi-turn conversation context
+- chat.ts types: Added RetrievedCandidate type for RAG transparency
+- chat.ts types: Added SourceScope = 'books' | 'hybrid' | 'web' union type
+- Citation type updated with: refId, book, page, snippet fields
+- AssistantMessage: added retrievedCandidates, grounded, sessionId optional fields
+
+FILES: src/lib/api/stream-chat.ts (new), src/types/chat.ts
