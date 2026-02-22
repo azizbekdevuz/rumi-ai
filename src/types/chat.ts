@@ -20,6 +20,8 @@ export interface AssistantMessage extends ChatMessage {
   advice: string[];
   citations: Citation[];
   retrievedCandidates?: RetrievedCandidate[];
+  /** True when the response is grounded in retrieved corpus data */
+  grounded?: boolean;
 }
 
 export interface Citation {
@@ -35,16 +37,24 @@ export interface RetrievedCandidate {
   refId: string;
 }
 
+/** Single turn in the history payload sent to the backend */
+export interface HistoryTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export interface ChatRequest {
   message: string;
   language: Language;
   country: Country;
   sourceScope: SourceScope;
-  history: ChatMessage[];
+  sessionId?: string;
+  history?: HistoryTurn[];
 }
 
 export interface ChatResponse {
   id: string;
+  sessionId?: string;
   verse: {
     fa: string;
     en?: string;
@@ -54,4 +64,5 @@ export interface ChatResponse {
   advice: string[];
   citations: Citation[];
   retrievedCandidates?: RetrievedCandidate[];
+  grounded?: boolean;
 }
