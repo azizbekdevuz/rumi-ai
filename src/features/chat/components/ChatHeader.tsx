@@ -3,26 +3,36 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks';
-//eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { motion as motionTokens } from '@/lib/design-system/motion';
-import { HeartIcon } from '@/components/ui/icons';
+import { HeartIcon, NewChatIcon } from '@/components/ui/icons';
+import type { SourceScope } from '@/types/chat';
+
+// ── Source scope options ─────────────────────────────────────────
+
+const SOURCE_SCOPE_OPTIONS: { value: SourceScope; label: string }[] = [
+  { value: 'books', label: 'Books' },
+  { value: 'web_books', label: 'Hybrid' },
+  { value: 'web', label: 'Web' },
+];
+
+// ── Props ────────────────────────────────────────────────────────
 
 interface ChatHeaderProps {
   citeEnabled: boolean;
   onCiteToggle: (enabled: boolean) => void;
+  sourceScope: SourceScope;
+  onSourceScopeChange: (scope: SourceScope) => void;
+  onNewChat?: () => void;
 }
 
-export default function ChatHeader({ citeEnabled, onCiteToggle }: ChatHeaderProps) {
+export default function ChatHeader({
+  citeEnabled,
+  onCiteToggle,
+  sourceScope,
+  onSourceScopeChange,
+  onNewChat,
+}: ChatHeaderProps) {
   const reducedMotion = useReducedMotion();
   const [isFavorited, setIsFavorited] = useState(false);
-
-  const handleCiteToggle = () => {
-    onCiteToggle(!citeEnabled);
-  };
-
-  const handleFavorite = () => {
-    setIsFavorited(!isFavorited);
-  };
 
   const buttonVariants = reducedMotion
     ? undefined
@@ -37,10 +47,40 @@ export default function ChatHeader({ citeEnabled, onCiteToggle }: ChatHeaderProp
         <h2 className="chat-header-title">Rumi AI Agent</h2>
 
         <div className="chat-header-actions">
+          {/* New Chat */}
+          {onNewChat && (
+            <motion.button
+              className="chat-header-action-btn"
+              onClick={onNewChat}
+              aria-label="New chat"
+              whileHover={reducedMotion ? {} : { scale: 1.05 }}
+              whileTap={reducedMotion ? {} : { scale: 0.95 }}
+              title="New chat"
+            >
+              <NewChatIcon style={{ width: 18, height: 18 }} />
+            </motion.button>
+          )}
+
+          {/* Source scope selector */}
+          <div className="chat-header-scope-group" role="radiogroup" aria-label="Source scope">
+            {SOURCE_SCOPE_OPTIONS.map((opt) => (
+              <motion.button
+                key={opt.value}
+                className={`chat-header-scope-btn ${sourceScope === opt.value ? 'active' : ''}`}
+                onClick={() => onSourceScopeChange(opt.value)}
+                aria-pressed={sourceScope === opt.value}
+                whileHover={reducedMotion ? {} : { scale: 1.05 }}
+                whileTap={reducedMotion ? {} : { scale: 0.95 }}
+              >
+                {opt.label}
+              </motion.button>
+            ))}
+          </div>
+
           {/* Heart Icon */}
           <motion.button
             className="chat-header-action-btn"
-            onClick={handleFavorite}
+            onClick={() => setIsFavorited(!isFavorited)}
             aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
             variants={buttonVariants}
             whileHover={reducedMotion ? {} : 'hover'}
@@ -59,7 +99,7 @@ export default function ChatHeader({ citeEnabled, onCiteToggle }: ChatHeaderProp
           {/* Cite Toggle */}
           <motion.button
             className={`chat-header-cite-toggle ${citeEnabled ? 'active' : ''}`}
-            onClick={handleCiteToggle}
+            onClick={() => onCiteToggle(!citeEnabled)}
             aria-label={citeEnabled ? 'Hide citations' : 'Show citations'}
             aria-pressed={citeEnabled}
             variants={buttonVariants}
@@ -69,26 +109,6 @@ export default function ChatHeader({ citeEnabled, onCiteToggle }: ChatHeaderProp
             Cite
           </motion.button>
 
-          {/* Small Icon Button (placeholder for future feature) */}
-          <motion.button
-            className="chat-header-action-btn"
-            aria-label="More options"
-            variants={buttonVariants}
-            whileHover={reducedMotion ? {} : 'hover'}
-            whileTap={reducedMotion ? {} : 'tap'}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="8" cy="3" r="1.5" fill="currentColor" />
-              <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-              <circle cx="8" cy="13" r="1.5" fill="currentColor" />
-            </svg>
-          </motion.button>
         </div>
       </div>
 

@@ -97,9 +97,11 @@ function MessageBubble({ message, citeEnabled, onCitationClick, language }: Mess
           },
         };
 
-  const hasVerse = assistantMessage.verse?.fa;
-  const hasInterpretation = assistantMessage.interpretation;
-  const hasAdvice = assistantMessage.advice && assistantMessage.advice.length > 0;
+  const hasVerse = !!assistantMessage.verse?.fa;
+  const hasInterpretation = !!assistantMessage.interpretation;
+  // Filter out empty/whitespace-only advice to avoid rendering bare arrow markers
+  const filteredAdvice = (assistantMessage.advice ?? []).filter((a) => a.trim());
+  const hasAdvice = filteredAdvice.length > 0;
   const hasCitations = assistantMessage.citations && assistantMessage.citations.length > 0;
   const firstCitation = hasCitations ? assistantMessage.citations[0] : null;
 
@@ -163,7 +165,7 @@ function MessageBubble({ message, citeEnabled, onCitationClick, language }: Mess
               initial="initial"
               animate="animate"
             >
-              {assistantMessage.advice.map((item, index) => (
+              {filteredAdvice.map((item, index) => (
                 <motion.p
                   key={index}
                   className="message-bubble-advice-item"

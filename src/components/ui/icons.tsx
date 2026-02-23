@@ -29,6 +29,7 @@ import {
   Check,
   Loader2,
   MessageSquareDiff,
+  SquarePen,
   type LucideProps,
 } from 'lucide-react';
 
@@ -117,4 +118,5 @@ export {
   Check as CheckIcon,
   Loader2 as LoaderIcon,
   MessageSquareDiff as MsgSquareIcon,
+  SquarePen as NewChatIcon,
 };
