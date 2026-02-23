@@ -1,0 +1,21 @@
+WEEK 2 | Commit 12
+
+CHANGES:
+- ChatHeader: Added New Chat button and source scope selector, removed non-functional 3-dot menu
+- Composer: Removed non-functional microphone button for cleaner UI
+- MessageBubble: Improved structured response rendering for verse/interpretation/advice
+- Icons: Added NewChatIcon (SquarePen from lucide-react)
+
+DETAILS:
+- ChatHeader now includes: New Chat button (SquarePen icon), source scope toggle, cite toggle
+- ChatHeader: Before had a 3-dot menu button that did nothing on click; now removed
+- ChatHeader: Source scope selector (Books/Hybrid/Web) uses radiogroup ARIA pattern
+- Composer: Before had a microphone button that was completely non-functional
+- Composer: After removal, only functional elements remain (textarea + send button)
+- Principle applied: Every visible button/element must have real functionality
+- MessageBubble: Enhanced verse card rendering with proper attribution
+- MessageBubble: Improved interpretation and advice section layout
+- MessageBubble: Citation chips render with proper styling and click handlers
+- icons.tsx: Added NewChatIcon as SquarePen export from lucide-react for shared use
+
+FILES: src/features/chat/components/ChatHeader.tsx, Composer.tsx, MessageBubble.tsx, src/components/ui/icons.tsx
