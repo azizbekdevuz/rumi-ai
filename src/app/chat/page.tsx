@@ -1,8 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n/i18n-context';
-import { ChatMessage as ChatMessageType, AssistantMessage, SourceScope, Citation } from '../../types/chat';
+import {
+  ChatMessage as ChatMessageType,
+  AssistantMessage,
+  SourceScope,
+  Citation,
+  HistoryTurn,
+} from '../../types/chat';
+import { streamChat, StreamCompleteData } from '@/lib/api/stream-chat';
 import CitationModal from '@/features/chat/components/CitationModal';
 import ReportModal from '@/features/chat/components/ReportModal';
 import SuggestedPrompts from '@/features/chat/components/SuggestedPrompts';
@@ -17,37 +24,76 @@ import { motion as motionTokens } from '@/lib/design-system/motion';
 import { useReducedMotion } from '@/lib/hooks';
 import { MsgSquareIcon } from '@/components/ui/icons';
 
+// ── Session persistence helpers ───────────────────────────────────
+
+const SESSION_KEY = 'rumi_chat_session_id';
+
+function loadSessionId(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  return localStorage.getItem(SESSION_KEY) ?? undefined;
+}
+
+function saveSessionId(id: string) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(SESSION_KEY, id);
+  }
+}
+
+// ── History builder ───────────────────────────────────────────────
+
+/** Build a bounded (max 6 turns) history payload from existing messages */
+function buildHistory(messages: ChatMessageType[]): HistoryTurn[] {
+  return messages
+    .filter((m) => m.content.trim())
+    .slice(-6)
+    .map((m) => ({ role: m.role, content: m.content }));
+}
+
 export default function ChatPage() {
   const { language, t } = useI18n();
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sourceScope, setSourceScope] = useState<SourceScope>('books');
   const [citeEnabled, setCiteEnabled] = useState(true);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
   const [reportMessageId, setReportMessageId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const reducedMotion = useReducedMotion();
 
-  const simulateStreaming = async (response: ChatMessageType): Promise<AssistantMessage> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: response.id,
-          role: 'assistant',
-          content: (response as AssistantMessage).interpretation,
-          timestamp: new Date(),
-          verse: (response as AssistantMessage).verse,
-          interpretation: (response as AssistantMessage).interpretation,
-          advice: (response as AssistantMessage).advice,
-          citations: (response as AssistantMessage).citations,
-          retrievedCandidates: (response as AssistantMessage).retrievedCandidates,
-        });
-      }, 1500);
-    });
-  };
+  // Ref to track the ID of the currently streaming assistant message
+  const streamingIdRef = useRef<string | null>(null);
 
-  const handleSend = async () => {
+  // Restore session id from localStorage on mount
+  useEffect(() => {
+    setSessionId(loadSessionId());
+  }, []);
+
+  /** Persist session id to state + localStorage when received from backend */
+  const handleSessionId = useCallback((id: string | undefined) => {
+    if (id) {
+      setSessionId(id);
+      saveSessionId(id);
+    }
+  }, []);
+
+  /** Start a brand-new chat session */
+  const handleNewChat = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(SESSION_KEY);
+    }
+    setSessionId(undefined);
+    setMessages([]);
+    setInput('');
+    setIsLoading(false);
+    streamingIdRef.current = null;
+  }, []);
+
+  /**
+   * Send a message. Uses real SSE streaming from /api/chat/stream.
+   * Falls back to non-streaming /api/chat on stream failure.
+   */
+  const handleSend = useCallback(async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage: ChatMessageType = {
@@ -57,44 +103,144 @@ export default function ChatPage() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const assistantId = `assistant-${Date.now()}`;
+    streamingIdRef.current = assistantId;
+
+    // Build history *before* adding new messages
+    const history = buildHistory(messages);
+
+    // Add user message + empty assistant placeholder
+    const placeholder: AssistantMessage = {
+      id: assistantId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      verse: { fa: '' },
+      interpretation: '',
+      advice: [''],
+      citations: [],
+    };
+
+    setMessages((prev) => [...prev, userMessage, placeholder]);
     setInput('');
     setIsLoading(true);
 
+    try {
+      await streamChat(
+        { message: userMessage.content, language, sourceScope, sessionId, history },
+        {
+          onChunk: (text) => {
+            // Progressive text update
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId
+                  ? { ...m, content: (m.content ?? '') + text }
+                  : m,
+              ),
+            );
+          },
+          onComplete: (data: StreamCompleteData) => {
+            // Persist session id
+            handleSessionId(data.sessionId);
+
+            // Finalize with full structured data
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId
+                  ? { ...m, ...data, id: assistantId, timestamp: new Date() }
+                  : m,
+              ),
+            );
+          },
+          onError: (error) => {
+            console.error('[Chat] Stream error, falling back:', error);
+            // Fall back to non-streaming endpoint
+            fallbackNonStreaming(userMessage.content, assistantId, history);
+          },
+        },
+      );
+    } catch (err) {
+      console.error('[Chat] Unexpected error:', err);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? {
+                ...m,
+                content: 'Sorry, something went wrong. Please try again.',
+                interpretation: 'An error occurred while processing your request.',
+                advice: ['Please try again or rephrase your question.'],
+              }
+            : m,
+        ),
+      );
+    } finally {
+      streamingIdRef.current = null;
+      setIsLoading(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input, isLoading, language, sourceScope, sessionId, messages, handleSessionId]);
+
+  /**
+   * Non-streaming fallback — calls /api/chat directly.
+   * Used when the streaming endpoint fails.
+   */
+  const fallbackNonStreaming = async (
+    message: string,
+    assistantId: string,
+    history: HistoryTurn[],
+  ) => {
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: userMessage.content,
+          message,
           language,
           country: 'KR',
           sourceScope,
-          history: messages,
+          sessionId,
+          history,
         }),
       });
 
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      const assistantMessage = await simulateStreaming(data);
 
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Failed to send message:', error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `error-${Date.now()}`,
-          role: 'assistant',
-          content: 'Sorry, something went wrong. Please try again.',
-          timestamp: new Date(),
-          verse: { fa: '' },
-          interpretation: 'An error occurred while processing your request.',
-          advice: ['Please try again or rephrase your question.'],
-          citations: [],
-        } as AssistantMessage,
-      ]);
-    } finally {
-      setIsLoading(false);
+      // Persist session id from non-streaming response
+      handleSessionId(data.sessionId);
+
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? {
+                id: assistantId,
+                role: 'assistant' as const,
+                content: data.interpretation || data.advice?.[0] || '',
+                timestamp: new Date(),
+                verse: data.verse ?? { fa: '' },
+                interpretation: data.interpretation ?? '',
+                advice: data.advice ?? [''],
+                citations: data.citations ?? [],
+                retrievedCandidates: data.retrievedCandidates,
+                grounded: data.grounded,
+              }
+            : m,
+        ),
+      );
+    } catch (fallbackErr) {
+      console.error('[Chat] Fallback also failed:', fallbackErr);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? {
+                ...m,
+                content: 'Sorry, something went wrong. Please try again.',
+                interpretation: 'An error occurred while processing your request.',
+                advice: ['Please try again or rephrase your question.'],
+              }
+            : m,
+        ),
+      );
     }
   };
 
@@ -118,7 +264,13 @@ export default function ChatPage() {
     <ChatPageShell>
       <div className="chat-page-container">
         <ChatPanel>
-          <ChatHeader citeEnabled={citeEnabled} onCiteToggle={setCiteEnabled} />
+          <ChatHeader
+            citeEnabled={citeEnabled}
+            onCiteToggle={setCiteEnabled}
+            sourceScope={sourceScope}
+            onSourceScopeChange={setSourceScope}
+            onNewChat={handleNewChat}
+          />
 
           <AnimatePresence mode="wait">
             {messages.length === 0 ? (
