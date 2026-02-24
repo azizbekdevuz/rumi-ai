@@ -1,0 +1,19 @@
+WEEK 2 | Commit 14
+
+CHANGES:
+- New PATCH /api/user/settings BFF route for persisting user preferences to backend
+- Updated feedback BFF route with expanded category validation matching all frontend modals
+
+DETAILS:
+- User settings route: Proxies to backend PATCH /api/user/settings with JWT from cookie
+- Accepts { preferred_lang, theme } payload and returns success/error response
+- Requires authentication: returns 401 Unauthorized if no rumi_token cookie present
+- Enables Profile page Save Changes button to persist preferences to database
+- Feedback route type validation expanded:
+  - Before: Only accepted 'up', 'down', 'report' types (3 categories)
+  - After: Accepts general, bug, feature, appreciation, incorrect, offensive, ocr_error, other
+- Feedback route: session_id and message_id now passed as optional to backend
+- Enables both navbar general feedback (no chat context) and chat message-specific reports
+- Error handling consistent with other BFF routes using jsonError() helper
+
+FILES: src/app/api/user/settings/route.ts (new), src/app/api/feedback/route.ts
