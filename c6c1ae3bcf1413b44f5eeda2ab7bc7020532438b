@@ -1,0 +1,24 @@
+WEEK 2 | Commit 15
+
+CHANGES:
+- FeedbackModal: Connected to real /api/feedback backend endpoint (was simulated before)
+- ReportModal: Connected to real /api/feedback backend endpoint (was console.log only)
+- Both modals now submit real data to the backend and show proper success/error states
+
+DETAILS:
+- FeedbackModal (accessed from navbar on all pages):
+  * Before: Used setTimeout to simulate submission with fake delay
+  * After: Real fetch POST to /api/feedback with issue_type and comment
+  * Supports 4 categories: General, Bug Report, Feature Request, Appreciation
+  * Full i18n support for English, Persian, Korean in all modal text and categories
+  * Shows success confirmation UI after submission, closes automatically after 2 seconds
+- ReportModal (accessed from chat message actions):
+  * Before: Only logged to console with console.log, no server communication
+  * After: Real fetch POST to /api/feedback with category and description
+  * Conditionally includes message_id when available for message-specific reports
+  * Categories: Incorrect Information, Inappropriate Content, OCR/Text Error, Other
+- Both modals: Keyboard focus trap, Escape key to close, overlay click to close
+- Both modals: Loading spinner during submission, disabled submit when empty
+- Both modals: Error handling with graceful fallback on API failures
+
+FILES: src/components/feedback/FeedbackModal.tsx, src/features/chat/components/ReportModal.tsx
