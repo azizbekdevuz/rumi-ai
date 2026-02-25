@@ -50,22 +50,30 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Mock submission - replace with actual API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Report submitted:', {
-        messageId,
-        category,
-        description,
+      const resp = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: category,
+          message: description.trim(),
+          ...(messageId ? { message_id: messageId } : {}),
+        }),
       });
+
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => null);
+        console.error('[Report] Submit failed:', data);
+      }
 
       setSubmitted(true);
       setTimeout(() => {
         handleClose();
       }, 2000);
     } catch (error) {
-      console.error('Failed to submit report:', error);
+      console.error('[Report] Network error:', error);
+      setSubmitted(true);
+      setTimeout(() => handleClose(), 2000);
     } finally {
       setIsSubmitting(false);
     }

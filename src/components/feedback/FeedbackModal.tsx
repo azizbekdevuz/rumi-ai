@@ -127,11 +127,30 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const resp = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type,
+          message: message.trim(),
+          // General feedback — no session or message reference
+        }),
+      });
 
-    setIsSubmitted(true);
-    setIsSubmitting(false);
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => null);
+        console.error('[Feedback] Submit failed:', data);
+      }
+
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error('[Feedback] Network error:', err);
+      // Still show success UI — the user did their part
+      setIsSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
