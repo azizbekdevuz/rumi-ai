@@ -1,0 +1,28 @@
+WEEK 2 | Commit 16
+
+CHANGES:
+- Rewrote UserDropdown component with click-outside-to-close and proper styling
+- Added AuthProvider to root layout for application-wide auth state management
+- Added WCAG accessibility skip links to layout
+- Integrated Feedback button into navbar accessible from every page
+
+DETAILS:
+- UserDropdown component rewrite:
+  * Added useRef + useEffect for detecting clicks outside the dropdown to close it
+  * Before: Dropdown had no outside-click handling, stayed open until manual close
+  * After: Clicks anywhere outside dropdown automatically closes it
+  * Added User icon for Profile link, LogOut icon for logout action (consistent iconography)
+  * Added visual divider between Profile and Log Out menu items
+  * Styled with warm earthy palette matching overall Rumi AI design language
+  * framer-motion animations for open/close with reduced-motion support
+- Navbar auth integration:
+  * Shows user dropdown button when authenticated, Sign In button when guest
+  * Feedback button in navbar opens FeedbackModal accessible from every page
+  * Mobile hamburger menu includes: all nav links, auth links, feedback, language switch
+- layout.tsx changes:
+  * Wrapped application children with AuthProvider enabling useAuth() everywhere
+  * Before: No auth context in layout; components couldn't access user state
+  * After: Full auth state available globally via useAuth() hook
+  * Added skip-to-content and skip-to-chat accessibility links (WCAG 2.1 compliance)
+
+FILES: src/components/layout/Navbar.tsx, src/app/layout.tsx
