@@ -2,14 +2,17 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+// useEffect, useRef, useCallback imported below alongside lucide-react
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { useTheme } from '@/lib/theme/theme-context';
 import { Language } from '@/lib/i18n/translations';
 import { RumiLogo, MoonIcon, SunIcon, MenuIcon, CloseIcon } from '@/components/ui/icons';
 import { FeedbackModal } from '@/components/feedback/FeedbackModal';
-import { User, MessageSquareText, LogIn } from 'lucide-react';
+import { User, MessageSquareText, LogIn, LogOut, UserCircle } from 'lucide-react';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
+import { useAuth } from '@/lib/auth/auth-context';
+import { useEffect, useRef, useCallback } from 'react';
 
 // =============================================================================
 // ANIMATED NAV LINK
@@ -124,7 +127,9 @@ interface MobileMenuProps {
   onFeedbackClick: () => void;
   loginLabel: string;
   profileLabel: string;
+  logoutLabel: string;
   isAuthenticated: boolean;
+  onLogout: () => void;
 }
 
 function MobileMenu({
@@ -138,7 +143,9 @@ function MobileMenu({
   onFeedbackClick,
   loginLabel,
   profileLabel,
+  logoutLabel,
   isAuthenticated,
+  onLogout,
 }: MobileMenuProps) {
   const prefersReducedMotion = useReducedMotion();
 
@@ -196,9 +203,17 @@ function MobileMenu({
           {/* Mobile Auth */}
           <motion.div variants={itemVariants}>
             {isAuthenticated ? (
-              <Link href="/profile" className="mobile-nav-link" onClick={onClose}>
-                {profileLabel}
-              </Link>
+              <>
+                <Link href="/profile" className="mobile-nav-link" onClick={onClose}>
+                  {profileLabel}
+                </Link>
+                <button
+                  onClick={() => { onClose(); onLogout(); }}
+                  className="mobile-nav-link text-start w-full"
+                >
+                  {logoutLabel}
+                </button>
+              </>
             ) : (
               <Link href="/login" className="mobile-nav-link" onClick={onClose}>
                 {loginLabel}
@@ -244,20 +259,38 @@ interface UserDropdownProps {
   isOpen: boolean;
   onToggle: () => void;
   profileLabel: string;
+  logoutLabel: string;
   onClose: () => void;
+  onLogout: () => void;
 }
 
-function UserDropdown({ isOpen, onToggle, profileLabel, onClose }: UserDropdownProps) {
+function UserDropdown({ isOpen, onToggle, profileLabel, logoutLabel, onClose, onLogout }: UserDropdownProps) {
   const prefersReducedMotion = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  const handleClickOutside = useCallback(
+    (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, handleClickOutside]);
 
   const dropdownVariants = {
     closed: {
       opacity: 0,
       scale: 0.95,
-      y: -10,
-      transition: {
-        duration: prefersReducedMotion ? 0 : 0.15,
-      },
+      y: -8,
+      transition: { duration: prefersReducedMotion ? 0 : 0.15 },
     },
     open: {
       opacity: 1,
@@ -271,31 +304,22 @@ function UserDropdown({ isOpen, onToggle, profileLabel, onClose }: UserDropdownP
   };
 
   return (
-    <div className="relative hidden md:block">
+    <div ref={containerRef} className="relative hidden md:block">
       <motion.button
         onClick={onToggle}
-        className="p-2 rounded-full transition-colors"
-        style={{
-          background: 'var(--accent-teal-light)',
-          color: 'var(--accent-teal)',
-        }}
+        className="user-menu-trigger"
         aria-label="User menu"
         aria-expanded={isOpen}
-        whileHover={prefersReducedMotion ? undefined : { scale: 1.1 }}
+        whileHover={prefersReducedMotion ? undefined : { scale: 1.08 }}
         whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
       >
         <User className="w-5 h-5" />
       </motion.button>
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute top-full end-0 mt-2 w-48 py-2 rounded-[var(--radius-md)] z-50"
-            style={{
-              background: 'var(--bg-tertiary)',
-              boxShadow: 'var(--shadow-lg)',
-              border: '1px solid var(--border-color)',
-            }}
+            className="user-menu-dropdown"
             variants={dropdownVariants}
             initial="closed"
             animate="open"
@@ -303,12 +327,22 @@ function UserDropdown({ isOpen, onToggle, profileLabel, onClose }: UserDropdownP
           >
             <Link
               href="/profile"
-              className="block px-4 py-2 text-sm transition-colors hover:bg-[var(--accent-teal-light)]"
-              style={{ color: 'var(--text-primary)' }}
+              className="user-menu-item"
               onClick={onClose}
             >
+              <UserCircle className="w-4 h-4" />
               {profileLabel}
             </Link>
+
+            <div className="user-menu-divider" />
+
+            <button
+              onClick={() => { onClose(); onLogout(); }}
+              className="user-menu-item user-menu-item--danger"
+            >
+              <LogOut className="w-4 h-4" />
+              {logoutLabel}
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -323,13 +357,13 @@ function UserDropdown({ isOpen, onToggle, profileLabel, onClose }: UserDropdownP
 export default function Navbar() {
   const { language, setLanguage, t } = useI18n();
   const { theme, toggleTheme } = useTheme();
+  const { user, status, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
-  // Mock auth state - replace with actual auth
-  const isAuthenticated = false;
+  const isAuthenticated = status === 'authenticated' && !!user;
 
   const languages: Language[] = ['fa', 'en', 'kr'];
 
@@ -349,6 +383,12 @@ export default function Navbar() {
     en: 'Profile',
     fa: 'پروفایل',
     kr: '프로필',
+  };
+
+  const logoutLabel = {
+    en: 'Log Out',
+    fa: 'خروج',
+    kr: '로그아웃',
   };
 
   const navLinks = [
@@ -418,7 +458,9 @@ export default function Navbar() {
                 isOpen={userMenuOpen}
                 onToggle={() => setUserMenuOpen(!userMenuOpen)}
                 profileLabel={profileLabel[language] || profileLabel.en}
+                logoutLabel={logoutLabel[language] || logoutLabel.en}
                 onClose={() => setUserMenuOpen(false)}
+                onLogout={logout}
               />
             ) : (
               <motion.div
@@ -470,7 +512,9 @@ export default function Navbar() {
           onFeedbackClick={() => setFeedbackOpen(true)}
           loginLabel={loginLabel[language] || loginLabel.en}
           profileLabel={profileLabel[language] || profileLabel.en}
+          logoutLabel={logoutLabel[language] || logoutLabel.en}
           isAuthenticated={isAuthenticated}
+          onLogout={logout}
         />
       </header>
 

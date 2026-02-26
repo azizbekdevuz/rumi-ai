@@ -6,6 +6,7 @@ import '@fontsource/vazirmatn/700.css';
 import './globals.css';
 import { I18nProvider } from '@/lib/i18n/i18n-context';
 import { ThemeProvider } from '@/lib/theme/theme-context';
+import { AuthProvider } from '@/lib/auth/auth-context';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Background from '@/components/ui/Background';
@@ -44,16 +45,18 @@ export default function RootLayout({
       <body className={`${inter.variable} ${playfair.variable}`}>
         <ThemeProvider>
           <I18nProvider>
-            <Background />
-            <a href="#main-content" className="skip-link">
-              Skip to content
-            </a>
-            <a href="#chat-input" className="skip-link" style={{ left: '140px' }}>
-              Skip to chat
-            </a>
-            <Navbar />
-            <main id="main-content">{children}</main>
-            <Footer />
+            <AuthProvider>
+              <Background />
+              <a href="#main-content" className="skip-link">
+                Skip to content
+              </a>
+              <a href="#chat-input" className="skip-link" style={{ left: '140px' }}>
+                Skip to chat
+              </a>
+              <Navbar />
+              <main id="main-content">{children}</main>
+              <Footer />
+            </AuthProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>
