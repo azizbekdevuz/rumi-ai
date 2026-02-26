@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { useTheme } from '@/lib/theme/theme-context';
+import { useAuth } from '@/lib/auth/auth-context';
 import { useReducedMotion } from '@/lib/hooks';
 import { ChevronRight, ChevronLeft, Sun, Moon } from 'lucide-react';
 import ProfilePageShell from '@/features/profile/components/ProfilePageShell';
@@ -18,17 +19,25 @@ export default function ProfilePage() {
   const { language, dir, setLanguage } = useI18n();
   const direction = dir;
   const { theme, toggleTheme } = useTheme();
+  const { user: authUser, status: authStatus } = useAuth();
   const reducedMotion = useReducedMotion();
+
+  // Gate client-derived values (language, theme) behind a mount check
+  // to avoid hydration mismatches from localStorage-based providers.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [activeSection, setActiveSection] = useState<ProfileSection>('account');
   const [emailUpdates, setEmailUpdates] = useState(true);
   const [accountDeletion, setAccountDeletion] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Mock user data - in real app, fetch from API
+  // Derive display values from auth state (graceful fallbacks)
   const user = {
-    name: 'Mohammad Niaraki',
-    email: 'mohammad.niaraki@email.com',
-    avatar: null,
+    name: authUser?.email?.split('@')[0] ?? 'Default User',
+    email: authUser?.email ?? '',
+    avatar: null as string | null,
   };
 
   const content = {
@@ -100,7 +109,10 @@ export default function ProfilePage() {
     },
   };
 
-  const c = content[language] || content.en;
+  // Use server-safe defaults until mounted to prevent hydration mismatch
+  const safeLanguage = mounted ? language : 'en';
+  const safeTheme = mounted ? theme : 'light';
+  const c = content[safeLanguage] || content.en;
 
   const languageOptions = [
     { value: 'fa', label: 'FA' },
@@ -114,9 +126,33 @@ export default function ProfilePage() {
   ];
 
   const handleSave = async () => {
-    // TODO: Call API to save settings
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+    setIsSaving(true);
+    setSaveError('');
+    setSaveSuccess(false);
+
+    try {
+      const resp = await fetch('/api/user/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          preferred_lang: language,
+          theme,
+        }),
+      });
+
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => null);
+        setSaveError(data?.message ?? 'Failed to save settings');
+        return;
+      }
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch {
+      setSaveError('Network error — please try again');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleLanguageChange = (value: string) => {
@@ -133,7 +169,7 @@ export default function ProfilePage() {
 
   return (
     <ProfilePageShell>
-      <div className="profile-page-content" dir={direction}>
+      <div className="profile-page-content" dir={mounted ? direction : 'ltr'}>
         {/* Hero Title Block */}
         <motion.div
           className="profile-hero"
@@ -221,7 +257,7 @@ export default function ProfilePage() {
                       <label className={styles.profileSettingLabel}>{c.preferredLanguage}</label>
                       <SegmentedControl
                         options={languageOptions}
-                        value={language}
+                        value={safeLanguage}
                         onChange={handleLanguageChange}
                       />
                   </div>
@@ -231,7 +267,7 @@ export default function ProfilePage() {
                       <label className={styles.profileSettingLabel}>{c.theme}</label>
                       <SegmentedControl
                         options={themeOptions}
-                        value={theme}
+                        value={safeTheme}
                         onChange={handleThemeChange}
                     />
                   </div>
@@ -241,12 +277,13 @@ export default function ProfilePage() {
                       <motion.button
                         type="button"
                         onClick={handleSave}
+                        disabled={isSaving || authStatus !== 'authenticated'}
                         className={styles.profileSaveButton}
                         whileHover={reducedMotion ? undefined : {}}
                         whileTap={reducedMotion ? undefined : {}}
                         transition={{ duration: 0.15 }}
                       >
-                        {c.saveChanges}
+                        {isSaving ? '...' : c.saveChanges}
                       </motion.button>
                       {saveSuccess && (
                         <motion.div
@@ -257,7 +294,17 @@ export default function ProfilePage() {
                         >
                           {c.saved}
                         </motion.div>
-                        )}
+                      )}
+                      {saveError && (
+                        <motion.div
+                          className="profile-save-success"
+                          style={{ color: 'var(--error, #c0392b)' }}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          {saveError}
+                        </motion.div>
+                      )}
                       </div>
                   </div>
 

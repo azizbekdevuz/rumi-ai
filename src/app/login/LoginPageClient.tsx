@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/i18n-context';
+import { useAuth } from '@/lib/auth/auth-context';
 import { Feather } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks';
@@ -14,27 +15,29 @@ import AuthFormLogin from '@/features/auth/components/AuthFormLogin';
 import AuthFormSignup from '@/features/auth/components/AuthFormSignup';
 import SocialButtonsRow from '@/features/auth/components/SocialButtonsRow';
 
-function toErrorMessage(x: any, fallback: string) {
+function toErrorMessage(x: unknown, fallback: string): string {
     if (!x) return fallback;
 
     if (typeof x === "string") return x;
     if (x instanceof Error) return x.message || fallback;
 
     // Typical API error object cases
-    if (typeof x === "object") {
-        if (typeof x.message === "string") return x.message;
-        if (typeof x.error === "string") return x.error;
-        if (typeof x.detail === "string") return x.detail;
+    if (typeof x === "object" && x !== null) {
+        const obj = x as Record<string, unknown>;
+        if (typeof obj.message === "string") return obj.message;
+        if (typeof obj.error === "string") return obj.error;
+        if (typeof obj.detail === "string") return obj.detail;
 
         // Some APIs return details as string/array/object
-        if (typeof x.details === "string") return x.details;
-        if (Array.isArray(x.details)) {
-            const first = x.details.find((v: any) => typeof v === "string");
-            if (first) return first;
+        if (typeof obj.details === "string") return obj.details;
+        if (Array.isArray(obj.details)) {
+            const first = obj.details.find((v: unknown) => typeof v === "string");
+            if (typeof first === "string") return first;
         }
-        if (x.details && typeof x.details === "object") {
+        if (obj.details && typeof obj.details === "object") {
             // try common FastAPI/Pydantic validation format
-            const msg = x.details.msg || x.details.message;
+            const details = obj.details as Record<string, unknown>;
+            const msg = details.msg ?? details.message;
             if (typeof msg === "string") return msg;
         }
 
@@ -51,6 +54,7 @@ function toErrorMessage(x: any, fallback: string) {
 
 export default function LoginPageClient() {
     const { language, dir } = useI18n();
+    const { refresh: refreshAuth } = useAuth();
     const direction = dir;
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -205,6 +209,8 @@ export default function LoginPageClient() {
                 return;
             }
 
+            // Refresh global auth state so Navbar updates immediately
+            await refreshAuth();
             router.push('/chat');
         } catch (error) {
             setLoginError(toErrorMessage(error, c.loginError));
@@ -244,6 +250,8 @@ export default function LoginPageClient() {
                 return;
             }
 
+            // Refresh global auth state so Navbar updates immediately
+            await refreshAuth();
             router.push('/chat');
         } catch (error) {
             setSignupError(toErrorMessage(error, c.signupError));
