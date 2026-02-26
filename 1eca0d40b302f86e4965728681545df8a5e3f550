@@ -1,0 +1,23 @@
+WEEK 2 | Commit 17
+
+CHANGES:
+- Updated LoginPageClient to work with new AuthProvider context flow
+- Connected Profile page Save Changes button to backend settings API
+
+DETAILS:
+- LoginPageClient:
+  * Updated authentication flow to integrate with AuthProvider
+  * After successful login, calls auth refresh() to update global auth state
+  * Ensures navbar and other components reflect logged-in state immediately
+- Profile page:
+  * Save Changes button before: No backend call, button was completely non-functional
+  * Save Changes button after: Calls PATCH /api/user/settings to persist preferences
+  * Persists preferred_lang and theme to backend database via user settings endpoint
+  * Shows animated success notification after successful save
+  * Shows error notification if save fails with descriptive message
+  * Save button disabled when user is not authenticated (prevents guest save attempts)
+  * Added hydration-safe mounting check to prevent localStorage mismatch on SSR
+  * User display name derived from auth email (splits at @ symbol)
+  * Language and theme changes applied locally first, then persisted to backend on save
+
+FILES: src/app/login/LoginPageClient.tsx, src/app/profile/page.tsx
