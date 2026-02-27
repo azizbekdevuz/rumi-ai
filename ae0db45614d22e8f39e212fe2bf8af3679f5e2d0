@@ -1,0 +1,27 @@
+WEEK 2 | Commit 18
+
+CHANGES:
+- Refactored monolithic globals.css (8604 lines) into 10 feature-scoped CSS files
+- globals.css now serves as a clean import manifest (20 lines)
+- All styles organized under src/styles/ directory for better maintainability
+
+DETAILS:
+- Before: Single globals.css file with 8604 lines, extremely difficult to navigate and maintain
+- After: 10 focused CSS files under src/styles/ imported via @import in globals.css
+- File breakdown:
+  * tokens.css (307 lines): CSS custom properties, design tokens, typography, base resets
+  * background.css (205 lines): Animated background patterns, gradient overlays
+  * navbar.css (459 lines): Navigation bar, language switch, theme toggle, user dropdown menu
+  * home.css (882 lines): Hero section, features grid, how-it-works steps, CTA section
+  * chat.css (2239 lines): Chat UI, message bubbles, composer, utility bar, citation modals
+  * books.css (2085 lines): Library grid, book cards, reader view, verse carousel, search
+  * auth.css (1087 lines): Login/signup forms, social login buttons, auth panels, validation
+  * about.css (611 lines): About page hero, mission section, feature cards, team section
+  * profile.css (632 lines): Profile settings, sidebar navigation, toggle switches, avatar
+  * feedback.css (97 lines): Feedback/report modal styles, form elements, success states
+- globals.css reduced from 8604 lines to: @import 'tailwindcss' + 10 @import statements
+- All existing visual functionality preserved with zero regressions
+- Verified with: pnpm lint (0 errors), tsc --noEmit (0 errors), pnpm build (success)
+- Total lines across all extracted files matches original content (no loss or duplication)
+
+FILES: src/app/globals.css, src/styles/*.css (10 new files)
