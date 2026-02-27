@@ -1,0 +1,204 @@
+﻿/* ============================================
+   BACKGROUND COMPONENT STYLES
+   ============================================ */
+
+.background-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Watercolor texture base - the actual image */
+/* PERFORMANCE: Removed background-attachment: fixed (causes repaints on scroll) */
+.bg-image-layer {
+  position: absolute;
+  inset: 0;
+  background-image: url('/img/background.webp');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  /* Removed: background-attachment: fixed - causes performance issues */
+  transform: translateZ(0);
+}
+
+/* Animated gradient overlay for motion and atmosphere */
+.bg-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, 
+      rgba(248, 245, 237, 0.3) 0%,
+      rgba(240, 235, 224, 0.4) 25%,
+      rgba(245, 240, 230, 0.35) 50%,
+      rgba(240, 235, 224, 0.4) 75%,
+      rgba(248, 245, 237, 0.3) 100%
+    ),
+    radial-gradient(ellipse at 30% 30%, rgba(27, 123, 107, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 70%, rgba(212, 168, 75, 0.06) 0%, transparent 50%);
+  background-size: 200% 200%, 100% 100%, 100% 100%;
+  animation: gradientShift 20s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%, center, center; }
+  50% { background-position: 100% 50%, center, center; }
+}
+
+[data-theme='dark'] .bg-gradient-overlay {
+  background:
+    linear-gradient(135deg,
+      rgba(15, 20, 25, 0.75) 0%,
+      rgba(20, 25, 32, 0.8) 25%,
+      rgba(18, 23, 30, 0.78) 50%,
+      rgba(20, 25, 32, 0.8) 75%,
+      rgba(15, 20, 25, 0.75) 100%
+    ),
+    radial-gradient(ellipse at 30% 30%, rgba(62, 184, 184, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 70%, rgba(218, 168, 64, 0.05) 0%, transparent 50%);
+  background-size: 200% 200%, 100% 100%, 100% 100%;
+}
+
+.bg-gradient-base {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, 
+      transparent 0%,
+      transparent 20%,
+      rgba(248, 245, 237, 0.15) 60%,
+      rgba(240, 235, 224, 0.25) 100%
+    ),
+    radial-gradient(ellipse 150% 80% at 50% 100%, rgba(201, 146, 44, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 20% 80%, rgba(26, 122, 122, 0.02) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 50% at 80% 80%, rgba(26, 122, 122, 0.02) 0%, transparent 50%);
+  /* Subtle breathing effect */
+  animation: atmosphereBreath 15s ease-in-out infinite;
+}
+
+@keyframes atmosphereBreath {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+[data-theme='dark'] .bg-gradient-base {
+  background:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent 20%,
+      rgba(15, 20, 25, 0.3) 60%,
+      rgba(26, 31, 39, 0.5) 100%
+    ),
+    radial-gradient(ellipse 150% 80% at 50% 100%, rgba(218, 168, 64, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 20% 80%, rgba(62, 184, 184, 0.02) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 50% at 80% 80%, rgba(62, 184, 184, 0.02) 0%, transparent 50%);
+}
+
+.bg-architecture {
+  position: absolute;
+  bottom: 0;
+  height: 40vh;
+  max-height: 300px;
+  width: auto;
+  color: rgba(45, 42, 36, 0.06);
+}
+
+[data-theme='dark'] .bg-architecture {
+  color: rgba(232, 228, 220, 0.04);
+}
+
+.bg-architecture-left {
+  left: 0;
+}
+
+.bg-architecture-right {
+  right: 0;
+}
+
+.bg-architecture .golden-dome {
+  fill: rgba(201, 146, 44, 0.12);
+}
+
+[data-theme='dark'] .bg-architecture .golden-dome {
+  fill: rgba(218, 168, 64, 0.08);
+}
+
+.bg-birds {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: auto;
+  color: rgba(45, 42, 36, 0.08);
+  animation: birds-drift 60s linear infinite;
+}
+
+[data-theme='dark'] .bg-birds {
+  color: rgba(232, 228, 220, 0.05);
+}
+
+@keyframes birds-drift {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-45%) translateY(-10px); }
+}
+
+.bg-clouds {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.cloud {
+  position: absolute;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(40px);
+}
+
+[data-theme='dark'] .cloud {
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+}
+
+.cloud-1 {
+  width: 600px;
+  height: 200px;
+  top: 5%;
+  left: -10%;
+  animation: cloud-drift 120s linear infinite;
+}
+
+.cloud-2 {
+  width: 500px;
+  height: 180px;
+  top: 15%;
+  right: -5%;
+  animation: cloud-drift 90s linear infinite reverse;
+}
+
+.cloud-3 {
+  width: 400px;
+  height: 150px;
+  top: 25%;
+  left: 30%;
+  animation: cloud-drift 150s linear infinite;
+}
+
+@keyframes cloud-drift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(100px); }
+}
+
+.bg-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L35 25L60 30L35 35L30 60L25 35L0 30L25 25Z' fill='%232d2a24' fill-opacity='1'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+[data-theme='dark'] .bg-pattern {
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L35 25L60 30L35 35L30 60L25 35L0 30L25 25Z' fill='%23e8e4dc' fill-opacity='1'/%3E%3C/svg%3E");
+}

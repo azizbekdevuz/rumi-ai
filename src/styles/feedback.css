@@ -1,0 +1,96 @@
+﻿/* Feedback Modal */
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.feedback-textarea {
+  padding: var(--space-5);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  resize: vertical;
+  min-height: 140px;
+  transition: all var(--transition-fast);
+  line-height: 1.6;
+}
+
+.feedback-textarea:focus {
+  outline: none;
+  border-color: var(--accent-teal);
+  box-shadow: 0 0 0 4px var(--accent-teal-light);
+}
+
+.feedback-category {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.category-btn {
+  padding: var(--space-4) var(--space-3);
+  border: 2px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 13px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 80px;
+  justify-content: center;
+}
+
+.category-btn:hover {
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+  background: var(--accent-teal-light);
+}
+
+.category-btn.active {
+  background: var(--accent-teal-light);
+  color: var(--accent-teal);
+  border-color: var(--accent-teal);
+}
+
+.feedback-submit {
+  padding: var(--space-5);
+  background: var(--gradient-teal);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  align-self: stretch;
+  min-height: 56px;
+}
+
+.feedback-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 8px 24px rgba(26, 122, 122, 0.25);
+}
+
+.feedback-submit:focus-visible {
+  outline: 3px solid var(--accent-teal);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .feedback-category {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .category-btn {
+    min-height: 70px;
+    padding: var(--space-3);
+  }
+}
