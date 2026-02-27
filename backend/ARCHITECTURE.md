@@ -1,10 +1,59 @@
-# RUMI AI Agent Backend Architecture
+# Rumi AI Agent — Backend Architecture
 
-This document describes the backend architecture based on the microservices design diagram.
+Detailed backend architecture documentation for the Rumi AI Agent FastAPI service.
+
+---
 
 ## Architecture Overview
 
-The backend follows a microservices architecture with an API Gateway pattern, supporting multilingual chat, verse search, and book management.
+The backend follows a **layered architecture** with an API Gateway pattern:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                     main.py                          │
+│  FastAPI app · CORS · Middleware · Router includes   │
+└───────────────────────┬─────────────────────────────┘
+                        │
+           ┌────────────┼────────────┐
+           ▼            ▼            ▼
+┌──────────────┐ ┌───────────┐ ┌──────────────┐
+│  Middleware   │ │  Routers  │ │   Schemas    │
+│  ──────────  │ │  ───────  │ │  ─────────   │
+│  auth.py     │ │  auth     │ │  Pydantic v2 │
+│  rate_limit  │ │  chat     │ │  Request +   │
+│  validator   │ │  stream   │ │  Response    │
+└──────────────┘ │  search   │ │  models      │
+                 │  books    │ └──────────────┘
+                 │  citation │
+                 │  feedback │
+                 │  user     │
+                 │  _session │
+                 └─────┬─────┘
+                       │
+           ┌───────────┼───────────┐
+           ▼           ▼           ▼
+┌──────────────┐ ┌───────────┐ ┌──────────────┐
+│   Services   │ │  Models   │ │   Database   │
+│  ──────────  │ │  ───────  │ │  ─────────   │
+│  ChatService │ │  User     │ │  SQLAlchemy  │
+│  PromptBuild │ │  Session  │ │  SessionLocal│
+│  LLMGenerate │ │  Message  │ │  PostgreSQL  │
+│  Multilingual│ │  Book     │ └──────────────┘
+│  Search      │ │  Verse    │
+│  Citation    │ │  Citation │
+│  GuestUser   │ │  Feedback │
+└──────────────┘ └───────────┘
+```
+
+### Design Principles
+
+- **Thin routers**: HTTP concerns only — auth resolution, session management, request/response mapping
+- **Fat services**: Business logic — RAG pipeline, prompt construction, LLM calls, enrichment
+- **Centralised config**: All settings via pydantic-settings (`app/config.py`), never `os.getenv()`
+- **Shared helpers**: Common session/user resolution in `routers/_session.py`
+- **Consistent schemas**: Pydantic v2 models for all request/response contracts
+
+---
 
 ## Components
 
@@ -12,241 +61,308 @@ The backend follows a microservices architecture with an API Gateway pattern, su
 
 **Location:** `app/middleware/`
 
-The API Gateway provides:
+| Middleware | File | Purpose |
+|-----------|------|---------|
+| **JWT Authentication** | `auth.py` | Token verification, `get_current_user` / `get_optional_user` dependencies |
+| **Rate Limiting** | `rate_limit.py` | In-memory sliding window (100 req/min general, 30 req/min chat) |
+| **Request Validator** | `request_validator.py` | Content-type checks, size limit (10MB) |
 
-- **Authentication/JWT** (`auth.py`): JWT token-based authentication
-  - User registration and login
-  - Token generation and validation
-  - Protected route access
+Middleware execution order (outer → inner):
 
-- **Rate Limiting** (`rate_limit.py`): Request rate limiting
-  - 100 requests/minute (default)
-  - 30 requests/minute (chat endpoints)
-  - 60 requests/minute (search endpoints)
-  - Sliding window algorithm
+```
+CORS → Request Validator → Rate Limiter → Router (with auth dependency)
+```
 
-- **Request Validator** (`request_validator.py`): Request validation
-  - Content-type validation
-  - Request size limits (10MB max)
-  - Error handling
+### 2. Routers
 
-### 2. Chat Service
+| File | Prefix | Endpoints |
+|------|--------|-----------|
+| `auth.py` | `/api/auth` | `POST /login`, `POST /signup` |
+| `chat.py` | `/api/chat` | `POST /` — non-streaming chat |
+| `chat_stream.py` | `/api/chat` | `POST /stream` — SSE streaming chat |
+| `search.py` | `/api/search` | `GET /` — verse search |
+| `books.py` | `/api/books` | `GET /:id/pages/:n` — book page |
+| `citation.py` | `/api/citation` | `GET /:id` — citation detail |
+| `feedback.py` | `/api/feedback` | `POST /` — submit feedback |
+| `user.py` | `/api/user` | `GET /me`, `PATCH /settings` |
+| `_session.py` | — | Shared helpers (not a router) |
 
-**Location:** `app/routers/chat.py`
+### 3. Services
 
-**Endpoints:**
-- `POST /api/chat` - Send chat message (supports FA/EN/KR)
-- `POST /api/chat/sessions` - Create chat session
-- `GET /api/chat/sessions` - List chat sessions
-- `GET /api/chat/sessions/{session_id}/messages` - Get messages
+| Service | File | Responsibility |
+|---------|------|---------------|
+| **ChatService** | `chat_service.py` | RAG pipeline orchestrator — calls retrieval, prompt builder, LLM, enrichment |
+| **PromptBuilder** | `prompt_builder.py` | Builds system/user prompts, parses LLM response into interpretation + advice |
+| **LLMGenerationService** | `llm_generation.py` | HTTP calls to OpenAI/Ollama, auto-detects provider, mock mode |
+| **MultilingualGenerationService** | `multilingual_generation.py` | Context preparation — verse/citation retrieval for the prompt |
+| **SearchService** | `search_service.py` | Verse keyword search |
+| **CitationService** | `citation_service.py` | Citation lookup by ID |
+| **GuestUserService** | `guest_user_service.py` | Creates/retrieves shared anonymous user |
 
-**Features:**
-- Multilingual support (Farsi, English, Korean)
-- Session management
-- Message history
-- Integration with LLM generation
+### 4. Shared Session Helpers
 
-### 3. Search Service
+**Location:** `app/routers/_session.py`
 
-**Location:** `app/routers/search.py`
+Two pure functions used by both chat endpoints:
 
-**Endpoints:**
-- `GET /api/search/verses` - Search verses
-- `GET /api/search/verses/{verse_id}` - Get specific verse
-- `GET /api/search/verses/{verse_id}/citations` - Get verse citations
+- **`resolve_user_id(current_user, db)`** — Returns a plain `uuid.UUID` for authenticated or guest user. Materialises the UUID so it survives ORM session expiry.
+- **`resolve_or_create_session(db, user_id, session_id)`** — Reuses existing `ChatSession` or creates a new one. Returns `(session, is_new)`. Flushed but not committed (callers decide commit strategy).
 
-**Features:**
-- Multilingual verse search
-- Book filtering
-- Citation retrieval
+---
 
-### 4. Books API
+## Chat RAG Pipeline
 
-**Location:** `app/routers/books.py`
+### Pipeline Steps
 
-**Endpoints:**
-- `GET /api/books` - List books
-- `GET /api/books/{book_id}` - Get book details
-- `GET /api/books/{book_id}/verses` - Get book verses
-- `GET /api/books/{book_id}/pages/{page_number}` - Get book page
+```
+  1. Resolve user (authenticated or guest)
+  2. Resolve session (reuse or create)
+  3. Retrieve context (verses + citations from DB)
+  4. Detect grounding (any verses found?)
+  5. Build system prompt (grounded vs ungrounded)
+  6. Build user prompt (message + context + history)
+  7. Call LLM (OpenAI / Ollama)
+  8. Parse response (interpretation + advice)
+  9. Enrich (verse text, citation details, candidates)
+  10. Persist messages to DB
+  11. Return structured response
+```
 
-**Features:**
-- Book metadata management
-- Verse retrieval by book
-- Page-level access with citations
+### Detailed Flow
 
-### 5. Authentication Service
+```
+chat.py / chat_stream.py
+    │
+    ├── resolve_user_id()        → UUID
+    ├── resolve_or_create_session() → (ChatSession, bool)
+    │
+    └── ChatService.process_chat()
+            │
+            ├── MultilingualService.prepare_context()
+            │   → {verses: [...], citations: [...]}
+            │
+            ├── grounded = len(verses) > 0
+            │
+            ├── PromptBuilder.build_system_prompt(language, grounded)
+            │   → System prompt string
+            │
+            ├── PromptBuilder.build_user_prompt(message, verses, citations, history)
+            │   → User prompt string
+            │
+            ├── LLMGenerationService.generate(system_prompt, user_prompt, language)
+            │   → Raw LLM text
+            │
+            ├── PromptBuilder.parse_llm_response(raw_text, language)
+            │   → {interpretation: "...", advice: "..."}
+            │
+            ├── _enrich_verse(verse_id) → {fa, en, kr}
+            ├── _enrich_citations(citation_ids) → [{id, book, page, snippet}]
+            ├── _build_candidates(verses_ctx) → [{refId, book, page}]
+            │
+            └── Return result dict
+```
 
-**Location:** `app/routers/auth.py`
+### Honest Mode (Ungrounded)
 
-**Endpoints:**
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login (returns JWT token)
+When retrieval returns 0 verses and 0 citations:
 
-**Features:**
-- Password hashing (bcrypt)
-- JWT token generation
-- User session management
+- System prompt switches to ungrounded variant
+- LLM is instructed: **"Do NOT fabricate, invent, or quote any Rumi verses"**
+- Response `grounded` field = `false`
+- `verse` = `{fa: "", en: "", kr: ""}`
+- `citations` = `[]`
 
-### 6. Feedback Service
+### Multi-Turn History
 
-**Location:** `app/routers/feedback.py`
+- Frontend sends max 6 turns in `ChatRequest.history`
+- Backend injects into user prompt under "Previous conversation" section
+- Each turn truncated to 300 chars
+- Language-aware (same language as current request)
 
-**Endpoints:**
-- `POST /api/feedback` - Submit feedback on message
-- `GET /api/feedback` - List user feedback
-
-**Features:**
-- Message feedback collection
-- Issue tracking
-- User feedback history
-
-## Core Services
-
-### Multilingual Generation Service
-
-**Location:** `app/services/multilingual_generation.py`
-
-**Responsibilities:**
-- Multilingual prompt template management
-- Context preparation for LLM
-- Verse reranking (multilingual)
-- Internal vs hybrid source handling
-
-**Prompt Templates:**
-- FA (Farsi): Persian prompt template
-- EN (English): English prompt template
-- KR (Korean): Korean prompt template
-
-### LLM Generation Service
-
-**Location:** `app/services/llm_generation.py`
-
-**Responsibilities:**
-- LLM API integration (GPT-4, etc.)
-- Response generation
-- Context formatting
-- Error handling and fallbacks
-
-**Configuration:**
-- Configurable via environment variables
-- Supports multiple LLM providers
-- Mock mode for development
-
-### Chat Service
-
-**Location:** `app/services/chat_service.py`
-
-**Responsibilities:**
-- Chat message processing
-- Orchestration between services
-- Response generation workflow
-
-### Search Service
-
-**Location:** `app/services/search_service.py`
-
-**Responsibilities:**
-- Verse search implementation
-- Multilingual search support
-- Result ranking and filtering
-
-### Citation Service
-
-**Location:** `app/services/citation_service.py`
-
-**Responsibilities:**
-- Citation data management
-- Book-page-verse relationships
-- Highlight box handling
+---
 
 ## Database Schema
 
-The database follows the ERD with 7 main entities:
+### Entity Relationship
 
-1. **Users** - User accounts and authentication
-2. **Chat_Sessions** - Chat session management
-3. **Messages** - Individual chat messages
-4. **Feedback_Reports** - User feedback on messages
-5. **Books** - Book metadata
-6. **Verses** - Verse content (multilingual)
-7. **Citations** - Citation data with page references
+```
+Users ──< 1:N >── Chat_Sessions ──< 1:N >── Messages
+Users ──< 1:N >── Feedback_Reports
+Messages ──< 0:1 >── Feedback_Reports
+Books ──< 1:N >── Verses ──< 1:N >── Citations
+Messages.verse_id ──> Verses (optional FK)
+Messages.citation_ids ──> Citations[] (UUID array)
+```
+
+### Tables
+
+| Table | Key Fields |
+|-------|-----------|
+| **Users** | `id` (UUID PK), `email` (unique), `password_hash`, `preferred_lang`, `theme`, `is_guest`, `is_deleted`, `created_at`, `last_login` |
+| **Chat_Sessions** | `id` (UUID PK), `user_id` (FK→Users), `source_mode`, `created_at` |
+| **Messages** | `id` (UUID PK), `session_id` (FK→Sessions), `role`, `message_text`, `language`, `verse_id` (FK→Verses), `citation_ids` (UUID[]), `feedback`, `created_at` |
+| **Feedback_Reports** | `id` (UUID PK), `message_id` (FK→Messages, optional), `user_id` (FK→Users), `session_id` (optional), `issue_type`, `comment`, `created_at` |
+| **Books** | `id` (UUID PK), `title`, `title_en`, `pdf_url`, `type`, `created_at` |
+| **Verses** | `id` (UUID PK), `book_id` (FK→Books), `line_number`, `text_fa`, `text_en`, `text_kr`, `created_at` |
+| **Citations** | `id` (UUID PK), `verse_id` (FK→Verses), `book_id` (FK→Books), `page_number`, `line_range`, `highlight_box` (JSON), `snippet` |
+
+Migrations managed by **Alembic** (`alembic/versions/`).
+
+---
+
+## API Endpoints
+
+### Public Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Health check |
+| `GET` | `/` | Service info |
+| `POST` | `/api/auth/signup` | Register |
+| `POST` | `/api/auth/login` | Login (returns JWT) |
+
+### Optional Auth (works for guests)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/chat` | Non-streaming chat |
+| `POST` | `/api/chat/stream` | SSE streaming chat |
+| `GET` | `/api/search?query=…&lang=fa` | Search verses |
+| `GET` | `/api/citation/:id` | Citation detail |
+| `GET` | `/api/books/:id/pages/:n` | Book page |
+| `POST` | `/api/feedback` | Submit feedback |
+
+### Required Auth
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/user/me` | Current user profile |
+| `PATCH` | `/api/user/settings` | Update language/theme |
+
+### Chat Request/Response Contract
+
+**Request** (`ChatRequest`):
+```json
+{
+  "question": "How do I deal with loss?",
+  "language": "en",
+  "source_scope": "books",
+  "session_id": null,
+  "history": [{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]
+}
+```
+
+**Response** (`ChatResponse`):
+```json
+{
+  "session_id": "uuid",
+  "verse": {"fa": "...", "en": "...", "kr": "..."},
+  "interpretation": "...",
+  "advice": "...",
+  "citations": [{"id": "uuid", "book": "Masnavi", "page_number": 42, "snippet": "..."}],
+  "retrieved_candidates": [...],
+  "grounded": true
+}
+```
+
+**SSE Events** (streaming):
+```
+data: {"type": "chunk", "text": "partial text..."}
+data: {"type": "done", "session_id": "...", "verse": {...}, ...}
+data: {"type": "error", "message": "..."}
+```
+
+---
 
 ## Configuration
 
-**Location:** `app/config.py`
+**Location:** `app/config.py` (pydantic-settings `BaseSettings`)
 
-**Environment Variables:**
-- `DATABASE_URL` - PostgreSQL connection string
-- `SECRET_KEY` - JWT secret key
-- `REDIS_URL` - Redis connection (for caching)
-- `LLM_API_KEY` - LLM API key
-- `LLM_API_URL` - LLM API endpoint
-- `LLM_MODEL` - LLM model name
-- `ELASTICSEARCH_URL` - ElasticSearch connection
-- `VECTOR_DB_URL` - Vector database connection
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `DATABASE_URL` | str | `postgresql://rumi_user:…` | PostgreSQL connection |
+| `SECRET_KEY` | str | — | JWT signing key |
+| `LLM_API_KEY` | str | — | LLM API key |
+| `LLM_API_URL` | str | OpenAI endpoint | LLM endpoint |
+| `LLM_MODEL` | str | `gpt-4` | Model name |
+| `USE_MOCK` | bool | `false` | Mock LLM responses |
+| `DEBUG` | bool | `false` | Debug logging |
+| `ALLOWED_HOSTS` | str | `localhost,127.0.0.1` | CORS origins |
+| `JWT_ALGORITHM` | str | `HS256` | JWT algorithm |
+| `JWT_EXPIRATION_HOURS` | int | `24` | Token TTL |
+| `RATE_LIMIT_REQUESTS` | int | `100` | Requests per window |
+| `RATE_LIMIT_WINDOW` | int | `60` | Window in seconds |
+| `REDIS_URL` | str | `redis://localhost:6379/0` | Redis (optional) |
+| `VECTOR_DB_URL` | str | — | Vector DB (planned) |
+| `ELASTICSEARCH_URL` | str | `localhost:9200` | Elastic (planned) |
 
-## API Endpoints Summary
+All settings are loaded from `.env` via `load_dotenv(override=True)` in `main.py`.
 
-### Public Endpoints
-- `GET /health` - Health check
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
+---
 
-### Protected Endpoints (Require JWT)
-- `POST /api/chat` - Send chat message
-- `GET /api/chat/sessions` - List sessions
-- `POST /api/feedback` - Submit feedback
-- `GET /api/feedback` - List feedback
+## Docker Compose Services
 
-### Optional Authentication
-- `GET /api/search/*` - Search endpoints
-- `GET /api/books/*` - Book endpoints
+| Service | Image | Port | Purpose |
+|---------|-------|------|---------|
+| `db` | `postgres:13-alpine` | 5432 | PostgreSQL database |
+| `api` | `Dockerfile` | 8000 | FastAPI backend |
+| `nginx` | `nginx:alpine` | 80 | Reverse proxy |
+| `adminer` | `adminer` | 8080 | DB management UI |
 
-## Middleware Stack
+Development mode: run only `db` via Docker, run `api` locally with `--reload`.
 
-1. **CORS Middleware** - Cross-origin resource sharing
-2. **Request Validator** - Request validation
-3. **Rate Limiter** - Rate limiting
-4. **Authentication** - JWT verification (on protected routes)
+---
 
-## Future Enhancements
+## Debug Logging
 
-Based on the architecture diagram, future enhancements include:
+The chat pipeline includes structured debug logs at each stage:
 
-1. **Redis Integration** - For distributed caching and rate limiting
-2. **Vector Database** - For semantic search and embeddings
-3. **ElasticSearch** - For full-text search (BM25)
-4. **Graph Database** - For complex relationships
-5. **Microservices Deployment** - Docker and Kubernetes orchestration
+```
+INFO  Processing chat for session=..., user_message='...' (lang=FA, scope=books)
+DEBUG Context retrieved: 3 verses, 2 citations. Top verse IDs: [uuid1, uuid2, uuid3]
+DEBUG Prompts built: system_len=450, user_len=1200
+DEBUG LLM generated response (first 100 chars): In the story of the reed...
+DEBUG LLM response parsed: interpretation_len=280, advice_len=150
+DEBUG Enrichment complete: verse_present=True, citations_count=2, candidates_count=3
+```
+
+Logging level controlled by `DEBUG` env var (`True` → `DEBUG`, `False` → `INFO`).
+
+---
+
+## Known Limitations (MVP)
+
+| Gap | Impact | Plan |
+|-----|--------|------|
+| No vector search | Retrieval uses SQL text matching | pgvector extension |
+| No `source_scope` filtering | Parameter accepted but unused | Backend filtering logic |
+| No chat history reload | Session persisted but no GET endpoint | `GET /api/chat/history/:id` |
+| No Elasticsearch | Full-text uses SQL LIKE | BM25 index |
+| No Redis | Rate limiting in-memory | Distributed caching |
+| No PDF/OCR pipeline | Books not ingestible | OCR + alignment pipeline |
+| No WebSocket chat | SSE only | Optional upgrade |
+
+---
 
 ## Development
 
-### Running the Application
+### Run Locally
 
 ```bash
-# Install dependencies
 pip install -r requirements.txt
-
-# Run migrations
 alembic upgrade head
-
-# Start server
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8000
 ```
 
-### Testing
+### API Docs
+
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+### Migrations
 
 ```bash
-# Run tests
-pytest
-
-# With coverage
-pytest --cov=app
+alembic revision --autogenerate -m "description"
+alembic upgrade head
+alembic downgrade -1
 ```
-
-## API Documentation
-
-Interactive API documentation available at:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
