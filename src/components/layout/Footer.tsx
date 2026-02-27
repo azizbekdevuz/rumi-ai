@@ -3,135 +3,84 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
+import { useTheme } from '@/lib/theme/theme-context';
 import { RumiLogo } from '@/components/ui/icons';
-import { Heart, Github, Twitter, Mail } from 'lucide-react';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
+import type { Language } from '@/lib/i18n/translations';
 
 // =============================================================================
-// ANIMATED SOCIAL LINK
-// =============================================================================
-
-interface SocialLinkProps {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-}
-
-function SocialLink({ href, label, icon }: SocialLinkProps) {
-  const prefersReducedMotion = useReducedMotion();
-  
-  return (
-    <motion.a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-teal)] hover:bg-[var(--accent-teal-light)] transition-colors"
-      aria-label={label}
-      whileHover={prefersReducedMotion ? undefined : { scale: 1.1, y: -2 }}
-      whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
-      transition={{ type: 'spring' as const, stiffness: 400, damping: 15 }}
-    >
-      {icon}
-    </motion.a>
-  );
-}
-
-// =============================================================================
-// ANIMATED FOOTER LINK
+// FOOTER LINK
 // =============================================================================
 
 interface FooterLinkProps {
   href: string;
   children: React.ReactNode;
-  external?: boolean;
 }
 
-function FooterLink({ href, children, external }: FooterLinkProps) {
+function FooterLink({ href, children }: FooterLinkProps) {
   const prefersReducedMotion = useReducedMotion();
-  
-  const linkProps = external ? {
-    target: '_blank',
-    rel: 'noopener noreferrer',
-  } : {};
-
-  const Component = external ? 'a' : Link;
 
   return (
     <motion.div
       whileHover={prefersReducedMotion ? undefined : { x: 4 }}
       transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
     >
-      <Component href={href} className="footer-link" {...linkProps}>
+      <Link href={href} className="footer-link">
         {children}
-      </Component>
+      </Link>
     </motion.div>
   );
 }
 
 // =============================================================================
-// ANIMATED BUTTON GROUP (Removed - unused)
+// TOGGLE BUTTON
 // =============================================================================
 
-// function _AnimatedButtonGroup({ items, ariaLabel }: ButtonGroupProps) {
-//   const prefersReducedMotion = useReducedMotion();
-  
-//   return (
-//     <div className="footer-language" role="group" aria-label={ariaLabel}>
-//       {items.map((item) => (
-//         <motion.button
-//           key={item.key}
-//           onClick={item.onClick}
-//           className={`footer-lang-btn ${item.isActive ? 'active' : ''}`}
-//           aria-pressed={item.isActive}
-//           whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
-//           whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
-//           transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
-//         >
-//           {item.label}
-//         </motion.button>
-//       ))}
-//     </div>
-//   );
-// }
+interface ToggleBtnProps {
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  className: string;
+}
+
+function ToggleBtn({ label, isActive, onClick, className }: ToggleBtnProps) {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <motion.button
+      onClick={onClick}
+      className={`${className} ${isActive ? 'active' : ''}`}
+      aria-pressed={isActive}
+      whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+      whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
+      transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
+    >
+      {label}
+    </motion.button>
+  );
+}
 
 // =============================================================================
 // MAIN FOOTER
 // =============================================================================
 
 export default function Footer() {
-  const { language, t } = useI18n();
+  const { language, setLanguage, t } = useI18n();
+  const { theme, setTheme } = useTheme();
   const prefersReducedMotion = useReducedMotion();
 
-  const content = {
-    en: {
-      copyright: '© 2024 Rumi AI. All rights reserved.',
-      madeWith: 'Made with',
-      forSeekers: 'for seekers of wisdom',
-      privacy: 'Privacy',
-      terms: 'Terms',
-      contact: 'Contact',
-    },
-    fa: {
-      copyright: '© ۲۰۲۴ رومی AI. تمام حقوق محفوظ است.',
-      madeWith: 'ساخته شده با',
-      forSeekers: 'برای جویندگان حکمت',
-      privacy: 'حریم خصوصی',
-      terms: 'شرایط',
-      contact: 'تماس',
-    },
-    kr: {
-      copyright: '© 2024 Rumi AI. 모든 권리 보유.',
-      madeWith: '만들어짐',
-      forSeekers: '지혜를 찾는 자들을 위해',
-      privacy: '개인정보',
-      terms: '이용약관',
-      contact: '연락처',
-    },
-  };
+  const languages: { key: Language; label: string }[] = [
+    { key: 'fa', label: 'FA' },
+    { key: 'en', label: 'EN' },
+    { key: 'kr', label: 'KR' },
+  ];
 
-  const c = content[language] || content.en;
+  const themes = [
+    { key: 'light' as const, label: t.footer.light },
+    { key: 'dark' as const, label: t.footer.dark },
+  ];
 
-  // Animation variants for staggered reveal
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -166,37 +115,16 @@ export default function Footer() {
       >
         {/* Logo & Tagline */}
         <motion.div className="footer-column" variants={itemVariants}>
-          <Link href="/" className="flex items-center gap-2 mb-4 group">
+          <Link href="/" className="footer-brand">
             <motion.div
               whileHover={prefersReducedMotion ? undefined : { rotate: 10, scale: 1.1 }}
               transition={{ type: 'spring' as const, stiffness: 400, damping: 15 }}
             >
               <RumiLogo className="w-8 h-8" />
             </motion.div>
-            <span className="text-lg font-serif font-bold text-[var(--text-primary)]">
-              Rumi AI
-            </span>
+            <span className="footer-brand-name">Rumi AI Agent</span>
           </Link>
           <p className="footer-tagline">{t.footer.tagline}</p>
-          
-          {/* Social Links */}
-          <div className="flex items-center gap-3 mt-4">
-            <SocialLink
-              href="https://github.com"
-              label="GitHub"
-              icon={<Github className="w-5 h-5" />}
-            />
-            <SocialLink
-              href="https://twitter.com"
-              label="Twitter"
-              icon={<Twitter className="w-5 h-5" />}
-            />
-            <SocialLink
-              href="mailto:contact@rumi-ai.com"
-              label="Email"
-              icon={<Mail className="w-5 h-5" />}
-            />
-          </div>
         </motion.div>
 
         {/* Quick Links */}
@@ -210,49 +138,40 @@ export default function Footer() {
           </nav>
         </motion.div>
 
-        {/* Legal */}
+        {/* Language & Theme */}
         <motion.div className="footer-column" variants={itemVariants}>
-          <h3 className="footer-heading">{c.contact}</h3>
-          <nav className="footer-links" aria-label="Legal links">
-            <FooterLink href="/privacy">{c.privacy}</FooterLink>
-            <FooterLink href="/terms">{c.terms}</FooterLink>
-            <FooterLink href="mailto:contact@rumi-ai.com" external>
-              {c.contact}
-            </FooterLink>
-          </nav>
-        </motion.div>
-      </motion.div>
+          {/* Language Switcher */}
+          <div className="footer-setting-row">
+            <span className="footer-setting-label">{t.footer.language}:</span>
+            <div className="footer-language" role="group" aria-label={t.footer.language}>
+              {languages.map((lang) => (
+                <ToggleBtn
+                  key={lang.key}
+                  label={lang.label}
+                  isActive={language === lang.key}
+                  onClick={() => setLanguage(lang.key)}
+                  className="footer-lang-btn"
+                />
+              ))}
+            </div>
+          </div>
 
-      {/* Bottom Bar */}
-      <motion.div
-        className="border-t border-[var(--border-color)] mt-8 pt-6"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-      >
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[var(--text-muted)]">
-          <p>{c.copyright}</p>
-          <motion.p 
-            className="flex items-center gap-1"
-            whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
-          >
-            {c.madeWith}
-            <motion.span
-              animate={prefersReducedMotion ? undefined : {
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            >
-              <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-            </motion.span>
-            {c.forSeekers}
-          </motion.p>
-        </div>
+          {/* Theme Switcher */}
+          <div className="footer-setting-row">
+            <span className="footer-setting-label">{t.footer.theme}:</span>
+            <div className="footer-theme" role="group" aria-label={t.footer.theme}>
+              {themes.map((th) => (
+                <ToggleBtn
+                  key={th.key}
+                  label={th.label}
+                  isActive={theme === th.key}
+                  onClick={() => setTheme(th.key)}
+                  className="footer-theme-btn"
+                />
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
     </footer>
   );

@@ -30,8 +30,7 @@ export default function SuggestedPrompts({ language, onPromptClick }: SuggestedP
             className="prompt-chip"
             aria-label={`Ask: ${prompt.text}`}
           >
-            <span className="prompt-category">{prompt.category}</span>
-            <span className="prompt-text">{prompt.text}</span>
+            {prompt.text}
           </button>
         ))}
       </div>

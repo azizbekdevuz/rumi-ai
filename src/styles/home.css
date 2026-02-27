@@ -584,7 +584,7 @@
 .footer {
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
-  padding: var(--space-12) var(--space-6) var(--space-8);
+  padding: var(--space-12) var(--space-6) var(--space-10);
   position: relative;
 }
 
@@ -594,6 +594,7 @@
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr;
   gap: var(--space-12);
+  align-items: start;
 }
 
 .footer-column {
@@ -602,12 +603,29 @@
   gap: var(--space-4);
 }
 
+/* Brand block */
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.footer-brand-name {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
 .footer-heading {
   font-family: var(--font-heading);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
 .footer-tagline {
@@ -641,16 +659,31 @@
   border-radius: var(--radius-sm);
 }
 
+/* Settings rows (Language / Theme) */
+.footer-setting-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.footer-setting-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  min-width: 70px;
+}
+
 .footer-language,
 .footer-theme {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-1);
   flex-wrap: wrap;
 }
 
 .footer-lang-btn,
 .footer-theme-btn {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-3);
   border: 1px solid var(--border-color);
   background: var(--bg-tertiary);
   color: var(--text-secondary);
@@ -663,20 +696,21 @@
 
 .footer-lang-btn:hover,
 .footer-theme-btn:hover {
-  border-color: var(--accent-teal);
-  color: var(--accent-teal);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
 }
 
 .footer-lang-btn.active,
 .footer-theme-btn.active {
-  background: var(--accent-teal);
-  border-color: var(--accent-teal);
-  color: var(--text-inverse);
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: white;
+  font-weight: 600;
 }
 
 .footer-lang-btn:focus-visible,
 .footer-theme-btn:focus-visible {
-  outline: 2px solid var(--accent-teal);
+  outline: 2px solid var(--accent-gold);
   outline-offset: 2px;
 }
 
