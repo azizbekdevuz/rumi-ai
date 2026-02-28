@@ -43,6 +43,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+weekly reports/
 aboutProject/
 screenshots/
 generate-pdf.md
