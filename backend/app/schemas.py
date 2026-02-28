@@ -266,7 +266,7 @@ class VerseMultilingual(BaseModel):
 
 class CitationSummary(BaseModel):
     """Citation summary for chat response."""
-    id: UUID
+    id: str
     book: Optional[str] = None
     page_number: Optional[int] = None
     snippet: Optional[str] = None
@@ -274,7 +274,7 @@ class CitationSummary(BaseModel):
 
 class RetrievedCandidate(BaseModel):
     """Retrieved candidate for reasoning display."""
-    id: UUID
+    id: str
     book: Optional[str] = None
     page_number: Optional[int] = None
     snippet: Optional[str] = None
@@ -283,7 +283,7 @@ class RetrievedCandidate(BaseModel):
 
 class ChatResponse(BaseModel):
     """Schema for /api/chat POST response."""
-    session_id: Optional[UUID] = None
+    session_id: Optional[str] = None
     verse: VerseMultilingual
     interpretation: str
     advice: str

@@ -1,5 +1,6 @@
 """
 Database connection and session management for RUMI AI backend.
+Uses SQLite for local development (no PostgreSQL needed).
 """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,19 +11,27 @@ from typing import Generator
 # Database URL from environment variable (set by load_dotenv in main.py)
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://rumi_user:rumi_password@localhost:5432/rumi_ai"
+    "sqlite:///./rumi_ai.db"
 )
 
+# SQLite needs connect_args for check_same_thread
+connect_args = {}
+engine_kwargs = {
+    "echo": os.getenv("SQL_ECHO", "false").lower() == "true",
+}
+
+if DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
+else:
+    engine_kwargs["pool_pre_ping"] = True
+    engine_kwargs["pool_size"] = 5
+    engine_kwargs["max_overflow"] = 10
+
 # Create SQLAlchemy engine
-# Use a standard connection pool instead of NullPool so that connections
-# are reused across requests and lazy-loaded attributes still work after
-# session operations like commit / flush.
 engine = create_engine(
     DATABASE_URL,
-    pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10,
-    echo=os.getenv("SQL_ECHO", "false").lower() == "true"
+    connect_args=connect_args,
+    **engine_kwargs,
 )
 
 # Create SessionLocal class
