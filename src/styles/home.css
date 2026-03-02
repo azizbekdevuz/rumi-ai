@@ -578,140 +578,108 @@
 }
 
 /* ============================================
-   FOOTER
+   FOOTER — Compact Modern Design
    ============================================ */
 
 .footer {
-  background: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
-  padding: var(--space-12) var(--space-6) var(--space-10);
+  padding: var(--space-8) var(--space-6) var(--space-6);
   position: relative;
+  background: transparent;
 }
 
 .footer-container {
   max-width: var(--container-max);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: var(--space-12);
-  align-items: start;
-}
-
-.footer-column {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
-/* Brand block */
+/* Top row: brand + navigation */
+.footer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
 .footer-brand {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   text-decoration: none;
-  width: fit-content;
+  flex-shrink: 0;
+}
+
+.footer-brand-icon {
+  width: 24px;
+  height: 24px;
 }
 
 .footer-brand-name {
   font-family: var(--font-heading);
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
-.footer-heading {
-  font-family: var(--font-heading);
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--space-1);
-}
-
-.footer-tagline {
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.6;
-  max-width: 280px;
-}
-
-.footer-links {
+.footer-nav {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
 }
 
-.footer-link {
+.footer-nav-link {
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
   transition: color var(--transition-fast);
-  width: fit-content;
+  white-space: nowrap;
 }
 
-.footer-link:hover {
+.footer-nav-link:hover {
   color: var(--accent-teal);
 }
 
-.footer-link:focus-visible {
+.footer-nav-link:focus-visible {
   outline: 2px solid var(--accent-teal);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-/* Settings rows (Language / Theme) */
-.footer-setting-row {
+/* Separator */
+.footer-separator {
+  height: 1px;
+  background: var(--border-color);
+}
+
+/* Bottom row: tagline + copyright */
+.footer-bottom {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-}
-
-.footer-setting-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-  white-space: nowrap;
-  min-width: 70px;
-}
-
-.footer-language,
-.footer-theme {
-  display: flex;
-  gap: var(--space-1);
+  justify-content: space-between;
+  gap: var(--space-4);
   flex-wrap: wrap;
 }
 
-.footer-lang-btn,
-.footer-theme-btn {
-  padding: var(--space-1) var(--space-3);
-  border: 1px solid var(--border-color);
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
+.footer-tagline {
+  color: var(--text-muted);
   font-size: 13px;
-  font-weight: 500;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
+  line-height: 1.5;
+  margin: 0;
 }
 
-.footer-lang-btn:hover,
-.footer-theme-btn:hover {
-  border-color: var(--accent-gold);
-  color: var(--accent-gold);
-}
-
-.footer-lang-btn.active,
-.footer-theme-btn.active {
-  background: var(--accent-gold);
-  border-color: var(--accent-gold);
-  color: white;
-  font-weight: 600;
-}
-
-.footer-lang-btn:focus-visible,
-.footer-theme-btn:focus-visible {
-  outline: 2px solid var(--accent-gold);
-  outline-offset: 2px;
+.footer-copyright {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  white-space: nowrap;
 }
 
 /* ============================================
@@ -893,9 +861,20 @@
     font-size: 16px;
   }
 
-  .footer-container {
-    grid-template-columns: 1fr;
-    gap: var(--space-8);
+  .footer-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .footer-nav {
+    gap: var(--space-3);
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
   }
 
   .bg-architecture {
