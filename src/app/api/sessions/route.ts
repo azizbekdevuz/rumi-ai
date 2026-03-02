@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
 
@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
  * GET /api/sessions — list chat sessions for the current user.
  * Proxies to backend GET /api/chat/sessions.
  */
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('rumi_token')?.value;

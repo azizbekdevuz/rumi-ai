@@ -57,6 +57,16 @@ class ChatSessionResponse(ChatSessionBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ChatSessionWithPreview(ChatSessionResponse):
+    """Chat session with embedded preview text and message count.
+
+    Returned by the ``GET /api/chat/sessions`` endpoint so the
+    frontend does not need N+1 requests to show session previews.
+    """
+    message_count: int = 0
+    preview: str = ""
+
+
 class ChatSessionListResponse(BaseModel):
     """Schema for chat session list response."""
     sessions: List[ChatSessionResponse]

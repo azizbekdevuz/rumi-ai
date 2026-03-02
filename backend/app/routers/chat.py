@@ -9,6 +9,7 @@ Also provides GET /api/chat/sessions and
 GET /api/chat/sessions/{session_id}/messages for the profile page.
 """
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func as sql_func
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from uuid import UUID
@@ -20,6 +21,7 @@ from app.schemas import (
     ChatRequest,
     ChatResponse,
     ChatSessionResponse,
+    ChatSessionWithPreview,
     CitationSummary,
     MessageResponse,
     RetrievedCandidate,
@@ -140,22 +142,68 @@ async def chat(
 # ── Session / History Endpoints ──────────────────────────────────
 
 
-@router.get("/sessions", response_model=List[ChatSessionResponse])
+@router.get("/sessions", response_model=List[ChatSessionWithPreview])
 def list_sessions(
     limit: int = Query(50, ge=1, le=200),
     current_user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db),
 ):
-    """List chat sessions for the current user (newest first)."""
+    """List chat sessions for the current user (newest first).
+
+    Each session includes ``message_count`` and ``preview`` (the first
+    user message) so the frontend never needs N+1 queries.
+    """
     user_id = resolve_user_id(current_user, db)
-    sessions = (
-        db.query(ChatSession)
+
+    # Sub-query: message count per session
+    count_sq = (
+        db.query(
+            Message.session_id,
+            sql_func.count(Message.id).label("message_count"),
+        )
+        .group_by(Message.session_id)
+        .subquery()
+    )
+
+    # Correlated scalar sub-query: first user message text per session.
+    # Uses LIMIT 1 instead of min(uuid) which PostgreSQL doesn't support.
+    preview_sq = (
+        db.query(Message.message_text)
+        .filter(
+            Message.session_id == ChatSession.id,
+            Message.role == "user",
+        )
+        .limit(1)
+        .correlate(ChatSession)
+        .scalar_subquery()
+    )
+
+    rows = (
+        db.query(
+            ChatSession,
+            sql_func.coalesce(count_sq.c.message_count, 0).label("message_count"),
+            preview_sq.label("preview"),
+        )
+        .outerjoin(count_sq, ChatSession.id == count_sq.c.session_id)
         .filter(ChatSession.user_id == user_id)
         .order_by(ChatSession.created_at.desc())
         .limit(limit)
         .all()
     )
-    return sessions
+
+    result: List[ChatSessionWithPreview] = []
+    for session, msg_count, preview_text in rows:
+        result.append(
+            ChatSessionWithPreview(
+                id=session.id,
+                user_id=session.user_id,
+                created_at=session.created_at,
+                source_mode=session.source_mode,
+                message_count=msg_count,
+                preview=(preview_text or "")[:120],
+            )
+        )
+    return result
 
 
 @router.get("/sessions/{session_id}/messages", response_model=List[MessageResponse])
