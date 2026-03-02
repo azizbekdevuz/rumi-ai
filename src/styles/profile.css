@@ -502,6 +502,87 @@
   font-size: 15px;
 }
 
+/* Chat History List */
+.profile-chat-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.profile-chat-history-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: rgba(248, 245, 237, 0.4);
+  border: 1px solid rgba(45, 42, 36, 0.06);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  width: 100%;
+  font-family: var(--font-body);
+}
+
+.profile-chat-history-item:hover {
+  background: rgba(27, 123, 107, 0.08);
+  border-color: rgba(27, 123, 107, 0.2);
+}
+
+[data-theme='dark'] .profile-chat-history-item {
+  background: rgba(36, 46, 62, 0.5);
+  border-color: rgba(232, 228, 220, 0.1);
+}
+
+[data-theme='dark'] .profile-chat-history-item:hover {
+  background: rgba(77, 196, 180, 0.12);
+  border-color: rgba(77, 196, 180, 0.25);
+}
+
+.profile-chat-history-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(27, 123, 107, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-teal);
+  flex-shrink: 0;
+}
+
+.profile-chat-history-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-chat-history-preview {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-chat-history-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.profile-chat-history-arrow {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity var(--transition-fast);
+}
+
+.profile-chat-history-item:hover .profile-chat-history-arrow {
+  opacity: 1;
+  color: var(--accent-teal);
+}
+
 /* Footer Links */
 .profile-footer-links {
   display: flex;

@@ -1,26 +1,33 @@
 """
-Chat Router — POST /api/chat
+Chat Router — POST /api/chat + session history endpoints
 
 Thin controller: resolves auth, creates a DB session, delegates
 to ChatService for the full RAG pipeline, persists messages, and
 maps the result to the ChatResponse schema.
+
+Also provides GET /api/chat/sessions and
+GET /api/chat/sessions/{session_id}/messages for the profile page.
 """
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import List, Optional
+from uuid import UUID
 import logging
 
 from app.database import get_db
-from app.models import User, Message
+from app.models import User, ChatSession, Message
 from app.schemas import (
     ChatRequest,
     ChatResponse,
+    ChatSessionResponse,
     CitationSummary,
+    MessageResponse,
     RetrievedCandidate,
     VerseMultilingual,
 )
 from app.middleware.auth import get_optional_user
 from app.services.chat_service import ChatService
+from app.services.guest_user_service import get_or_create_guest_user
 from app.routers._session import resolve_user_id, resolve_or_create_session
 
 logger = logging.getLogger(__name__)
@@ -128,3 +135,51 @@ async def chat(
         raise HTTPException(
             status_code=500, detail=f"Error processing chat: {exc}",
         )
+
+
+# ── Session / History Endpoints ──────────────────────────────────
+
+
+@router.get("/sessions", response_model=List[ChatSessionResponse])
+def list_sessions(
+    limit: int = Query(50, ge=1, le=200),
+    current_user: Optional[User] = Depends(get_optional_user),
+    db: Session = Depends(get_db),
+):
+    """List chat sessions for the current user (newest first)."""
+    user_id = resolve_user_id(current_user, db)
+    sessions = (
+        db.query(ChatSession)
+        .filter(ChatSession.user_id == user_id)
+        .order_by(ChatSession.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return sessions
+
+
+@router.get("/sessions/{session_id}/messages", response_model=List[MessageResponse])
+def get_session_messages(
+    session_id: UUID,
+    current_user: Optional[User] = Depends(get_optional_user),
+    db: Session = Depends(get_db),
+):
+    """Retrieve all messages for a given session (chronological order)."""
+    user_id = resolve_user_id(current_user, db)
+
+    # Verify session belongs to this user
+    session = (
+        db.query(ChatSession)
+        .filter(ChatSession.id == session_id, ChatSession.user_id == user_id)
+        .first()
+    )
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    messages = (
+        db.query(Message)
+        .filter(Message.session_id == session_id)
+        .order_by(Message.id)  # UUID v4 doesn't sort chronologically, but insertion order works
+        .all()
+    )
+    return messages

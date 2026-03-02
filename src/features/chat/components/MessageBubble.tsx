@@ -105,6 +105,9 @@ function MessageBubble({ message, citeEnabled, onCitationClick, language }: Mess
   const hasCitations = assistantMessage.citations && assistantMessage.citations.length > 0;
   const firstCitation = hasCitations ? assistantMessage.citations[0] : null;
 
+  // Detect "empty placeholder" state — show typing indicator instead of empty bubble
+  const isPlaceholder = !hasVerse && !hasInterpretation && !hasAdvice && !assistantMessage.content?.trim();
+
   return (
     <motion.article
       className="message-bubble-wrapper message-bubble-assistant"
@@ -126,6 +129,14 @@ function MessageBubble({ message, citeEnabled, onCitationClick, language }: Mess
           />
         </div>
 
+        {/* Typing indicator when content is still loading */}
+        {isPlaceholder ? (
+          <div className="typing-indicator" aria-label="Rumi AI is thinking...">
+            <span />
+            <span />
+            <span />
+          </div>
+        ) : (
         <div className="message-bubble-assistant-bubble">
           {/* Verse Card (first message only, if verse exists) */}
           {hasVerse && (
@@ -238,6 +249,7 @@ function MessageBubble({ message, citeEnabled, onCitationClick, language }: Mess
             </motion.p>
           )}
         </div>
+        )}
       </div>
     </motion.article>
   );

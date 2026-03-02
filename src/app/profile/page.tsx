@@ -1,19 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { useTheme } from '@/lib/theme/theme-context';
 import { useAuth } from '@/lib/auth/auth-context';
 import { useReducedMotion } from '@/lib/hooks';
-import { ChevronRight, ChevronLeft, Sun, Moon } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Sun, Moon, MessageSquare } from 'lucide-react';
 import ProfilePageShell from '@/features/profile/components/ProfilePageShell';
 import ProfileSidebar, { type ProfileSection } from '@/features/profile/components/ProfileSidebar';
 import SegmentedControl from '@/features/profile/components/SegmentedControl';
 import ToggleSwitch from '@/features/profile/components/ToggleSwitch';
 import styles from './profile.module.css';
+
+// ── Chat session type from backend ──────────────────────────────
+interface ChatSessionItem {
+  id: string;
+  created_at: string;
+  source_mode: string | null;
+  /** First user message text — populated after fetch */
+  preview?: string;
+  message_count?: number;
+}
 
 export default function ProfilePage() {
   const { language, dir, setLanguage } = useI18n();
@@ -21,6 +32,7 @@ export default function ProfilePage() {
   const { theme, toggleTheme } = useTheme();
   const { user: authUser, status: authStatus } = useAuth();
   const reducedMotion = useReducedMotion();
+  const router = useRouter();
 
   // Gate client-derived values (language, theme) behind a mount check
   // to avoid hydration mismatches from localStorage-based providers.
@@ -32,6 +44,62 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  // ── Chat history state ──
+  const [chatSessions, setChatSessions] = useState<ChatSessionItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState('');
+
+  /** Fetch chat sessions when the history tab becomes active */
+  const fetchChatSessions = useCallback(async () => {
+    setHistoryLoading(true);
+    setHistoryError('');
+    try {
+      const resp = await fetch('/api/sessions');
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const sessions: ChatSessionItem[] = await resp.json();
+
+      // For each session, fetch first message to build a preview
+      const enriched = await Promise.all(
+        sessions.slice(0, 30).map(async (s) => {
+          try {
+            const msgResp = await fetch(`/api/sessions/${s.id}/messages`);
+            if (!msgResp.ok) return { ...s, preview: '', message_count: 0 };
+            const msgs = await msgResp.json();
+            const firstUser = msgs.find((m: { role: string }) => m.role === 'user');
+            return {
+              ...s,
+              preview: firstUser?.message_text?.slice(0, 100) || '',
+              message_count: msgs.length,
+            };
+          } catch {
+            return { ...s, preview: '', message_count: 0 };
+          }
+        }),
+      );
+      setChatSessions(enriched);
+    } catch (err) {
+      setHistoryError(err instanceof Error ? err.message : 'Failed to load history');
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
+  // Fetch chat history when switching to the history tab
+  useEffect(() => {
+    if (activeSection === 'history' && chatSessions.length === 0 && !historyLoading) {
+      fetchChatSessions();
+    }
+  }, [activeSection, chatSessions.length, historyLoading, fetchChatSessions]);
+
+  /** Navigate to /chat with a specific session loaded */
+  const openChat = (sessionId: string) => {
+    // Store the session id so the chat page can pick it up
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('rumi_chat_session_id', sessionId);
+    }
+    router.push(`/chat?session=${sessionId}`);
+  };
 
   // Derive display values from auth state (graceful fallbacks)
   const user = {
@@ -338,9 +406,57 @@ export default function ProfilePage() {
                 >
                   <h3 className={styles.profileSectionTitle}>{c.chatHistory}</h3>
                   <div className={styles.profileSectionDivider} />
-                  <div className="profile-empty-state">
-                    <p>{c.noHistory}</p>
-                      </div>
+
+                  {historyLoading && (
+                    <div className="profile-empty-state">
+                      <p>Loading...</p>
+                    </div>
+                  )}
+
+                  {historyError && (
+                    <div className="profile-empty-state">
+                      <p style={{ color: 'var(--error, #c0392b)' }}>{historyError}</p>
+                    </div>
+                  )}
+
+                  {!historyLoading && !historyError && chatSessions.length === 0 && (
+                    <div className="profile-empty-state">
+                      <p>{c.noHistory}</p>
+                    </div>
+                  )}
+
+                  {!historyLoading && chatSessions.length > 0 && (
+                    <div className="profile-chat-history-list">
+                      {chatSessions.map((session) => (
+                        <motion.button
+                          key={session.id}
+                          className="profile-chat-history-item"
+                          onClick={() => openChat(session.id)}
+                          initial={reducedMotion ? {} : { opacity: 0, y: 8 }}
+                          animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
+                          whileHover={reducedMotion ? undefined : { x: 4 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="profile-chat-history-icon">
+                            <MessageSquare size={18} />
+                          </div>
+                          <div className="profile-chat-history-info">
+                            <p className="profile-chat-history-preview">
+                              {session.preview || 'Chat session'}
+                            </p>
+                            <span className="profile-chat-history-meta">
+                              {new Date(session.created_at).toLocaleDateString(
+                                safeLanguage === 'fa' ? 'fa-IR' : safeLanguage === 'kr' ? 'ko-KR' : 'en-US',
+                                { year: 'numeric', month: 'short', day: 'numeric' },
+                              )}
+                              {session.message_count ? ` · ${session.message_count} messages` : ''}
+                            </span>
+                          </div>
+                          <ChevronRight size={16} className="profile-chat-history-arrow" />
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )}
 

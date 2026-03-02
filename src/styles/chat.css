@@ -916,7 +916,7 @@ body:has(.chat-page-shell) .background-wrapper {
 }
 
 .message-bubble-advice-item::before {
-  content: 'â†’';
+  content: '\2192';
   position: absolute;
   left: 0;
   color: var(--accent-teal);
@@ -1219,7 +1219,7 @@ body:has(.chat-page-shell) .background-wrapper {
 }
 
 .advice-item::before {
-  content: 'â†’';
+  content: '\2192';
   position: absolute;
   left: 0;
   color: var(--accent-teal);
@@ -2083,7 +2083,7 @@ body:has(.chat-page-shell) .background-wrapper {
 [dir='rtl'] .advice-item::before {
   right: 0;
   left: auto;
-  content: 'â†';
+  content: '\2190';
 }
 
 [dir='rtl'] .message-controls {

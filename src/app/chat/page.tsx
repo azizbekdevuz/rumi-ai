@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { Suspense, useState, useCallback, useRef, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import {
   ChatMessage as ChatMessageType,
@@ -50,7 +51,16 @@ function buildHistory(messages: ChatMessageType[]): HistoryTurn[] {
 }
 
 export default function ChatPage() {
+  return (
+    <Suspense fallback={null}>
+      <ChatPageContent />
+    </Suspense>
+  );
+}
+
+function ChatPageContent() {
   const { language, t } = useI18n();
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -63,11 +73,61 @@ export default function ChatPage() {
 
   // Ref to track the ID of the currently streaming assistant message
   const streamingIdRef = useRef<string | null>(null);
+  // Track whether we already loaded a session from query param
+  const sessionLoadedRef = useRef(false);
 
-  // Restore session id from localStorage on mount
+  // Restore session id from localStorage on mount OR load from ?session= param
   useEffect(() => {
-    setSessionId(loadSessionId());
-  }, []);
+    const querySession = searchParams.get('session');
+    if (querySession && !sessionLoadedRef.current) {
+      sessionLoadedRef.current = true;
+      setSessionId(querySession);
+      saveSessionId(querySession);
+      // Load the session's messages from backend
+      loadSessionMessages(querySession);
+    } else if (!querySession) {
+      setSessionId(loadSessionId());
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  /** Load past messages for a given session id */
+  const loadSessionMessages = async (sid: string) => {
+    try {
+      const resp = await fetch(`/api/sessions/${sid}/messages`);
+      if (!resp.ok) return;
+      const msgs: Array<{
+        id: string;
+        role: string;
+        message_text: string | null;
+        session_id: string;
+      }> = await resp.json();
+
+      const chatMessages: ChatMessageType[] = msgs.map((m) => {
+        if (m.role === 'assistant') {
+          return {
+            id: m.id,
+            role: 'assistant' as const,
+            content: m.message_text || '',
+            timestamp: new Date(),
+            verse: { fa: '' },
+            interpretation: m.message_text || '',
+            advice: [''],
+            citations: [],
+          } as AssistantMessage;
+        }
+        return {
+          id: m.id,
+          role: 'user' as const,
+          content: m.message_text || '',
+          timestamp: new Date(),
+        };
+      });
+      setMessages(chatMessages);
+    } catch (err) {
+      console.error('[Chat] Failed to load session messages:', err);
+    }
+  };
 
   /** Persist session id to state + localStorage when received from backend */
   const handleSessionId = useCallback((id: string | undefined) => {
