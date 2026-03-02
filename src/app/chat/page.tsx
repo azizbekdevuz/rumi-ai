@@ -17,6 +17,7 @@ import SuggestedPrompts from '@/features/chat/components/SuggestedPrompts';
 import ChatPageShell from '@/features/chat/components/ChatPageShell';
 import ChatPanel from '@/features/chat/components/ChatPanel';
 import ChatHeader from '@/features/chat/components/ChatHeader';
+import ChatHistoryDrawer from '@/features/chat/components/ChatHistoryDrawer';
 import MessageList from '@/features/chat/components/MessageList';
 import Composer from '@/features/chat/components/Composer';
 import UtilityBar from '@/features/chat/components/UtilityBar';
@@ -69,6 +70,7 @@ function ChatPageContent() {
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
   const [reportMessageId, setReportMessageId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const reducedMotion = useReducedMotion();
 
   // Ref to track the ID of the currently streaming assistant message
@@ -86,9 +88,8 @@ function ChatPageContent() {
       // Load the session's messages from backend
       loadSessionMessages(querySession);
     } else if (!querySession) {
-      setSessionId(loadSessionId());
+    setSessionId(loadSessionId());
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   /** Load past messages for a given session id */
@@ -148,6 +149,17 @@ function ChatPageContent() {
     setIsLoading(false);
     streamingIdRef.current = null;
   }, []);
+
+  /** Switch to an existing chat session */
+  const handleSelectSession = useCallback((sid: string) => {
+    if (sid === sessionId) return; // already on this session
+    setSessionId(sid);
+    saveSessionId(sid);
+    setMessages([]);
+    setIsLoading(false);
+    streamingIdRef.current = null;
+    loadSessionMessages(sid);
+  }, [sessionId]);
 
   /**
    * Send a message. Uses real SSE streaming from /api/chat/stream.
@@ -330,6 +342,7 @@ function ChatPageContent() {
             sourceScope={sourceScope}
             onSourceScopeChange={setSourceScope}
             onNewChat={handleNewChat}
+            onHistoryToggle={() => setHistoryOpen((o) => !o)}
           />
 
           <AnimatePresence mode="wait">
@@ -405,14 +418,23 @@ function ChatPageContent() {
         {/* Footer */}
         <footer className="chat-page-footer">
           <a href="/privacy" className="chat-footer-link">
-            Privacy Policy
+            {t.about?.privacyPolicy || 'Privacy Policy'}
           </a>
           <span className="chat-footer-separator">|</span>
           <a href="/contact" className="chat-footer-link">
-            Contact Us
+            {t.about?.contactUs || 'Contact Us'}
           </a>
         </footer>
       </div>
+
+      {/* Chat History Drawer */}
+      <ChatHistoryDrawer
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onSelectSession={handleSelectSession}
+        onNewChat={handleNewChat}
+        currentSessionId={sessionId}
+      />
 
       {/* Citation Modal */}
       <CitationModal citation={selectedCitation} onClose={() => setSelectedCitation(null)} />

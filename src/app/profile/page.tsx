@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -21,9 +21,9 @@ interface ChatSessionItem {
   id: string;
   created_at: string;
   source_mode: string | null;
-  /** First user message text — populated after fetch */
-  preview?: string;
-  message_count?: number;
+  /** First user message text — returned by backend directly */
+  preview: string;
+  message_count: number;
 }
 
 export default function ProfilePage() {
@@ -49,48 +49,53 @@ export default function ProfilePage() {
   const [chatSessions, setChatSessions] = useState<ChatSessionItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState('');
+  // Guard against infinite retries — only fetch once per tab switch
+  const historyFetchedForUserRef = useRef<string | null>(null);
 
-  /** Fetch chat sessions when the history tab becomes active */
+  // ── Clear chat history when user changes (sign-out / sign-in) ──
+  const currentUserId = authUser?.id ?? null;
+  useEffect(() => {
+    // If the user identity changed, reset cached history so the new
+    // user's sessions will be fetched on the next tab switch.
+    if (historyFetchedForUserRef.current !== currentUserId) {
+      setChatSessions([]);
+      setHistoryError('');
+      historyFetchedForUserRef.current = null; // mark as not-yet-fetched
+    }
+  }, [currentUserId]);
+
+  /** Fetch chat sessions — single request, backend returns preview + count */
   const fetchChatSessions = useCallback(async () => {
+    if (authStatus !== 'authenticated') return;
     setHistoryLoading(true);
     setHistoryError('');
     try {
       const resp = await fetch('/api/sessions');
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const sessions: ChatSessionItem[] = await resp.json();
-
-      // For each session, fetch first message to build a preview
-      const enriched = await Promise.all(
-        sessions.slice(0, 30).map(async (s) => {
-          try {
-            const msgResp = await fetch(`/api/sessions/${s.id}/messages`);
-            if (!msgResp.ok) return { ...s, preview: '', message_count: 0 };
-            const msgs = await msgResp.json();
-            const firstUser = msgs.find((m: { role: string }) => m.role === 'user');
-            return {
-              ...s,
-              preview: firstUser?.message_text?.slice(0, 100) || '',
-              message_count: msgs.length,
-            };
-          } catch {
-            return { ...s, preview: '', message_count: 0 };
-          }
-        }),
-      );
-      setChatSessions(enriched);
+      setChatSessions(sessions);
+      // Mark this user's history as fetched
+      historyFetchedForUserRef.current = currentUserId;
     } catch (err) {
       setHistoryError(err instanceof Error ? err.message : 'Failed to load history');
+      // Still mark as fetched to prevent infinite retries
+      historyFetchedForUserRef.current = currentUserId;
     } finally {
       setHistoryLoading(false);
     }
-  }, []);
+  }, [authStatus, currentUserId]);
 
-  // Fetch chat history when switching to the history tab
+  // Fetch chat history when switching to the history tab (once per user)
   useEffect(() => {
-    if (activeSection === 'history' && chatSessions.length === 0 && !historyLoading) {
+    if (
+      activeSection === 'history' &&
+      authStatus === 'authenticated' &&
+      historyFetchedForUserRef.current !== currentUserId &&
+      !historyLoading
+    ) {
       fetchChatSessions();
     }
-  }, [activeSection, chatSessions.length, historyLoading, fetchChatSessions]);
+  }, [activeSection, authStatus, currentUserId, historyLoading, fetchChatSessions]);
 
   /** Navigate to /chat with a specific session loaded */
   const openChat = (sessionId: string) => {
@@ -420,9 +425,9 @@ export default function ProfilePage() {
                   )}
 
                   {!historyLoading && !historyError && chatSessions.length === 0 && (
-                    <div className="profile-empty-state">
-                      <p>{c.noHistory}</p>
-                    </div>
+                  <div className="profile-empty-state">
+                    <p>{c.noHistory}</p>
+                      </div>
                   )}
 
                   {!historyLoading && chatSessions.length > 0 && (
