@@ -82,6 +82,7 @@ export interface Translations {
       heading: string;
       content: string;
     }[];
+    ctaText?: string;
   };
   contact?: {
     title: string;
@@ -228,6 +229,7 @@ export const translations: Record<Language, Translations> = {
           content: 'We may update this privacy policy from time to time. We will notify registered users of significant changes via email. Continued use of the service after changes constitutes acceptance of the updated policy.',
         },
       ],
+      ctaText: 'Have questions about your privacy?',
     },
     contact: {
       title: 'Contact Us',
@@ -372,6 +374,7 @@ export const translations: Record<Language, Translations> = {
           content: 'ما ممکن است این سیاست حریم خصوصی را به‌روزرسانی کنیم. تغییرات مهم از طریق ایمیل به کاربران ثبت‌نام شده اطلاع‌رسانی خواهد شد.',
         },
       ],
+      ctaText: 'سؤالی درباره حریم خصوصی دارید؟',
     },
     contact: {
       title: 'تماس با ما',
@@ -516,6 +519,7 @@ export const translations: Record<Language, Translations> = {
           content: '이 개인정보 보호정책을 수시로 업데이트할 수 있습니다. 중요한 변경 사항은 이메일로 알려드립니다.',
         },
       ],
+      ctaText: '개인정보에 대해 궁금한 점이 있으신가요?',
     },
     contact: {
       title: '문의하기',

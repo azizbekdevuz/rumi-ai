@@ -457,7 +457,11 @@ export default function ProfilePage() {
                               {session.message_count ? ` · ${session.message_count} messages` : ''}
                             </span>
                           </div>
-                          <ChevronRight size={16} className="profile-chat-history-arrow" />
+                          {dir === 'rtl' ? (
+                            <ChevronLeft size={16} className="profile-chat-history-arrow" />
+                          ) : (
+                            <ChevronRight size={16} className="profile-chat-history-arrow" />
+                          )}
                         </motion.button>
                       ))}
                     </div>

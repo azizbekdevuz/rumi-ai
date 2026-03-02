@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MessageSquare, Plus } from 'lucide-react';
 import { useReducedMotion } from '@/lib/hooks';
+import { useAuth } from '@/lib/auth/auth-context';
 
 // ── Types ─────────────────────────────────────────────────────────
 
@@ -32,11 +33,14 @@ export default function ChatHistoryDrawer({
   currentSessionId,
 }: ChatHistoryDrawerProps) {
   const reducedMotion = useReducedMotion();
+  const { status } = useAuth();
+  const isAuthenticated = status === 'authenticated';
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const fetchedRef = useRef(false);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const fetchSessions = useCallback(async () => {
     if (fetchedRef.current) return;
@@ -56,12 +60,19 @@ export default function ChatHistoryDrawer({
     }
   }, []);
 
-  // Fetch sessions when the drawer opens
+  // Fetch sessions when the drawer opens (authenticated users only)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isAuthenticated) {
       fetchSessions();
     }
-  }, [isOpen, fetchSessions]);
+  }, [isOpen, isAuthenticated, fetchSessions]);
+
+  // Move focus to close button when drawer opens
+  useEffect(() => {
+    if (isOpen) {
+      closeButtonRef.current?.focus();
+    }
+  }, [isOpen]);
 
   // Close on Escape key
   useEffect(() => {
@@ -134,12 +145,14 @@ export default function ChatHistoryDrawer({
             exit="exit"
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
             role="dialog"
+            aria-modal="true"
             aria-label="Chat history"
           >
             {/* Header */}
             <div className="chat-history-drawer-header">
               <h3 className="chat-history-drawer-title">Chat History</h3>
               <button
+                ref={closeButtonRef}
                 className="chat-history-drawer-close"
                 onClick={onClose}
                 aria-label="Close chat history"
@@ -159,17 +172,21 @@ export default function ChatHistoryDrawer({
 
             {/* Session List */}
             <div className="chat-history-drawer-list">
-              {loading && (
+              {!isAuthenticated && (
+                <p className="chat-history-drawer-status">Sign in to view chat history.</p>
+              )}
+
+              {isAuthenticated && loading && (
                 <p className="chat-history-drawer-status">Loading...</p>
               )}
 
-              {error && (
+              {isAuthenticated && error && (
                 <p className="chat-history-drawer-status chat-history-drawer-error">
                   {error}
                 </p>
               )}
 
-              {!loading && !error && sessions.length === 0 && (
+              {isAuthenticated && !loading && !error && sessions.length === 0 && (
                 <p className="chat-history-drawer-status">No past chats yet.</p>
               )}
 

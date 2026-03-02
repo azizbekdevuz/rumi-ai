@@ -152,7 +152,11 @@ def list_sessions(
 
     Each session includes ``message_count`` and ``preview`` (the first
     user message) so the frontend never needs N+1 queries.
+    Unauthenticated requests return an empty list to avoid exposing
+    shared guest-account sessions.
     """
+    if current_user is None:
+        return []
     user_id = resolve_user_id(current_user, db)
 
     # Sub-query: message count per session
@@ -166,13 +170,14 @@ def list_sessions(
     )
 
     # Correlated scalar sub-query: first user message text per session.
-    # Uses LIMIT 1 instead of min(uuid) which PostgreSQL doesn't support.
+    # Order by created_at for a deterministic, chronological first message.
     preview_sq = (
         db.query(Message.message_text)
         .filter(
             Message.session_id == ChatSession.id,
             Message.role == "user",
         )
+        .order_by(Message.created_at.asc())
         .limit(1)
         .correlate(ChatSession)
         .scalar_subquery()
@@ -212,7 +217,13 @@ def get_session_messages(
     current_user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db),
 ):
-    """Retrieve all messages for a given session (chronological order)."""
+    """Retrieve all messages for a given session (chronological order).
+
+    Returns 404 for unauthenticated requests to avoid exposing shared
+    guest-account messages.
+    """
+    if current_user is None:
+        raise HTTPException(status_code=404, detail="Session not found")
     user_id = resolve_user_id(current_user, db)
 
     # Verify session belongs to this user
@@ -227,7 +238,7 @@ def get_session_messages(
     messages = (
         db.query(Message)
         .filter(Message.session_id == session_id)
-        .order_by(Message.id)  # UUID v4 doesn't sort chronologically, but insertion order works
+        .order_by(Message.created_at.asc())
         .all()
     )
     return messages

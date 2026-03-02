@@ -22,7 +22,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Sync React state with localStorage after hydration
   useEffect(() => {
-    const stored = localStorage.getItem('rumi-theme') as Theme | null;
+    let stored: Theme | null = null;
+    try {
+      stored = localStorage.getItem('rumi-theme') as Theme | null;
+    } catch {
+      // localStorage unavailable (private browsing, storage disabled, etc.)
+    }
     // Use requestAnimationFrame to avoid synchronous setState in effect
     requestAnimationFrame(() => {
       if (stored && ['light', 'dark'].includes(stored)) {
@@ -40,7 +45,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const applyTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem('rumi-theme', newTheme);
+    try {
+      localStorage.setItem('rumi-theme', newTheme);
+    } catch {
+      // localStorage unavailable; state and DOM attribute are still updated
+    }
     document.documentElement.setAttribute('data-theme', newTheme);
   };
 

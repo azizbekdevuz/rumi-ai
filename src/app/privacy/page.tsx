@@ -108,9 +108,7 @@ export default function PrivacyPage() {
           transition={{ duration: 0.5 }}
         >
           <p className="privacy-cta-text">
-            {dir === 'rtl'
-              ? 'سؤالی درباره حریم خصوصی دارید؟'
-              : 'Have questions about your privacy?'}
+            {t.privacy?.ctaText || 'Have questions about your privacy?'}
           </p>
           <Link href="/contact" className="privacy-cta-link">
             {t.about?.contactUs || 'Contact Us'}

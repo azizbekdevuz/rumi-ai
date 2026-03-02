@@ -94,7 +94,14 @@ function AnimatedThemeToggle({ theme, mounted, onToggle }: ThemeToggleProps) {
   // so there's no perceptible flash — only the icon pops in after hydration.
   if (!mounted) {
     return (
-      <button className="theme-toggle" aria-label="Toggle theme" tabIndex={0}>
+      <button
+        type="button"
+        className="theme-toggle"
+        aria-label="Toggle theme"
+        disabled
+        aria-disabled="true"
+        tabIndex={-1}
+      >
         <div style={{ width: 24, height: 24 }} />
       </button>
     );
