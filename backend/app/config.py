@@ -75,5 +75,10 @@ class Settings(BaseSettings):
     # ElasticSearch (for full-text search)
     ELASTICSEARCH_URL: str = "http://localhost:9200"
 
+    # RAG / Ollama embedding configuration
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    EMBED_MODEL: str = "nomic-embed-text:latest"
+    BOOK_VERSE_DIR: str = ""
+
 
 settings = Settings()
