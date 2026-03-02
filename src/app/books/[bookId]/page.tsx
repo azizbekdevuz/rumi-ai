@@ -154,28 +154,12 @@ export default function BookReaderPage() {
 
   if (!book) {
     return (
-      <main 
-        className="min-h-screen flex items-center justify-center py-12 px-4" 
-        dir={direction}
-        style={{ background: 'var(--bg-primary)' }}
-      >
-        <div className="text-center">
-          <BookOpen 
-            className="w-16 h-16 mx-auto mb-4" 
-            style={{ color: 'var(--text-muted)' }} 
-          />
-          <h1 
-            className="text-2xl font-serif font-bold mb-4"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            {c.notFound}
-          </h1>
-          <Link
-            href="/books"
-            className="inline-flex items-center gap-2 hover:underline"
-            style={{ color: 'var(--accent-teal)' }}
-          >
-            <BackArrow className="w-5 h-5" />
+      <main className="book-reader-not-found" dir={direction}>
+        <div className="book-reader-not-found-content">
+          <BookOpen className="book-reader-not-found-icon" />
+          <h1 className="book-reader-not-found-title">{c.notFound}</h1>
+          <Link href="/books" className="book-reader-not-found-link">
+            <BackArrow />
             {c.goBack}
           </Link>
         </div>
@@ -184,117 +168,71 @@ export default function BookReaderPage() {
   }
 
   return (
-    <main 
-      className="min-h-screen flex flex-col" 
-      dir={direction}
-      style={{ background: 'var(--bg-primary)' }}
-    >
+    <main className="book-reader-page" dir={direction}>
       {/* Top Toolbar */}
-      <header 
-        className="sticky top-0 z-40"
-        style={{ 
-          background: 'var(--bg-tertiary)', 
-          borderBottom: '2px solid var(--border-color)',
-          boxShadow: 'var(--shadow-sm)'
-        }}
-      >
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between gap-6">
-            {/* Back & Title */}
-            <div className="flex items-center gap-5 min-w-0">
-              <Link
-                href="/books"
-                className="flex items-center gap-2 transition-colors py-2 px-3 rounded-lg hover:bg-[var(--bg-secondary)]"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                <BackArrow className="w-5 h-5" />
-                <span className="hidden sm:inline font-medium">{c.back}</span>
-              </Link>
-              <div 
-                className="h-8 w-px hidden sm:block"
-                style={{ background: 'var(--border-color)' }}
-              />
-              <h1 
-                className="text-xl font-serif font-semibold truncate"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                {getBookTitle(book)}
-              </h1>
-            </div>
+      <header className="book-reader-header">
+        <div className="book-reader-header-content">
+          {/* Back & Title */}
+          <div className="book-reader-nav">
+            <Link href="/books" className="book-reader-back-link">
+              <BackArrow />
+              <span>{c.back}</span>
+            </Link>
+            <div className="book-reader-nav-divider" />
+            <h1 className="book-reader-title">{getBookTitle(book)}</h1>
+          </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowToc(!showToc)}
-                className="p-3 rounded-lg transition-colors"
-                style={{ 
-                  background: showToc ? 'var(--accent-teal-light)' : 'var(--bg-secondary)',
-                  border: showToc ? '1px solid var(--accent-teal)' : '1px solid var(--border-color)'
-                }}
-                aria-label={c.toc}
-                title={c.toc}
-              >
-                <List 
-                  className="w-5 h-5" 
-                  style={{ color: showToc ? 'var(--accent-teal)' : 'var(--text-secondary)' }} 
-                />
-              </button>
-              <button
-                className="p-3 rounded-lg transition-colors"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                aria-label={c.bookmark}
-                title={c.bookmark}
-              >
-                <BookMarked className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
-              </button>
-              <button
-                className="p-3 rounded-lg transition-colors hidden sm:flex"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                aria-label={c.share}
-                title={c.share}
-              >
-                <Share2 className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
-              </button>
-              <button
-                className="p-3 rounded-lg transition-colors hidden sm:flex"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                aria-label={c.download}
-                title={c.download}
-              >
-                <Download className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
-              </button>
-            </div>
+          {/* Actions */}
+          <div className="book-reader-actions">
+            <button
+              onClick={() => setShowToc(!showToc)}
+              className={`book-reader-action-btn ${showToc ? 'active' : ''}`}
+              aria-label={c.toc}
+              title={c.toc}
+            >
+              <List />
+            </button>
+            <button
+              className="book-reader-action-btn"
+              aria-label={c.bookmark}
+              title={c.bookmark}
+            >
+              <BookMarked />
+            </button>
+            <button
+              className="book-reader-action-btn hidden-sm"
+              aria-label={c.share}
+              title={c.share}
+            >
+              <Share2 />
+            </button>
+            <button
+              className="book-reader-action-btn hidden-sm"
+              aria-label={c.download}
+              title={c.download}
+            >
+              <Download />
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="book-reader-main">
         {/* Table of Contents Sidebar */}
         {showToc && (
-          <aside 
-            className="w-72 overflow-y-auto"
-            style={{ 
-              background: 'var(--bg-tertiary)', 
-              borderInlineEnd: '2px solid var(--border-color)' 
-            }}
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 
-                  className="font-semibold text-lg"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  {c.toc}
-                </h2>
+          <aside className="book-reader-sidebar">
+            <div className="book-reader-sidebar-content">
+              <div className="book-reader-sidebar-header">
+                <h2 className="book-reader-sidebar-title">{c.toc}</h2>
                 <button
                   onClick={() => setShowToc(false)}
-                  className="p-2 rounded-lg transition-colors lg:hidden"
-                  style={{ background: 'var(--bg-secondary)' }}
+                  className="book-reader-sidebar-close hidden-lg"
+                  aria-label="Close"
                 >
-                  <X className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                  <X />
                 </button>
               </div>
-              <nav className="space-y-2">
+              <nav className="book-reader-toc-nav">
                 {tocItems.map((item, index) => {
                   const isActive = currentPage >= item.page &&
                     (tocItems[index + 1] ? currentPage < tocItems[index + 1].page : true);
@@ -305,19 +243,10 @@ export default function BookReaderPage() {
                         setCurrentPage(item.page);
                         setShowToc(false);
                       }}
-                      className="w-full text-start px-4 py-3 rounded-lg transition-all"
-                      style={{
-                        background: isActive ? 'var(--accent-teal-light)' : 'transparent',
-                        color: isActive ? 'var(--accent-teal)' : 'var(--text-secondary)',
-                        border: isActive ? '1px solid var(--accent-teal)' : '1px solid transparent',
-                        fontWeight: isActive ? 600 : 400
-                      }}
+                      className={`book-reader-toc-item ${isActive ? 'active' : ''}`}
                     >
-                      <span className="block truncate text-base">{item.title}</span>
-                      <span 
-                        className="text-sm mt-1 block"
-                        style={{ color: isActive ? 'var(--accent-teal)' : 'var(--text-muted)', opacity: 0.8 }}
-                      >
+                      <span className="book-reader-toc-item-title">{item.title}</span>
+                      <span className="book-reader-toc-item-page">
                         {c.page} {item.page}
                       </span>
                     </button>
@@ -329,70 +258,40 @@ export default function BookReaderPage() {
         )}
 
         {/* PDF Viewer Area */}
-        <div className="flex-1 flex flex-col">
+        <div className="book-reader-viewer">
           {/* Citation Highlight Banner */}
           {highlightText && (
-            <div 
-              className="px-4 py-2"
-              style={{ 
-                background: 'var(--accent-gold-light)', 
-                borderBottom: '1px solid rgba(201, 146, 44, 0.2)' 
-              }}
-            >
-              <p className="text-sm" style={{ color: 'var(--accent-gold)' }}>
-                <span className="font-medium">{c.citationHighlight}:</span>{' '}
-                <span className="italic">&ldquo;{highlightText}&rdquo;</span>
+            <div className="book-reader-citation-banner">
+              <p className="book-reader-citation-text">
+                <strong>{c.citationHighlight}:</strong>{' '}
+                <em>&ldquo;{highlightText}&rdquo;</em>
               </p>
             </div>
           )}
 
           {/* PDF Display */}
-          <div 
-            className="flex-1 overflow-auto p-4 lg:p-8 flex items-center justify-center"
-            style={{ background: 'var(--bg-secondary)' }}
-          >
+          <div className="book-reader-pdf-container">
             <div
-              className="bg-white rounded-lg overflow-hidden"
+              className="book-reader-pdf-wrapper"
               style={{
                 width: `${(600 * zoom) / 100}px`,
                 height: `${(800 * zoom) / 100}px`,
-                maxWidth: '90vw',
-                maxHeight: '80vh',
-                boxShadow: 'var(--shadow-xl)'
               }}
             >
               {/* PDF Skeleton/Placeholder */}
-              <div 
-                className="w-full h-full flex flex-col items-center justify-center p-8"
-                style={{ background: '#faf9f6' }}
-              >
-                <BookOpen 
-                  className="w-16 h-16 mb-4" 
-                  style={{ color: 'var(--text-muted)', opacity: 0.3 }} 
-                />
-                <p 
-                  className="text-center mb-2"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  {c.pdfPlaceholder}
-                </p>
-                <p 
-                  className="text-sm text-center"
-                  style={{ color: 'var(--text-muted)', opacity: 0.6 }}
-                >
+              <div className="book-reader-pdf-placeholder">
+                <BookOpen className="book-reader-pdf-icon" />
+                <p className="book-reader-pdf-text">{c.pdfPlaceholder}</p>
+                <p className="book-reader-pdf-page-info">
                   {c.page} {currentPage} {c.of} {totalPages}
                 </p>
                 {/* Mock content preview */}
-                <div className="mt-8 w-full max-w-md space-y-3">
+                <div className="book-reader-pdf-skeleton">
                   {[75, 100, 85, 66, 80, 100, 75].map((width, i) => (
-                    <div 
+                    <div
                       key={i}
-                      className="h-4 rounded"
-                      style={{ 
-                        background: 'var(--text-muted)', 
-                        opacity: 0.1,
-                        width: `${width}%`
-                      }}
+                      className="book-reader-pdf-skeleton-line"
+                      style={{ width: `${width}%` }}
                     />
                   ))}
                 </div>
@@ -401,33 +300,20 @@ export default function BookReaderPage() {
           </div>
 
           {/* Bottom Toolbar */}
-          <div 
-            className="px-6 py-4"
-            style={{ 
-              background: 'var(--bg-tertiary)', 
-              borderTop: '2px solid var(--border-color)' 
-            }}
-          >
-            <div className="flex items-center justify-between max-w-3xl mx-auto">
+          <div className="book-reader-footer">
+            <div className="book-reader-footer-content">
               {/* Page Navigation */}
-              <div className="flex items-center gap-3">
+              <div className="book-reader-page-nav">
                 <button
                   onClick={handlePrevPage}
                   disabled={currentPage <= 1}
-                  className="p-3 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ 
-                    background: 'var(--bg-secondary)', 
-                    border: '1px solid var(--border-color)' 
-                  }}
+                  className="book-reader-nav-btn"
                   aria-label="Previous page"
                 >
-                  <PrevIcon className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+                  <PrevIcon />
                 </button>
 
-                <div 
-                  className="flex items-center gap-3 text-base"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
+                <div className="book-reader-page-input-group">
                   <input
                     type="number"
                     value={currentPage}
@@ -437,16 +323,11 @@ export default function BookReaderPage() {
                         setCurrentPage(page);
                       }
                     }}
-                    className="w-16 px-3 py-2 text-center rounded-lg font-medium"
-                    style={{
-                      border: '2px solid var(--border-color)',
-                      background: 'var(--bg-primary)',
-                      color: 'var(--text-primary)'
-                    }}
+                    className="book-reader-page-input"
                     min={1}
                     max={totalPages}
                   />
-                  <span className="font-medium">
+                  <span className="book-reader-page-total">
                     {c.of} {totalPages}
                   </span>
                 </div>
@@ -454,62 +335,41 @@ export default function BookReaderPage() {
                 <button
                   onClick={handleNextPage}
                   disabled={currentPage >= totalPages}
-                  className="p-3 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ 
-                    background: 'var(--bg-secondary)', 
-                    border: '1px solid var(--border-color)' 
-                  }}
+                  className="book-reader-nav-btn"
                   aria-label="Next page"
                 >
-                  <NextIcon className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+                  <NextIcon />
                 </button>
               </div>
 
               {/* Zoom Controls */}
-              <div className="flex items-center gap-3">
+              <div className="book-reader-zoom-controls">
                 <button
                   onClick={handleZoomOut}
                   disabled={zoom <= 50}
-                  className="p-3 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ 
-                    background: 'var(--bg-secondary)', 
-                    border: '1px solid var(--border-color)' 
-                  }}
+                  className="book-reader-zoom-btn"
                   aria-label="Zoom out"
                 >
-                  <ZoomOut className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+                  <ZoomOut />
                 </button>
 
-                <span 
-                  className="text-base w-14 text-center font-medium"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  {zoom}%
-                </span>
+                <span className="book-reader-zoom-value">{zoom}%</span>
 
                 <button
                   onClick={handleZoomIn}
                   disabled={zoom >= 200}
-                  className="p-3 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ 
-                    background: 'var(--bg-secondary)', 
-                    border: '1px solid var(--border-color)' 
-                  }}
+                  className="book-reader-zoom-btn"
                   aria-label="Zoom in"
                 >
-                  <ZoomIn className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+                  <ZoomIn />
                 </button>
 
                 <button
                   onClick={toggleFullscreen}
-                  className="p-3 rounded-lg transition-colors hidden sm:flex"
-                  style={{ 
-                    background: 'var(--bg-secondary)', 
-                    border: '1px solid var(--border-color)' 
-                  }}
+                  className="book-reader-zoom-btn hidden-sm"
                   aria-label="Toggle fullscreen"
                 >
-                  <Maximize className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+                  <Maximize />
                 </button>
               </div>
             </div>
