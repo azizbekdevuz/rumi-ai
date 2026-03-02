@@ -63,10 +63,7 @@ class ChatService:
         # Step 4: Generate via Ollama
         raw_text = await self.llm.generate(system_prompt, user_prompt, language)
 
-        # Step 5: Parse response
-        interpretation, advice = self._parse_response(raw_text)
-
-        # Build candidates for frontend
+        # Step 5: Build candidates for frontend
         retrieved_candidates = []
         for v in verses_context:
             retrieved_candidates.append({
@@ -77,28 +74,19 @@ class ChatService:
                 'score': v.get('score', 0.0),
             })
 
+        # Pass the raw LLM text through directly.  The frontend handles its
+        # own display logic.  Attempting to split the text on hard-coded
+        # separator strings (like "Practical Advice:") is fragile because
+        # the LLM does not reliably reproduce them.
         return {
             'response_text': raw_text,
             'verse_id': None,
             'citation_ids': [],
             'verse_data': verse_data,
-            'interpretation': interpretation,
-            'advice': advice,
+            'interpretation': raw_text,
+            'advice': raw_text,
             'citations_summary': [],
             'retrieved_candidates': retrieved_candidates,
             'grounded': len(retrieved_docs) > 0,
         }
 
-    def _parse_response(self, raw_text: str):
-        text = raw_text.strip()
-        for sep in ['Practical Advice:', 'Advice:', 'النصيحة:', 'نصیحت:']:
-            if sep in text:
-                parts = text.split(sep, 1)
-                interp = parts[0].replace('Interpretation:', '').strip()
-                adv = parts[1].strip()
-                return interp, adv
-        paragraphs = text.split('\n\n')
-        if len(paragraphs) >= 2:
-            mid = len(paragraphs) // 2
-            return '\n\n'.join(paragraphs[:mid]).strip(), '\n\n'.join(paragraphs[mid:]).strip()
-        return text, text

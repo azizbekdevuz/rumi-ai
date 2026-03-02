@@ -2,12 +2,13 @@
 RUMI AI Agent Backend - Main FastAPI application.
 RAG pipeline using FAISS + Ollama (nomic-embed-text + qwen2.5:3b).
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
 from dotenv import load_dotenv
-import os, logging
+import logging
 
 load_dotenv(override=True)
 
@@ -31,11 +32,29 @@ logger.info("Creating database tables...")
 Base.metadata.create_all(bind=engine)
 logger.info("Database tables created")
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Start FAISS index build in a background thread so the server
+    can accept requests immediately (health, docs, etc.)."""
+    logger.info("Initializing RAG service with FAISS (background)...")
+    try:
+        from app.services.rag_service import get_rag_service
+        rag = get_rag_service()
+        rag.build_index_background()
+        logger.info("RAG background indexing started for %d documents", len(rag.documents))
+    except Exception as exc:
+        logger.error("Failed to initialize RAG service: %s", exc, exc_info=True)
+        logger.warning("Chat will not have RAG capabilities")
+    yield
+
+
 app = FastAPI(
     title="RUMI AI Agent Backend",
     version=settings.APP_VERSION,
     description="Backend API for RUMI AI Agent - RAG with FAISS + Ollama",
     docs_url="/docs", redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -58,27 +77,20 @@ app.include_router(citation.router)
 app.include_router(user.router)
 
 
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Initializing RAG service with FAISS...")
-    try:
-        from app.services.rag_service import get_rag_service
-        rag = get_rag_service()
-        logger.info("RAG service initialized: %d documents indexed", len(rag.documents))
-    except Exception as exc:
-        logger.error("Failed to initialize RAG service: %s", exc, exc_info=True)
-        logger.warning("Chat will not have RAG capabilities")
-
-
 @app.get("/health")
 def health_check():
     from app.services.rag_service import _rag_instance
+    ready = _rag_instance is not None and _rag_instance.is_ready
     return {
         "status": "healthy",
         "service": "RUMI AI Agent Backend",
         "version": settings.APP_VERSION,
-        "rag_ready": _rag_instance is not None and _rag_instance.index is not None,
-        "rag_documents": _rag_instance.index.ntotal if _rag_instance and _rag_instance.index else 0,
+        "rag_ready": ready,
+        "rag_documents": (
+            _rag_instance.index.ntotal
+            if ready and _rag_instance.index
+            else 0
+        ),
     }
 
 
