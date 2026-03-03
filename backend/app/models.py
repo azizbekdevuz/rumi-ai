@@ -16,7 +16,9 @@ class User(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(Text, nullable=False, unique=True)
-    password_hash = Column(Text, nullable=False)
+    password_hash = Column(Text, nullable=True)  # Nullable for OAuth users
+    provider = Column(Text, nullable=False, server_default='email')  # 'email', 'kakao', etc.
+    provider_user_id = Column(Text, nullable=True)  # OAuth provider's user ID
     preferred_lang = Column(Text, nullable=True)
     theme = Column(Text, nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
