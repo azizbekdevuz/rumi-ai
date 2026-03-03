@@ -110,7 +110,7 @@ export default function ProfilePage() {
   const user = {
     name: authUser?.email?.split('@')[0] ?? 'Default User',
     email: authUser?.email ?? '',
-    avatar: null as string | null,
+    avatar: authUser?.avatar_url ?? null,
   };
 
   const content = {
