@@ -110,7 +110,9 @@ export default function LoginPageClient() {
             // Social
             orContinue: 'Or continue with',
             google: 'Google',
+            kakao: 'Kakao',
             apple: 'Apple',
+            appleComingSoon: 'This login method coming soon',
             // Footer
             noAccount: "Don't have an account?",
             signupLink: 'Sign up',
@@ -145,7 +147,9 @@ export default function LoginPageClient() {
             signupError: 'لطفاً همه فیلدها را به درستی پر کنید',
             orContinue: 'یا ادامه با',
             google: 'گوگل',
+            kakao: 'کاکائو',
             apple: 'اپل',
+            appleComingSoon: 'این روش ورود به زودی',
             noAccount: 'حساب کاربری ندارید؟',
             signupLink: 'ثبت نام',
             hasAccount: 'قبلاً حساب دارید؟',
@@ -178,7 +182,9 @@ export default function LoginPageClient() {
             signupError: '모든 필드를 올바르게 입력해주세요',
             orContinue: '또는 계속하기',
             google: 'Google',
+            kakao: '카카오',
             apple: 'Apple',
+            appleComingSoon: '이 로그인 방법은 곧 제공됩니다',
             noAccount: '계정이 없으신가요?',
             signupLink: '가입',
             hasAccount: '이미 계정이 있으신가요?',
@@ -362,7 +368,9 @@ export default function LoginPageClient() {
                     {/* Social Buttons */}
                     <SocialButtonsRow
                         googleLabel={c.google}
+                        kakaoLabel={c.kakao}
                         appleLabel={c.apple}
+                        appleComingSoon={c.appleComingSoon}
                     />
 
                     {/* Bottom Link */}
