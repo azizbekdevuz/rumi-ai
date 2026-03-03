@@ -102,26 +102,43 @@ function ChatPageContent() {
         role: string;
         message_text: string | null;
         session_id: string;
+        created_at?: string;
+        interpretation?: string | null;
+        advice?: string[] | null;
+        verse?: { fa?: string; en?: string; kr?: string } | null;
+        citations?: Array<{ id: string; book: string; page_number: number; snippet?: string }> | null;
       }> = await resp.json();
 
       const chatMessages: ChatMessageType[] = msgs.map((m) => {
         if (m.role === 'assistant') {
+          // Use structured data from API if available.
+          // If missing, leave structured fields empty and show plain content only.
+          const verse = m.verse ?? { fa: '', en: undefined, kr: undefined };
+          const interpretation = m.interpretation ?? '';
+          const advice = m.advice ?? [];
+          const citations = m.citations ?? [];
+
           return {
             id: m.id,
             role: 'assistant' as const,
             content: m.message_text || '',
-            timestamp: new Date(),
-            verse: { fa: '' },
-            interpretation: m.message_text || '',
-            advice: [''],
-            citations: [],
+            timestamp: m.created_at ? new Date(m.created_at) : new Date(),
+            verse,
+            interpretation,
+            advice,
+            citations: citations.map(c => ({
+              book: c.book || '',
+              page: c.page_number || 0,
+              refId: c.id || '',
+              snippet: c.snippet || '',
+            })),
           } as AssistantMessage;
         }
         return {
           id: m.id,
           role: 'user' as const,
           content: m.message_text || '',
-          timestamp: new Date(),
+          timestamp: m.created_at ? new Date(m.created_at) : new Date(),
         };
       });
       setMessages(chatMessages);
