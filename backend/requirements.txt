@@ -21,5 +21,9 @@ requests>=2.26.0
 httpx>=0.23.0
 Pillow>=9.0
 
+# RAG / Vector Search
+faiss-cpu>=1.7.0
+numpy>=1.24.0
+
 # Optional: Task Queue (for async processing)
 # celery[redis]==5.1.2

@@ -1,7 +1,10 @@
-version: '3.8'
-
 services:
-  # PostgreSQL Database
+  # ── NOTE: Ollama runs on the HOST machine (not in Docker) ───────
+  # Install via: https://ollama.com/download
+  # Then pull models: ollama pull nomic-embed-text:latest && ollama pull qwen2.5:3b
+  # The backend connects to Ollama on the host via host.docker.internal
+
+  # ── PostgreSQL Database ─────────────────────────────────────────
   db:
     image: postgres:13-alpine
     container_name: rumi_ai_db
@@ -22,7 +25,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API Service
+  # ── Backend API Service (FastAPI + RAG) ─────────────────────────
   api:
     build:
       context: .
@@ -32,21 +35,30 @@ services:
     ports:
       - "${API_PORT:-8000}:8000"
     environment:
-      - DATABASE_URL=postgresql://${DB_USER:-rumi_user}:${DB_PASSWORD:-rumi_password}@db:${DB_PORT:-5432}/rumi_ai
+      - DATABASE_URL=postgresql://${DB_USER:-rumi_user}:${DB_PASSWORD:-rumi_password}@db:5432/rumi_ai
       - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
-      - DEBUG=${DEBUG:-False}
+      - DEBUG=${DEBUG:-false}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_API_URL=${LLM_API_URL:-http://host.docker.internal:11434}
+      - LLM_MODEL=${LLM_MODEL:-qwen2.5:3b}
+      - USE_MOCK=${USE_MOCK:-false}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - EMBED_MODEL=${EMBED_MODEL:-nomic-embed-text:latest}
+      - BOOK_VERSE_DIR=/app/book_verse
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./logs:/app/logs
       - ./media:/app/media
+      - ../book_verse:/app/book_verse:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      start_period: 120s
+      retries: 5
 
   # NGINX Reverse Proxy (for production-like setup)
   nginx:

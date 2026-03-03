@@ -630,6 +630,11 @@ body:has(.auth-page-shell) .background-wrapper {
   color: rgba(45, 42, 36, 0.65);
   text-decoration: none;
   transition: color var(--transition-base);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
 }
 
 .auth-forgot-link:hover {

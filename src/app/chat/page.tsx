@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { Suspense, useState, useCallback, useRef, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import {
   ChatMessage as ChatMessageType,
@@ -16,6 +17,7 @@ import SuggestedPrompts from '@/features/chat/components/SuggestedPrompts';
 import ChatPageShell from '@/features/chat/components/ChatPageShell';
 import ChatPanel from '@/features/chat/components/ChatPanel';
 import ChatHeader from '@/features/chat/components/ChatHeader';
+import ChatHistoryDrawer from '@/features/chat/components/ChatHistoryDrawer';
 import MessageList from '@/features/chat/components/MessageList';
 import Composer from '@/features/chat/components/Composer';
 import UtilityBar from '@/features/chat/components/UtilityBar';
@@ -50,7 +52,16 @@ function buildHistory(messages: ChatMessageType[]): HistoryTurn[] {
 }
 
 export default function ChatPage() {
+  return (
+    <Suspense fallback={null}>
+      <ChatPageContent />
+    </Suspense>
+  );
+}
+
+function ChatPageContent() {
   const { language, t } = useI18n();
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -59,15 +70,82 @@ export default function ChatPage() {
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
   const [reportMessageId, setReportMessageId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const reducedMotion = useReducedMotion();
 
   // Ref to track the ID of the currently streaming assistant message
   const streamingIdRef = useRef<string | null>(null);
+  // Track whether we already loaded a session from query param
+  const sessionLoadedRef = useRef(false);
 
-  // Restore session id from localStorage on mount
+  // Restore session id from localStorage on mount OR load from ?session= param
   useEffect(() => {
+    const querySession = searchParams.get('session');
+    if (querySession && !sessionLoadedRef.current) {
+      sessionLoadedRef.current = true;
+      setSessionId(querySession);
+      saveSessionId(querySession);
+      // Load the session's messages from backend
+      loadSessionMessages(querySession);
+    } else if (!querySession) {
     setSessionId(loadSessionId());
-  }, []);
+    }
+  }, [searchParams]);
+
+  /** Load past messages for a given session id */
+  const loadSessionMessages = async (sid: string) => {
+    try {
+      const resp = await fetch(`/api/sessions/${sid}/messages`);
+      if (!resp.ok) return;
+      const msgs: Array<{
+        id: string;
+        role: string;
+        message_text: string | null;
+        session_id: string;
+        created_at?: string;
+        interpretation?: string | null;
+        advice?: string[] | null;
+        verse?: { fa?: string; en?: string; kr?: string } | null;
+        citations?: Array<{ id: string; book: string; page_number: number; snippet?: string }> | null;
+      }> = await resp.json();
+
+      const chatMessages: ChatMessageType[] = msgs.map((m) => {
+        if (m.role === 'assistant') {
+          // Use structured data from API if available.
+          // If missing, leave structured fields empty and show plain content only.
+          const verse = m.verse ?? { fa: '', en: undefined, kr: undefined };
+          const interpretation = m.interpretation ?? '';
+          const advice = m.advice ?? [];
+          const citations = m.citations ?? [];
+
+          return {
+            id: m.id,
+            role: 'assistant' as const,
+            content: m.message_text || '',
+            timestamp: m.created_at ? new Date(m.created_at) : new Date(),
+            verse,
+            interpretation,
+            advice,
+            citations: citations.map(c => ({
+              book: c.book || '',
+              page: c.page_number || 0,
+              refId: c.id || '',
+              snippet: c.snippet || '',
+            })),
+          } as AssistantMessage;
+        }
+        return {
+          id: m.id,
+          role: 'user' as const,
+          content: m.message_text || '',
+          timestamp: m.created_at ? new Date(m.created_at) : new Date(),
+        };
+      });
+      setMessages(chatMessages);
+    } catch (err) {
+      console.error('[Chat] Failed to load session messages:', err);
+    }
+  };
 
   /** Persist session id to state + localStorage when received from backend */
   const handleSessionId = useCallback((id: string | undefined) => {
@@ -88,6 +166,17 @@ export default function ChatPage() {
     setIsLoading(false);
     streamingIdRef.current = null;
   }, []);
+
+  /** Switch to an existing chat session */
+  const handleSelectSession = useCallback((sid: string) => {
+    if (sid === sessionId) return; // already on this session
+    setSessionId(sid);
+    saveSessionId(sid);
+    setMessages([]);
+    setIsLoading(false);
+    streamingIdRef.current = null;
+    loadSessionMessages(sid);
+  }, [sessionId]);
 
   /**
    * Send a message. Uses real SSE streaming from /api/chat/stream.
@@ -270,6 +359,7 @@ export default function ChatPage() {
             sourceScope={sourceScope}
             onSourceScopeChange={setSourceScope}
             onNewChat={handleNewChat}
+            onHistoryToggle={() => setHistoryOpen((o) => !o)}
           />
 
           <AnimatePresence mode="wait">
@@ -345,14 +435,23 @@ export default function ChatPage() {
         {/* Footer */}
         <footer className="chat-page-footer">
           <a href="/privacy" className="chat-footer-link">
-            Privacy Policy
+            {t.about?.privacyPolicy || 'Privacy Policy'}
           </a>
           <span className="chat-footer-separator">|</span>
           <a href="/contact" className="chat-footer-link">
-            Contact Us
+            {t.about?.contactUs || 'Contact Us'}
           </a>
         </footer>
       </div>
+
+      {/* Chat History Drawer */}
+      <ChatHistoryDrawer
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onSelectSession={handleSelectSession}
+        onNewChat={handleNewChat}
+        currentSessionId={sessionId}
+      />
 
       {/* Citation Modal */}
       <CitationModal citation={selectedCitation} onClose={() => setSelectedCitation(null)} />

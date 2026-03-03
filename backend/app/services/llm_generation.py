@@ -29,7 +29,7 @@ class LLMGenerationService:
         self.api_url: str = settings.LLM_API_URL
         self.model: str = settings.LLM_MODEL
         self.use_mock: bool = settings.USE_MOCK
-        self.timeout: float = 30.0
+        self.timeout: float = 120.0
 
         api_url_lower = self.api_url.lower()
         self.is_ollama = (

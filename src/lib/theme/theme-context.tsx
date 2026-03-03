@@ -1,11 +1,12 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
   theme: Theme;
+  mounted: boolean;
   toggleTheme: () => void;
   setTheme: (theme: Theme) => void;
 }
@@ -13,16 +14,24 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Lazy initialization to avoid setState in effect
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') return 'light';
+  // Always start with 'light' for consistent server/client first render.
+  // The blocking <script> in layout.tsx handles the visual theme before paint
+  // so users never see a flash, but React state stays consistent until useEffect.
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
+
+  // Sync React state with localStorage after hydration
+  useEffect(() => {
     const stored = localStorage.getItem('rumi-theme') as Theme | null;
-    if (stored && ['light', 'dark'].includes(stored)) {
-      document.documentElement.setAttribute('data-theme', stored);
-      return stored;
-    }
-    return 'light';
-  });
+    // Use requestAnimationFrame to avoid synchronous setState in effect
+    requestAnimationFrame(() => {
+      if (stored && ['light', 'dark'].includes(stored)) {
+        setThemeState(stored);
+        document.documentElement.setAttribute('data-theme', stored);
+      }
+      setMounted(true);
+    });
+  }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -36,7 +45,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme: applyTheme }}>
+    <ThemeContext.Provider value={{ theme, mounted, toggleTheme, setTheme: applyTheme }}>
       {children}
     </ThemeContext.Provider>
   );

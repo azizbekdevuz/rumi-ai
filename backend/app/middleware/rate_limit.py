@@ -2,7 +2,8 @@
 Rate limiting middleware for API Gateway.
 Uses in-memory storage (can be replaced with Redis for distributed systems).
 """
-from fastapi import Request, HTTPException
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from typing import Dict, Tuple
 from datetime import datetime, timedelta
 from collections import defaultdict
@@ -84,37 +85,50 @@ rate_limiter = RateLimiter()
 
 
 async def rate_limit_middleware(request: Request, call_next):
-    """Rate limiting middleware."""
-    # Skip rate limiting for health checks
+    """Rate limiting middleware.
+
+    NOTE: We return a ``JSONResponse`` instead of raising ``HTTPException``
+    because Starlette's ``BaseHTTPMiddleware`` does not let FastAPI's
+    exception handlers intercept exceptions — an ``HTTPException`` raised
+    here would surface as a raw 500 to the client.
+    """
+    # Skip rate limiting for health checks & docs
     if request.url.path in ["/health", "/docs", "/openapi.json", "/redoc"]:
         return await call_next(request)
-    
-    # Different limits for different endpoints
-    max_requests = 100  # Default: 100 requests per minute
-    if "/api/chat" in request.url.path:
-        max_requests = 30  # Chat: 30 requests per minute
-    elif "/api/search" in request.url.path:
-        max_requests = 60  # Search: 60 requests per minute
-    
+
+    # ── Per-endpoint limits ──────────────────────────────────────
+    path = request.url.path
+    if path.startswith("/api/chat/sessions"):
+        # Session/history listing — read-only, allow generous limit
+        max_requests = 120
+    elif "/api/chat" in path:
+        # Chat generation — heavier, keep tight
+        max_requests = 30
+    elif "/api/search" in path:
+        max_requests = 60
+    else:
+        max_requests = 100  # Default
+
     is_allowed, remaining = rate_limiter.check_rate_limit(
         request,
         max_requests=max_requests,
-        window_seconds=60
+        window_seconds=60,
     )
-    
+
     if not is_allowed:
-        raise HTTPException(
+        # Return a proper JSON response — never raise inside middleware
+        return JSONResponse(
             status_code=429,
-            detail="Rate limit exceeded. Please try again later.",
+            content={"detail": "Rate limit exceeded. Please try again later."},
             headers={
                 "X-RateLimit-Limit": str(max_requests),
                 "X-RateLimit-Remaining": "0",
-                "Retry-After": "60"
-            }
+                "Retry-After": "60",
+            },
         )
-    
+
     response = await call_next(request)
     response.headers["X-RateLimit-Limit"] = str(max_requests)
     response.headers["X-RateLimit-Remaining"] = str(remaining)
-    
+
     return response

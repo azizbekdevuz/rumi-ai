@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy.orm import Session
 
@@ -75,14 +75,49 @@ class ChatService:
         verses_ctx: List[Dict[str, Any]] = context.get("verses", [])
         citations_ctx: List[Dict[str, Any]] = context.get("citations", [])
 
+        # ── 1b. Fallback to FAISS RAG when DB retrieval yields nothing ──
+        rag_sourced = False
+        if not verses_ctx and not citations_ctx:
+            try:
+                from app.services.rag_service import get_rag_service
+                rag = get_rag_service()
+                if rag.is_ready:
+                    rag_docs = await rag.retrieve(user_message, top_k=5)
+                    if rag_docs:
+                        verses_ctx = [
+                            {
+                                "id": str(uuid4()),
+                                "text_fa": doc["text"],
+                                "text_en": None,
+                                "text_kr": None,
+                                "relevance_score": doc.get("score", 0.0),
+                                "_rag_page": doc.get("page"),
+                                "_rag_source": doc.get("source_file", ""),
+                            }
+                            for doc in rag_docs
+                        ]
+                        rag_sourced = True
+                        logger.info(
+                            "[chat:%s] RAG fallback | docs=%d | top_score=%.4f",
+                            session_id,
+                            len(rag_docs),
+                            rag_docs[0].get("score", 0.0),
+                        )
+                else:
+                    logger.debug("[chat:%s] RAG index not ready yet", session_id)
+            except Exception as exc:
+                logger.warning(
+                    "[chat:%s] RAG retrieval failed: %s", session_id, exc,
+                )
+
         grounded = bool(verses_ctx or citations_ctx)
         top_ids = [v.get("id", "?") for v in verses_ctx[:3]]
 
         logger.info(
             "[chat:%s] retrieval | verses=%d | citations=%d | "
-            "top_verse_ids=%s | grounded=%s",
+            "top_verse_ids=%s | grounded=%s | rag_sourced=%s",
             session_id, len(verses_ctx), len(citations_ctx),
-            top_ids, grounded,
+            top_ids, grounded, rag_sourced,
         )
 
         # ── 2. Build prompts ──
@@ -116,15 +151,28 @@ class ChatService:
         primary_verse_id: Optional[UUID] = None
         resolved_citation_ids: List[UUID] = []
 
-        if verses_ctx:
-            primary_verse_id = UUID(verses_ctx[0]["id"])
+        if not rag_sourced and verses_ctx:
+            try:
+                primary_verse_id = UUID(verses_ctx[0]["id"])
+            except (ValueError, KeyError):
+                pass
         if citations_ctx:
             resolved_citation_ids = [UUID(c["id"]) for c in citations_ctx]
 
         # ── 6. Enrich for the API response ──
-        verse_data = self._enrich_verse(primary_verse_id)
-        citations_summary = self._enrich_citations(resolved_citation_ids, language)
-        retrieved_candidates = self._build_candidates(verses_ctx, language)
+        if rag_sourced:
+            # RAG results: text comes directly from FAISS, no DB references
+            verse_data = {
+                "fa": verses_ctx[0].get("text_fa", "") if verses_ctx else "",
+                "en": "",
+                "kr": "",
+            }
+            citations_summary: List[Dict[str, Any]] = []
+            retrieved_candidates = self._build_rag_candidates(verses_ctx)
+        else:
+            verse_data = self._enrich_verse(primary_verse_id)
+            citations_summary = self._enrich_citations(resolved_citation_ids, language)
+            retrieved_candidates = self._build_candidates(verses_ctx, language)
 
         # ── Safe fallback: ensure consistent empty-grounding state ──
         if not verse_data.get("fa"):
@@ -134,9 +182,16 @@ class ChatService:
         if not retrieved_candidates:
             retrieved_candidates = []
 
-        # Ensure advice is never empty / None for schema stability
+        # Ensure interpretation/advice are never empty / None for schema stability
         interpretation = parsed["interpretation"] or raw_text.strip()
-        advice = parsed["advice"] or ""
+
+        raw_advice = parsed["advice"]
+        if isinstance(raw_advice, list):
+            advice = [str(x) for x in raw_advice]
+        elif isinstance(raw_advice, str):
+            advice = [raw_advice] if raw_advice.strip() else []
+        else:
+            advice = []
 
         logger.info(
             "[chat:%s] result | verse_present=%s | citation_count=%d | "
@@ -159,6 +214,23 @@ class ChatService:
         }
 
     # ── Private enrichment helpers ──────────────────────────────
+
+    @staticmethod
+    def _build_rag_candidates(
+        rag_verses: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        """Convert RAG-retrieved verses into RetrievedCandidate-compatible dicts."""
+        candidates: List[Dict[str, Any]] = []
+        for v in rag_verses:
+            page = v.get("_rag_page")
+            candidates.append({
+                "id": uuid4(),
+                "book": f"Rumi (page {page})" if page else "Rumi",
+                "page_number": page,
+                "snippet": (v.get("text_fa") or "")[:120],
+                "score": v.get("relevance_score"),
+            })
+        return candidates
 
     def _enrich_verse(
         self, verse_id: Optional[UUID],
