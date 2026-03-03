@@ -34,6 +34,15 @@ def get_or_create_guest_user(db: Session) -> User:
     if guest_user:
         if not guest_user.id:
             raise RuntimeError("Guest user found but has no ID — database corruption")
+        
+        # Fix existing guest user if provider is incorrect (migration from 'email' to 'guest')
+        if guest_user.provider != 'guest':
+            logger.info("Fixing existing guest user provider from '%s' to 'guest'", guest_user.provider)
+            guest_user.provider = 'guest'
+            guest_user.provider_user_id = None
+            db.commit()
+            db.refresh(guest_user)
+        
         logger.debug("Found existing guest user: %s", guest_user.id)
         return guest_user
 
@@ -48,6 +57,8 @@ def get_or_create_guest_user(db: Session) -> User:
         id=uuid.uuid4(),             # explicit id — not relying on server default
         email=GUEST_USER_EMAIL,
         password_hash=password_hash,
+        provider='guest',            # Guest users have their own provider type
+        provider_user_id=None,
         is_guest=True,
     )
 
@@ -76,6 +87,14 @@ def get_or_create_guest_user(db: Session) -> User:
             raise RuntimeError(
                 "Guest user retrieved but has no ID — database corruption"
             )
+        
+        # Fix existing guest user if provider is incorrect (migration from 'email' to 'guest')
+        if guest_user.provider != 'guest':
+            logger.info("Fixing existing guest user provider from '%s' to 'guest'", guest_user.provider)
+            guest_user.provider = 'guest'
+            guest_user.provider_user_id = None
+            db.commit()
+            db.refresh(guest_user)
         
         logger.info(
             "Retrieved existing guest user after race condition: %s",
