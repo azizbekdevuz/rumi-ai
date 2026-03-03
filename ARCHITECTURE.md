@@ -34,7 +34,7 @@ Comprehensive system overview with diagrams for the Rumi AI Agent: a multilingua
 │                                                                 │
 │  Languages: Persian (FA) · English (EN) · Korean (KR)           │
 │  Themes:    Light (parchment) · Dark                            │
-│  Auth:      JWT + anonymous guest                               │
+│  Auth:      JWT + OAuth (Kakao) + anonymous guest               │
 │  Chat:      Real-time SSE streaming + non-streaming fallback    │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -213,6 +213,8 @@ Frontend BFF Route              →  Backend Endpoint
 ─────────────────────────────────────────────────────
 POST /api/auth/login            →  POST /api/auth/login
 POST /api/auth/signup           →  POST /api/auth/signup
+GET  /api/auth/kakao/start      →  (redirects to Kakao OAuth)
+GET  /api/auth/kakao/callback   →  POST /api/auth/kakao (backend)
 POST /api/auth/logout           →  (clears httpOnly cookie)
 GET  /api/auth/me               →  GET  /api/user/me
 POST /api/chat                  →  POST /api/chat
@@ -490,6 +492,45 @@ PATCH /api/user/settings        →  PATCH /api/user/settings
       │                            │     → guest UUID            │
       │                            │                            │
       │                            │  4. Chat proceeds normally  │
+
+
+  ── Kakao OAuth Flow ──
+
+      │  1. Click Kakao button      │                            │
+      │     GET /api/auth/kakao/    │                            │
+      │     start                   │                            │
+      │ ─────────────────────────▶ │                            │
+      │                            │  2. Redirect to Kakao       │
+      │                            │     authorization page      │
+      │                            │ ─────────────────────────▶ │
+      │                            │                            │
+      │  3. User authorizes         │                            │
+      │     Kakao redirects to      │                            │
+      │     /api/auth/kakao/        │                            │
+      │     callback?code=...       │                            │
+      │ ◀───────────────────────── │                            │
+      │                            │                            │
+      │  4. GET /api/auth/kakao/    │                            │
+      │     callback?code=...       │                            │
+      │ ─────────────────────────▶ │                            │
+      │                            │  5. POST /api/auth/kakao    │
+      │                            │  {code, redirect_uri}       │
+      │                            │ ─────────────────────────▶ │
+      │                            │                            │
+      │                            │  6. Exchange code for token │
+      │                            │     Fetch user info         │
+      │                            │     Create/update user      │
+      │                            │     (provider='kakao')      │
+      │                            │                            │
+      │                            │  7. {token: "jwt"}          │
+      │                            │ ◀───────────────────────── │
+      │                            │                            │
+      │  8. Set-Cookie:            │                            │
+      │     rumi_token=jwt;        │                            │
+      │     httpOnly; secure;      │                            │
+      │     path=/; sameSite=lax   │                            │
+      │     Redirect to /chat      │                            │
+      │ ◀───────────────────────── │                            │
 ```
 
 ---
@@ -505,12 +546,16 @@ PATCH /api/user/settings        →  PATCH /api/user/settings
 │ id        (PK) │──┐    │ id          (PK) │──┐    │ id        (PK) │
 │ email   (uniq) │  │    │ user_id     (FK) │  │    │ session_id(FK) │
 │ password_hash  │  └───▶│ source_mode      │  └───▶│ role           │
-│ preferred_lang │       │ created_at       │       │ message_text   │
-│ theme          │       └──────────────────┘       │ language       │
-│ is_guest       │                                  │ verse_id  (FK) │
-│ is_deleted     │                                  │ citation_ids[] │
-│ created_at     │                                  │ feedback       │
-│ last_login     │                                  │ created_at     │
+│ provider       │       │ created_at       │       │ message_text   │
+│ provider_user_ │       └──────────────────┘       │ language       │
+│   id           │                                  │ verse_id  (FK) │
+│ avatar_url     │                                  │ citation_ids[] │
+│ preferred_lang │                                  │ feedback       │
+│ theme          │                                  │ created_at     │
+│ is_guest       │                                  │                │
+│ is_deleted     │                                  │                │
+│ created_at     │                                  │                │
+│ last_login     │                                  │                │
 └───────┬────────┘                                  └───────┬────────┘
         │                                                   │
         │  ┌──────────────────┐                             │
@@ -627,8 +672,10 @@ Message.citation_ids  ──>  Citation[]  (UUID array)
 │  email:         string       │
 │  preferredLang: string?      │
 │  theme:         string?      │
+│  avatarUrl:     string?      │  (OAuth profile image)
 │  createdAt:     string       │
 │  lastLogin:     string?      │
+│  isDeleted:     boolean      │
 └──────────────────────────────┘
 ```
 

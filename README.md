@@ -39,7 +39,7 @@ rumi-ai2/
 │   │   ├── layout.tsx            #   Root layout (providers, nav, footer)
 │   │   ├── globals.css           #   Global styles + component classes
 │   │   └── api/                  #   BFF routes (proxy to backend)
-│   │       ├── auth/             #     login / signup / logout / me
+│   │       ├── auth/             #     login / signup / logout / me / kakao
 │   │       ├── chat/             #     POST /api/chat + /api/chat/stream
 │   │       ├── books/            #     GET /api/books, /api/books/:id/pages/:n
 │   │       ├── citations/        #     GET /api/citations/:refId
@@ -81,7 +81,7 @@ rumi-ai2/
 │   │   ├── models.py             #   ORM models (User, ChatSession, Message, …)
 │   │   ├── schemas.py            #   Pydantic request/response schemas
 │   │   ├── routers/              #   API endpoint handlers
-│   │   │   ├── auth.py           #     POST /api/auth/login, /signup
+│   │   │   ├── auth.py           #     POST /api/auth/login, /signup, /kakao
 │   │   │   ├── chat.py           #     POST /api/chat
 │   │   │   ├── chat_stream.py    #     POST /api/chat/stream (SSE)
 │   │   │   ├── search.py         #     GET  /api/search
@@ -159,6 +159,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `BACKEND_URL` | Backend API base URL | `http://localhost:8000` |
+| `KAKAO_REST_API_KEY` | Kakao OAuth REST API key | — |
+| `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3000/api/auth/kakao/callback` |
 
 ### Backend (`.env`)
 
@@ -172,6 +174,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | `USE_MOCK` | Return mock LLM responses | `false` |
 | `DEBUG` | Enable debug logging | `false` |
 | `ALLOWED_HOSTS` | CORS allowed hosts (comma-separated) | `localhost,127.0.0.1` |
+| `KAKAO_REST_API_KEY` | Kakao OAuth REST API key | — |
+| `KAKAO_CLIENT_SECRET` | Kakao OAuth client secret (optional) | — |
+| `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3000/api/auth/kakao/callback` |
 
 ## Key Features
 
@@ -185,9 +190,11 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Authentication
 - JWT-based auth with httpOnly cookies
+- OAuth support: Kakao Login (Google and Apple coming soon)
 - Guest user support (anonymous chat)
 - Centralised `AuthProvider` context with `useAuth()` hook
 - Login / Signup / Logout flows
+- Profile avatar support (OAuth providers)
 
 ### Internationalization
 - Three languages: Persian (FA), English (EN), Korean (KR)
@@ -242,6 +249,9 @@ alembic downgrade -1
 | `GET` | `/api/books/:id/pages/:n` | Book page with verses |
 | `POST` | `/api/auth/login` | Login (returns JWT) |
 | `POST` | `/api/auth/signup` | Register |
+| `POST` | `/api/auth/kakao` | Kakao OAuth login (backend) |
+| `GET` | `/api/auth/kakao/start` | Kakao OAuth start (frontend) |
+| `GET` | `/api/auth/kakao/callback` | Kakao OAuth callback (frontend) |
 | `GET` | `/api/user/me` | Current user profile |
 | `PATCH` | `/api/user/settings` | Update language/theme prefs |
 | `POST` | `/api/feedback` | Submit feedback/report |

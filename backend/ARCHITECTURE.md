@@ -77,7 +77,7 @@ CORS → Request Validator → Rate Limiter → Router (with auth dependency)
 
 | File | Prefix | Endpoints |
 |------|--------|-----------|
-| `auth.py` | `/api/auth` | `POST /login`, `POST /signup` |
+| `auth.py` | `/api/auth` | `POST /login`, `POST /signup`, `POST /kakao` |
 | `chat.py` | `/api/chat` | `POST /` — non-streaming chat |
 | `chat_stream.py` | `/api/chat` | `POST /stream` — SSE streaming chat |
 | `search.py` | `/api/search` | `GET /` — verse search |
@@ -99,7 +99,32 @@ CORS → Request Validator → Rate Limiter → Router (with auth dependency)
 | **CitationService** | `citation_service.py` | Citation lookup by ID |
 | **GuestUserService** | `guest_user_service.py` | Creates/retrieves shared anonymous user |
 
-### 4. Shared Session Helpers
+### 4. Authentication & OAuth
+
+**Location:** `app/routers/auth.py`
+
+Authentication endpoints:
+- **`POST /api/auth/login`** — Email/password login. Rejects OAuth users (users with `password_hash=NULL`).
+- **`POST /api/auth/signup`** — Creates new user with `provider='email'` and hashed password.
+- **`POST /api/auth/kakao`** — Kakao OAuth login:
+  1. Exchanges authorization code for access token
+  2. Fetches user info from Kakao API
+  3. Creates or updates user with `provider='kakao'`, `provider_user_id`, and `avatar_url`
+  4. Returns JWT token
+
+**User Model OAuth Fields:**
+- `provider` — `'email'`, `'kakao'`, or `'guest'` (default: `'email'`)
+- `provider_user_id` — OAuth provider's user ID (nullable, unique with provider)
+- `avatar_url` — Profile image URL from OAuth provider (nullable)
+- `password_hash` — Nullable for OAuth users
+
+**OAuth User Creation Rules:**
+- Look up by `provider='kakao'` AND `provider_user_id`
+- If exists: update `last_login` and `avatar_url` (if provided)
+- If not exists: check for email conflict with existing `provider='email'` user → return 409
+- Create new user with Kakao email or placeholder `kakao_{id}@kakao.local`
+
+### 5. Shared Session Helpers
 
 **Location:** `app/routers/_session.py`
 
@@ -198,7 +223,7 @@ Messages.citation_ids ──> Citations[] (UUID array)
 
 | Table | Key Fields |
 |-------|-----------|
-| **Users** | `id` (UUID PK), `email` (unique), `password_hash`, `preferred_lang`, `theme`, `is_guest`, `is_deleted`, `created_at`, `last_login` |
+| **Users** | `id` (UUID PK), `email` (unique), `password_hash` (nullable), `provider` (email/kakao/guest), `provider_user_id` (nullable), `avatar_url` (nullable), `preferred_lang`, `theme`, `is_guest`, `is_deleted`, `created_at`, `last_login` |
 | **Chat_Sessions** | `id` (UUID PK), `user_id` (FK→Users), `source_mode`, `created_at` |
 | **Messages** | `id` (UUID PK), `session_id` (FK→Sessions), `role`, `message_text`, `language`, `verse_id` (FK→Verses), `citation_ids` (UUID[]), `feedback`, `created_at` |
 | **Feedback_Reports** | `id` (UUID PK), `message_id` (FK→Messages, optional), `user_id` (FK→Users), `session_id` (optional), `issue_type`, `comment`, `created_at` |
@@ -220,6 +245,7 @@ Migrations managed by **Alembic** (`alembic/versions/`).
 | `GET` | `/` | Service info |
 | `POST` | `/api/auth/signup` | Register |
 | `POST` | `/api/auth/login` | Login (returns JWT) |
+| `POST` | `/api/auth/kakao` | Kakao OAuth login (exchanges code for JWT) |
 
 ### Optional Auth (works for guests)
 
@@ -290,6 +316,9 @@ data: {"type": "error", "message": "..."}
 | `ALLOWED_HOSTS` | str | `localhost,127.0.0.1` | CORS origins |
 | `JWT_ALGORITHM` | str | `HS256` | JWT algorithm |
 | `JWT_EXPIRATION_HOURS` | int | `24` | Token TTL |
+| `KAKAO_REST_API_KEY` | str | — | Kakao OAuth REST API key |
+| `KAKAO_CLIENT_SECRET` | str | — | Kakao OAuth client secret (optional) |
+| `KAKAO_REDIRECT_URI` | str | — | Kakao OAuth redirect URI |
 | `RATE_LIMIT_REQUESTS` | int | `100` | Requests per window |
 | `RATE_LIMIT_WINDOW` | int | `60` | Window in seconds |
 | `REDIS_URL` | str | `redis://localhost:6379/0` | Redis (optional) |

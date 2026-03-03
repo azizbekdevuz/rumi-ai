@@ -22,6 +22,10 @@ Authenticates a user and provides a session token.
 }
 ```
 
+**Error Responses:**
+- `400` - OAuth users cannot use password login
+- `401` - Invalid email or password
+
 ### POST /api/auth/signup
 Creates a new user account.
 
@@ -39,6 +43,39 @@ Creates a new user account.
   "status": "User created"
 }
 ```
+
+### POST /api/auth/kakao
+Handles Kakao OAuth callback and authenticates user.
+
+**Request Body:**
+```json
+{
+  "code": "authorization_code_from_kakao",
+  "redirect_uri": "http://localhost:3000/api/auth/kakao/callback"
+}
+```
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Error Responses:**
+- `400` - Invalid authorization code or failed token exchange
+- `409` - Email already registered with email provider (must login with email first)
+- `500` - Kakao OAuth not configured
+- `503` - Failed to connect to Kakao API
+
+**Flow:**
+1. Frontend redirects to `/api/auth/kakao/start` → redirects to Kakao authorization
+2. User authorizes → Kakao redirects to `/api/auth/kakao/callback?code=...`
+3. Frontend calls backend `POST /api/auth/kakao` with code
+4. Backend exchanges code for access token, fetches user info
+5. Backend creates/updates user with `provider='kakao'` and `provider_user_id`
+6. Backend returns JWT token
+7. Frontend sets `rumi_token` cookie and redirects to `/chat`
 
 ## Chat Endpoint
 
@@ -165,11 +202,14 @@ Retrieves the current authenticated user's profile data.
   "email": "user@example.com",
   "preferred_lang": "fa",
   "theme": "light",
+  "avatar_url": "https://k.kakaocdn.net/dn/.../img_640x640.jpg",
   "created_at": "2025-01-22T10:00:00Z",
   "last_login": "2025-01-22T12:00:00Z",
   "is_deleted": false
 }
 ```
+
+**Note:** `avatar_url` is `null` for email users, populated for OAuth users (e.g., Kakao).
 
 ### PATCH /api/user/settings
 Updates user preferences such as language or interface theme.
@@ -261,6 +301,7 @@ Authorization: Bearer <token>
 Endpoints that don't require authentication:
 - `POST /api/auth/login`
 - `POST /api/auth/signup`
+- `POST /api/auth/kakao`
 - `POST /api/chat` (optional authentication)
 - `GET /api/search` (optional authentication)
 - `GET /api/citation/:id` (optional authentication)
