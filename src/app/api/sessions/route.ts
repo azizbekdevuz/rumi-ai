@@ -14,10 +14,14 @@ export async function GET() {
     const cookieStore = await cookies();
     const token = cookieStore.get('rumi_token')?.value;
 
-    const headers: HeadersInit = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    // Require authentication for session history
+    if (!token) {
+      return jsonError('Unauthorized', 401);
     }
+
+    const headers: HeadersInit = {
+      'Authorization': `Bearer ${token}`,
+    };
 
     const resp = await fetch(`${BACKEND_URL}/api/chat/sessions?limit=50`, {
       headers,

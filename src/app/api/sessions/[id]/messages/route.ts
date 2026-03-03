@@ -8,23 +8,37 @@ export const runtime = 'nodejs';
 /**
  * GET /api/sessions/:id/messages — list messages for a session.
  * Proxies to backend GET /api/chat/sessions/:id/messages.
+ * Requires authentication.
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    
+    // Validate UUID format to prevent path traversal
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return jsonError('Invalid session ID format', 400);
+    }
+    
     const cookieStore = await cookies();
     const token = cookieStore.get('rumi_token')?.value;
 
-    const headers: HeadersInit = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    // Require authentication for session messages
+    if (!token) {
+      return jsonError('Unauthorized', 401);
     }
 
+    const headers: HeadersInit = {
+      'Authorization': `Bearer ${token}`,
+    };
+
+    // Use encodeURIComponent for additional safety
+    const encodedId = encodeURIComponent(id);
     const resp = await fetch(
-      `${BACKEND_URL}/api/chat/sessions/${id}/messages`,
+      `${BACKEND_URL}/api/chat/sessions/${encodedId}/messages`,
       { headers },
     );
 
