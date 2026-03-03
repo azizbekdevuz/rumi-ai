@@ -147,6 +147,10 @@ def build_user_prompt(
             fa_text = v.get("text_fa", "")
             if lang_key != "fa" and fa_text and fa_text != text:
                 line += f"\n     (فارسی: {fa_text})"
+            # Include page reference for RAG-sourced verses
+            rag_page = v.get("_rag_page")
+            if rag_page is not None:
+                line += f"  [page {rag_page}]"
             parts.append(line)
         parts.append("")  # blank separator
 
@@ -161,8 +165,11 @@ def build_user_prompt(
                 parts.append(f"• [page {page}] {text}")
         parts.append("")
 
-    # ── User question ──
-    parts.append(f"{labels['question']}: {user_message}")
+    # ── User question (bounded to reduce prompt injection surface) ──
+    # Use delimiters to mitigate prompt injection
+    safe_message = user_message[:2000] if user_message else ""
+    safe_message = safe_message.replace('"""', '"')  # Escape triple quotes
+    parts.append(f"{labels['question']}: \"\"\"{safe_message}\"\"\"")
 
     return "\n".join(parts)
 

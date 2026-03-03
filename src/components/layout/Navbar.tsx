@@ -82,12 +82,24 @@ function AnimatedLanguageSwitch({ languages, currentLang, onSelect }: LanguageSw
 
 interface ThemeToggleProps {
   theme: 'light' | 'dark';
+  mounted: boolean;
   onToggle: () => void;
 }
 
-function AnimatedThemeToggle({ theme, onToggle }: ThemeToggleProps) {
+function AnimatedThemeToggle({ theme, mounted, onToggle }: ThemeToggleProps) {
   const prefersReducedMotion = useReducedMotion();
-  
+
+  // Before mount, render a static placeholder so server & client HTML match.
+  // The blocking <script> in layout.tsx already sets the CSS theme visually,
+  // so there's no perceptible flash — only the icon pops in after hydration.
+  if (!mounted) {
+    return (
+      <button className="theme-toggle" aria-label="Toggle theme" tabIndex={0}>
+        <div style={{ width: 24, height: 24 }} />
+      </button>
+    );
+  }
+
   return (
     <motion.button
       onClick={onToggle}
@@ -130,6 +142,9 @@ interface MobileMenuProps {
   logoutLabel: string;
   isAuthenticated: boolean;
   onLogout: () => void;
+  theme: 'light' | 'dark';
+  themeMounted: boolean;
+  onThemeToggle: () => void;
 }
 
 function MobileMenu({
@@ -146,6 +161,9 @@ function MobileMenu({
   logoutLabel,
   isAuthenticated,
   onLogout,
+  theme,
+  themeMounted,
+  onThemeToggle,
 }: MobileMenuProps) {
   const prefersReducedMotion = useReducedMotion();
 
@@ -192,6 +210,7 @@ function MobileMenu({
           animate="open"
           exit="closed"
         >
+          {/* Navigation links */}
           {links.map((link) => (
             <motion.div key={link.href} variants={itemVariants}>
               <Link href={link.href} className="mobile-nav-link" onClick={onClose}>
@@ -200,7 +219,9 @@ function MobileMenu({
             </motion.div>
           ))}
 
-          {/* Mobile Auth */}
+          <div className="mobile-menu-divider" />
+
+          {/* Auth section */}
           <motion.div variants={itemVariants}>
             {isAuthenticated ? (
               <>
@@ -209,7 +230,8 @@ function MobileMenu({
                 </Link>
                 <button
                   onClick={() => { onClose(); onLogout(); }}
-                  className="mobile-nav-link text-start w-full"
+                  className="mobile-nav-link"
+                  style={{ textAlign: 'start', width: '100%' }}
                 >
                   {logoutLabel}
                 </button>
@@ -221,28 +243,38 @@ function MobileMenu({
             )}
           </motion.div>
 
-          {/* Mobile Feedback */}
+          {/* Feedback */}
           <motion.div variants={itemVariants}>
             <button
               onClick={() => {
                 onClose();
                 onFeedbackClick();
               }}
-              className="mobile-nav-link text-start w-full"
+              className="mobile-nav-link"
+              style={{ textAlign: 'start', width: '100%' }}
             >
               {feedbackLabel}
             </button>
           </motion.div>
 
-          {/* Mobile language switch */}
-          <motion.div variants={itemVariants} style={{ marginTop: '16px' }}>
-            <AnimatedLanguageSwitch
-              languages={languages}
-              currentLang={currentLang}
-              onSelect={(lang) => {
-                onSelectLang(lang);
-                onClose();
-              }}
+          <div className="mobile-menu-divider" />
+
+          {/* Language + Theme controls */}
+          <motion.div variants={itemVariants} className="mobile-menu-settings">
+            <div className="mobile-menu-settings-controls">
+              <AnimatedLanguageSwitch
+                languages={languages}
+                currentLang={currentLang}
+                onSelect={(lang) => {
+                  onSelectLang(lang);
+                  onClose();
+                }}
+              />
+            </div>
+            <AnimatedThemeToggle
+              theme={theme}
+              mounted={themeMounted}
+              onToggle={onThemeToggle}
             />
           </motion.div>
         </motion.div>
@@ -356,7 +388,7 @@ function UserDropdown({ isOpen, onToggle, profileLabel, logoutLabel, onClose, on
 
 export default function Navbar() {
   const { language, setLanguage, t } = useI18n();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, mounted: themeMounted, toggleTheme } = useTheme();
   const { user, status, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -449,7 +481,7 @@ export default function Navbar() {
                 currentLang={language}
                 onSelect={setLanguage}
               />
-              <AnimatedThemeToggle theme={theme} onToggle={toggleTheme} />
+              <AnimatedThemeToggle theme={theme} mounted={themeMounted} onToggle={toggleTheme} />
             </div>
 
             {/* Auth Button */}
@@ -515,6 +547,9 @@ export default function Navbar() {
           logoutLabel={logoutLabel[language] || logoutLabel.en}
           isAuthenticated={isAuthenticated}
           onLogout={logout}
+          theme={theme}
+          themeMounted={themeMounted}
+          onThemeToggle={toggleTheme}
         />
       </header>
 

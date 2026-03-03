@@ -75,9 +75,9 @@ export default function MessageList({
           ))}
         </AnimatePresence>
 
-        {/* Loading Indicator */}
+        {/* Loading Indicator — only when no assistant placeholder is already visible */}
         <AnimatePresence>
-          {isLoading && (
+          {isLoading && messages.length > 0 && messages[messages.length - 1].role !== 'assistant' && (
             <motion.div
               className="chat-message-loading"
               initial={{ opacity: 0, scale: 0.95 }}

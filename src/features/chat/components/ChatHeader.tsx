@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { History } from 'lucide-react';
 import { useReducedMotion } from '@/lib/hooks';
 import { HeartIcon, NewChatIcon } from '@/components/ui/icons';
 import type { SourceScope } from '@/types/chat';
@@ -22,6 +23,7 @@ interface ChatHeaderProps {
   sourceScope: SourceScope;
   onSourceScopeChange: (scope: SourceScope) => void;
   onNewChat?: () => void;
+  onHistoryToggle?: () => void;
 }
 
 export default function ChatHeader({
@@ -30,6 +32,7 @@ export default function ChatHeader({
   sourceScope,
   onSourceScopeChange,
   onNewChat,
+  onHistoryToggle,
 }: ChatHeaderProps) {
   const reducedMotion = useReducedMotion();
   const [isFavorited, setIsFavorited] = useState(false);
@@ -47,6 +50,20 @@ export default function ChatHeader({
         <h2 className="chat-header-title">Rumi AI Agent</h2>
 
         <div className="chat-header-actions">
+          {/* Chat History */}
+          {onHistoryToggle && (
+            <motion.button
+              className="chat-header-action-btn"
+              onClick={onHistoryToggle}
+              aria-label="Chat history"
+              whileHover={reducedMotion ? {} : { scale: 1.05 }}
+              whileTap={reducedMotion ? {} : { scale: 0.95 }}
+              title="Chat history"
+            >
+              <History style={{ width: 18, height: 18 }} />
+            </motion.button>
+          )}
+
           {/* New Chat */}
           {onNewChat && (
             <motion.button

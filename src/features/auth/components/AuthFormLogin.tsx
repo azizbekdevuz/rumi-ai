@@ -3,7 +3,7 @@
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/lib/hooks';
-import Link from 'next/link';
+
 
 interface AuthFormLoginProps {
   email: string;
@@ -153,9 +153,13 @@ export default function AuthFormLogin({
           />
           <span>{content.rememberMe}</span>
         </label>
-        <Link href="/forgot-password" className="auth-forgot-link">
+        <button
+          type="button"
+          className="auth-forgot-link"
+          onClick={() => alert('Password reset is coming soon. Please contact support@rumiapp.com for help.')}
+        >
           {content.forgotPassword}
-        </Link>
+        </button>
       </div>
 
       {/* Submit Button */}

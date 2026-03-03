@@ -1,0 +1,692 @@
+/* ============================================
+   CONTACT PAGE
+   ============================================ */
+
+.contact-page {
+  min-height: calc(100vh - var(--nav-height));
+  padding-bottom: var(--space-16);
+}
+
+/* ── Hero ──────────────────────────────────── */
+
+.contact-hero {
+  padding: var(--space-20) var(--space-6) var(--space-12);
+  text-align: center;
+}
+
+.contact-hero-content {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.contact-hero-icon-wrap {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-gold-light);
+  color: var(--accent-gold);
+  margin-bottom: var(--space-2);
+}
+
+[data-theme='dark'] .contact-hero-icon-wrap {
+  background: rgba(212, 168, 75, 0.12);
+}
+
+.contact-hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.contact-hero-subtitle {
+  font-size: clamp(16px, 2vw, 18px);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 480px;
+}
+
+/* ── Body ──────────────────────────────────── */
+
+.contact-body {
+  padding: 0 var(--space-6);
+}
+
+.contact-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+/* ── Form Card ─────────────────────────────── */
+
+.contact-form-card {
+  position: relative;
+  background: 
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(255, 255, 255, 0.7) 50%,
+      rgba(255, 255, 255, 0.75) 100%
+    );
+  border: 1px solid rgba(27, 123, 107, 0.08);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-10);
+  box-shadow: 
+    0 1px 2px rgba(45, 42, 36, 0.03),
+    0 2px 8px rgba(45, 42, 36, 0.05),
+    0 8px 24px rgba(45, 42, 36, 0.04);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  transition: all 200ms ease-in-out;
+  overflow: hidden;
+}
+
+.contact-form-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg,
+    var(--accent-teal) 0%,
+    var(--accent-gold) 100%
+  );
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+  z-index: 1;
+}
+
+.contact-form-card:hover::before {
+  opacity: 1;
+}
+
+.contact-form-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-xl);
+  padding: 1px;
+  background: linear-gradient(135deg,
+    rgba(27, 123, 107, 0.05) 0%,
+    rgba(201, 146, 44, 0.05) 50%,
+    rgba(27, 123, 107, 0.05) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+}
+
+.contact-form-card:hover::after {
+  opacity: 1;
+}
+
+.contact-form-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 2px 4px rgba(45, 42, 36, 0.05),
+    0 4px 12px rgba(45, 42, 36, 0.07),
+    0 12px 32px rgba(45, 42, 36, 0.06),
+    0 24px 64px rgba(45, 42, 36, 0.04);
+  border-color: rgba(27, 123, 107, 0.12);
+}
+
+[data-theme='dark'] .contact-form-card {
+  background: 
+    linear-gradient(135deg,
+      rgba(30, 38, 52, 0.6) 0%,
+      rgba(30, 38, 52, 0.55) 100%
+    );
+  border-color: rgba(232, 228, 220, 0.08);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .contact-form-card:hover {
+  border-color: rgba(27, 123, 107, 0.2);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 12px 32px rgba(0, 0, 0, 0.15),
+    0 24px 64px rgba(0, 0, 0, 0.1);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  position: relative;
+  z-index: 2;
+}
+
+.contact-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.contact-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.contact-input,
+.contact-textarea {
+  padding: var(--space-4) var(--space-5);
+  border: 1.5px solid rgba(27, 123, 107, 0.1);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  line-height: 1.6;
+  transition: all 200ms ease-in-out;
+  outline: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.contact-input::placeholder,
+.contact-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.contact-input:focus,
+.contact-textarea:focus {
+  border-color: var(--accent-teal);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 0 0 3px rgba(27, 123, 107, 0.1),
+    0 2px 8px rgba(27, 123, 107, 0.08);
+  transform: translateY(-1px);
+}
+
+[data-theme='dark'] .contact-input,
+[data-theme='dark'] .contact-textarea {
+  background: rgba(20, 26, 38, 0.4);
+  border-color: rgba(232, 228, 220, 0.1);
+}
+
+[data-theme='dark'] .contact-input:focus,
+[data-theme='dark'] .contact-textarea:focus {
+  background: rgba(20, 26, 38, 0.6);
+  border-color: var(--accent-teal);
+  box-shadow: 
+    0 0 0 3px rgba(27, 123, 107, 0.15),
+    0 2px 8px rgba(27, 123, 107, 0.1);
+}
+
+.contact-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.contact-error {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--error);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(198, 40, 40, 0.08);
+  border: 1px solid rgba(198, 40, 40, 0.2);
+  border-radius: var(--radius-md);
+  letter-spacing: 0.01em;
+}
+
+.contact-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-10);
+  background: var(--gradient-teal);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  box-shadow: 
+    0 2px 8px rgba(27, 123, 107, 0.2),
+    0 4px 16px rgba(27, 123, 107, 0.15);
+  align-self: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+}
+
+.contact-submit:hover:not(:disabled)::before {
+  opacity: 1;
+}
+
+.contact-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 12px rgba(27, 123, 107, 0.25),
+    0 8px 24px rgba(27, 123, 107, 0.2);
+}
+
+.contact-submit:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 8px rgba(27, 123, 107, 0.2),
+    0 4px 16px rgba(27, 123, 107, 0.15);
+}
+
+.contact-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Success State ─────────────────────────── */
+
+.contact-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-5);
+  padding: var(--space-12) var(--space-8);
+  position: relative;
+  z-index: 2;
+}
+
+.contact-success-icon {
+  color: var(--accent-teal);
+  width: 64px;
+  height: 64px;
+  padding: var(--space-4);
+  background: rgba(27, 123, 107, 0.08);
+  border-radius: var(--radius-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms ease-in-out;
+}
+
+.contact-success:hover .contact-success-icon {
+  transform: scale(1.05);
+  background: rgba(27, 123, 107, 0.12);
+}
+
+.contact-success-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.contact-success-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin: 0;
+  max-width: 400px;
+  letter-spacing: 0.01em;
+}
+
+.contact-success-btn {
+  padding: var(--space-3) var(--space-8);
+  background: transparent;
+  border: 1.5px solid var(--accent-teal);
+  border-radius: var(--radius-lg);
+  color: var(--accent-teal);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  margin-top: var(--space-2);
+}
+
+.contact-success-btn:hover {
+  background: var(--accent-teal-light);
+  border-color: var(--accent-teal);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 123, 107, 0.15);
+}
+
+/* ── Info Sidebar ──────────────────────────── */
+
+.contact-info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-10) var(--space-8);
+  background: 
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.65) 100%
+    );
+  border: 1px solid rgba(27, 123, 107, 0.08);
+  border-radius: var(--radius-xl);
+  box-shadow: 
+    0 1px 2px rgba(45, 42, 36, 0.03),
+    0 2px 8px rgba(45, 42, 36, 0.05),
+    0 8px 24px rgba(45, 42, 36, 0.04);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  transition: all 200ms ease-in-out;
+  overflow: hidden;
+}
+
+.contact-info::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg,
+    var(--accent-gold) 0%,
+    var(--accent-teal) 100%
+  );
+  opacity: 0.6;
+  z-index: 1;
+}
+
+.contact-info::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-xl);
+  padding: 1px;
+  background: linear-gradient(135deg,
+    rgba(201, 146, 44, 0.05) 0%,
+    rgba(27, 123, 107, 0.05) 50%,
+    rgba(201, 146, 44, 0.05) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.contact-info:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 2px 4px rgba(45, 42, 36, 0.05),
+    0 4px 12px rgba(45, 42, 36, 0.07),
+    0 12px 32px rgba(45, 42, 36, 0.06);
+  border-color: rgba(27, 123, 107, 0.12);
+}
+
+[data-theme='dark'] .contact-info {
+  background: 
+    linear-gradient(135deg,
+      rgba(30, 38, 52, 0.6) 0%,
+      rgba(30, 38, 52, 0.55) 100%
+    );
+  border-color: rgba(232, 228, 220, 0.08);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .contact-info:hover {
+  border-color: rgba(27, 123, 107, 0.2);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.contact-info-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-8) 0;
+  letter-spacing: 0.01em;
+  position: relative;
+  z-index: 2;
+}
+
+.contact-info-items-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  position: relative;
+  z-index: 2;
+  margin-bottom: var(--space-8);
+}
+
+.contact-info-item {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  position: relative;
+  transition: transform 200ms ease-in-out;
+}
+
+.contact-info-item:hover {
+  transform: translateX(4px);
+}
+
+.contact-info-icon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  width: 20px;
+  height: 20px;
+  transition: color 200ms ease-in-out;
+}
+
+.contact-info-item:hover .contact-info-icon {
+  color: var(--accent-teal);
+}
+
+.contact-info-label {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-1);
+}
+
+.contact-info-value {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  text-decoration: none;
+  word-break: break-word;
+  transition: color 200ms ease-in-out;
+  line-height: 1.6;
+}
+
+a.contact-info-value:hover {
+  color: var(--accent-teal);
+}
+
+/* ── Decorative Quote ──────────────────────── */
+
+.contact-quote {
+  margin: 0;
+  padding: var(--space-6) var(--space-5);
+  border-left: 3px solid var(--accent-gold);
+  background: 
+    linear-gradient(135deg,
+      rgba(201, 146, 44, 0.08) 0%,
+      rgba(201, 146, 44, 0.05) 100%
+    );
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 200ms ease-in-out;
+}
+
+.contact-quote:hover {
+  background: 
+    linear-gradient(135deg,
+      rgba(201, 146, 44, 0.12) 0%,
+      rgba(201, 146, 44, 0.08) 100%
+    );
+  border-left-color: var(--accent-gold);
+  transform: translateX(2px);
+}
+
+[data-theme='dark'] .contact-quote {
+  background: 
+    linear-gradient(135deg,
+      rgba(212, 168, 75, 0.1) 0%,
+      rgba(212, 168, 75, 0.06) 100%
+    );
+}
+
+[data-theme='dark'] .contact-quote:hover {
+  background: 
+    linear-gradient(135deg,
+      rgba(212, 168, 75, 0.15) 0%,
+      rgba(212, 168, 75, 0.1) 100%
+    );
+}
+
+.contact-quote p {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin: 0 0 var(--space-3);
+  letter-spacing: 0.01em;
+}
+
+.contact-quote cite {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ── Responsive ────────────────────────────── */
+
+@media (max-width: 768px) {
+  .contact-hero {
+    padding: var(--space-12) var(--space-4) var(--space-8);
+  }
+
+  .contact-body {
+    padding: 0 var(--space-4);
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .contact-form-card {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .contact-form {
+    gap: var(--space-5);
+  }
+
+  .contact-form-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .contact-submit {
+    width: 100%;
+    justify-content: center;
+    padding: var(--space-4) var(--space-8);
+  }
+
+  .contact-info {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .contact-info-title {
+    margin-bottom: var(--space-6);
+  }
+
+  .contact-info-items-group {
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+
+  .contact-success {
+    padding: var(--space-10) var(--space-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-form-card {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .contact-info {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .contact-input,
+  .contact-textarea {
+    padding: var(--space-3) var(--space-4);
+  }
+}

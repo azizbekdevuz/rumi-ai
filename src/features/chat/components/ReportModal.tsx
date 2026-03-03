@@ -13,14 +13,92 @@ interface ReportModalProps {
 type ReportCategory = 'incorrect' | 'offensive' | 'ocr_error' | 'other';
 
 export default function ReportModal({ isOpen, onClose, messageId }: ReportModalProps) {
-  const { dir } = useI18n();
+  const { language, dir } = useI18n();
   const direction = dir;
   const [category, setCategory] = useState<ReportCategory>('incorrect');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const firstFocusableRef = useRef<HTMLButtonElement>(null);
+
+  const content = {
+    en: {
+      title: 'Report Issue',
+      issueTypeLabel: 'What type of issue is this?',
+      categories: {
+        incorrect: 'Incorrect Information',
+        offensive: 'Inappropriate Content',
+        ocr_error: 'OCR/Text Error',
+        other: 'Other',
+      },
+      descriptionLabel: 'Please describe the issue',
+      descriptionPlaceholder: 'Describe what\'s wrong with this response...',
+      submit: 'Submit Report',
+      submitting: 'Submitting...',
+      success: {
+        title: 'Thank You!',
+        message: 'Your report helps us improve Rumi AI. We appreciate your feedback.',
+        close: 'Close',
+      },
+      error: {
+        title: 'Something went wrong',
+        message: 'We couldn\'t submit your report right now. Please try again.',
+        retry: 'Try Again',
+      },
+    },
+    fa: {
+      title: 'گزارش مشکل',
+      issueTypeLabel: 'نوع مشکل چیست؟',
+      categories: {
+        incorrect: 'اطلاعات نادرست',
+        offensive: 'محتوای نامناسب',
+        ocr_error: 'خطای OCR/متن',
+        other: 'سایر',
+      },
+      descriptionLabel: 'لطفاً مشکل را توضیح دهید',
+      descriptionPlaceholder: 'مشکل این پاسخ را شرح دهید...',
+      submit: 'ارسال گزارش',
+      submitting: 'در حال ارسال...',
+      success: {
+        title: 'متشکریم!',
+        message: 'گزارش شما به بهبود رومی AI کمک می‌کند. از بازخورد شما سپاسگزاریم.',
+        close: 'بستن',
+      },
+      error: {
+        title: 'مشکلی پیش آمد',
+        message: 'ارسال گزارش در حال حاضر ممکن نیست. لطفاً دوباره تلاش کنید.',
+        retry: 'تلاش مجدد',
+      },
+    },
+    kr: {
+      title: '문제 신고',
+      issueTypeLabel: '어떤 유형의 문제인가요?',
+      categories: {
+        incorrect: '잘못된 정보',
+        offensive: '부적절한 콘텐츠',
+        ocr_error: 'OCR/텍스트 오류',
+        other: '기타',
+      },
+      descriptionLabel: '문제를 설명해 주세요',
+      descriptionPlaceholder: '이 응답의 문제점을 설명해 주세요...',
+      submit: '신고 제출',
+      submitting: '제출 중...',
+      success: {
+        title: '감사합니다!',
+        message: '여러분의 신고는 Rumi AI 개선에 도움이 됩니다.',
+        close: '닫기',
+      },
+      error: {
+        title: '문제가 발생했습니다',
+        message: '신고를 제출할 수 없습니다. 다시 시도해 주세요.',
+        retry: '다시 시도',
+      },
+    },
+  };
+
+  const c = content[language] || content.en;
 
   // Focus trap
   useEffect(() => {
@@ -49,6 +127,7 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError(false);
 
     try {
       const resp = await fetch('/api/feedback', {
@@ -62,18 +141,15 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
       });
 
       if (!resp.ok) {
-        const data = await resp.json().catch(() => null);
-        console.error('[Report] Submit failed:', data);
+        console.error('[Report] Submit failed:', resp.status);
+        setSubmitError(true);
+        return;
       }
 
       setSubmitted(true);
-      setTimeout(() => {
-        handleClose();
-      }, 2000);
     } catch (error) {
       console.error('[Report] Network error:', error);
-      setSubmitted(true);
-      setTimeout(() => handleClose(), 2000);
+      setSubmitError(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,18 +157,23 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
 
   const handleClose = () => {
     setSubmitted(false);
+    setSubmitError(false);
     setDescription('');
     setCategory('incorrect');
     onClose();
   };
 
+  const handleRetry = () => {
+    setSubmitError(false);
+  };
+
   if (!isOpen) return null;
 
   const categories: { value: ReportCategory; label: string }[] = [
-    { value: 'incorrect', label: 'Incorrect Information' },
-    { value: 'offensive', label: 'Inappropriate Content' },
-    { value: 'ocr_error', label: 'OCR/Text Error' },
-    { value: 'other', label: 'Other' },
+    { value: 'incorrect', label: c.categories.incorrect },
+    { value: 'offensive', label: c.categories.offensive },
+    { value: 'ocr_error', label: c.categories.ocr_error },
+    { value: 'other', label: c.categories.other },
   ];
 
   return (
@@ -118,7 +199,7 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
               id="report-modal-title"
               className="modal-title"
             >
-              Report Issue
+              {c.title}
             </h2>
           </div>
           <button
@@ -127,60 +208,51 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
             className="modal-close"
             aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <X style={{ width: 18, height: 18 }} />
           </button>
         </div>
 
         {/* Content */}
         <div className="modal-body">
           {submitted ? (
-            <div className="text-center py-10">
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>✓</div>
-              <h3 
-                className="text-2xl font-serif font-bold mb-4"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                Thank you for your feedback!
-              </h3>
-              <p 
-                className="mb-8 text-base leading-relaxed max-w-sm mx-auto"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                Your report helps us improve Rumi AI.
-              </p>
-              <button
-                onClick={handleClose}
-                className="py-4 px-8 rounded-[var(--radius-lg)] font-semibold transition-all hover:shadow-lg"
-                style={{
-                  background: 'var(--gradient-teal)',
-                  color: 'var(--text-inverse)'
-                }}
-              >
-                Close
+            <div className="modal-success">
+              <div className="modal-success-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+              </div>
+              <h3 className="modal-success-title">{c.success.title}</h3>
+              <p className="modal-success-text">{c.success.message}</p>
+              <button onClick={handleClose} className="modal-success-btn">
+                {c.success.close}
+              </button>
+            </div>
+          ) : submitError ? (
+            <div className="modal-error">
+              <div className="modal-error-icon">
+                <X />
+              </div>
+              <h3 className="modal-error-title">{c.error.title}</h3>
+              <p className="modal-error-text">{c.error.message}</p>
+              <button onClick={handleRetry} className="modal-error-btn">
+                {c.error.retry}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="feedback-form">
               {/* Issue Type */}
               <div>
-                <label 
-                  className="block text-sm font-semibold mb-3"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  What type of issue is this?
-                </label>
+                <label>{c.issueTypeLabel}</label>
                 <div className="feedback-category">
                   {categories.map((cat) => (
                     <button
                       key={cat.value}
                       type="button"
                       onClick={() => setCategory(cat.value)}
-                      className="category-btn"
-                      style={{
-                        borderColor: category === cat.value ? 'var(--accent-teal)' : 'var(--border-color)',
-                        background: category === cat.value ? 'var(--accent-teal-light)' : 'var(--bg-secondary)',
-                        color: category === cat.value ? 'var(--accent-teal)' : 'var(--text-secondary)'
-                      }}
+                      className={`category-btn ${category === cat.value ? 'active' : ''}`}
+                      style={category === cat.value ? {
+                        borderColor: 'var(--accent-teal)',
+                        background: 'var(--accent-teal-light)',
+                        color: 'var(--accent-teal)',
+                      } : undefined}
                       aria-pressed={category === cat.value}
                     >
                       {cat.label}
@@ -191,19 +263,13 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
 
               {/* Description */}
               <div>
-                <label 
-                  htmlFor="report-description"
-                  className="block text-sm font-semibold mb-3"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  Please describe the issue
-                </label>
+                <label htmlFor="report-description">{c.descriptionLabel}</label>
                 <textarea
                   id="report-description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="feedback-textarea"
-                  placeholder="Describe what's wrong with this response..."
+                  placeholder={c.descriptionPlaceholder}
                   required
                 />
               </div>
@@ -212,26 +278,9 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
               <button
                 type="submit"
                 disabled={isSubmitting || !description.trim()}
-                className="feedback-submit flex items-center justify-center gap-3"
-                style={{
-                  opacity: (isSubmitting || !description.trim()) ? 0.6 : 1,
-                  cursor: (isSubmitting || !description.trim()) ? 'not-allowed' : 'pointer'
-                }}
+                className="feedback-submit"
               >
-                {isSubmitting ? (
-                  <>
-                    <div 
-                      className="w-5 h-5 rounded-full animate-spin"
-                      style={{ 
-                        border: '2px solid rgba(255,255,255,0.3)', 
-                        borderTopColor: 'white'
-                      }}
-                    />
-                    Submitting...
-                  </>
-                ) : (
-                  'Submit Report'
-                )}
+                {isSubmitting ? c.submitting : c.submit}
               </button>
             </form>
           )}

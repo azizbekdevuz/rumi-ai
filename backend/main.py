@@ -2,6 +2,8 @@
 RUMI AI Agent Backend - Main FastAPI application.
 Architecture based on microservices design with API Gateway.
 """
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -44,13 +46,33 @@ logger.info("LLM_API_URL=%s, API_KEY present=%s", settings.LLM_API_URL, bool(set
 
 # Note: Database tables are managed by Alembic migrations, not here
 
+
+# ── Application lifespan (RAG index background build) ────────────
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    """Start RAG FAISS index build in a background thread on startup."""
+    try:
+        from app.services.rag_service import get_rag_service
+        rag = get_rag_service()
+        rag.build_index_background()
+        logger.info(
+            "RAG background indexing started (%d documents loaded)",
+            len(rag.documents),
+        )
+    except Exception as exc:
+        logger.error("Failed to initialise RAG service: %s", exc, exc_info=True)
+        logger.warning("Chat will fall back to DB-only retrieval (no RAG)")
+    yield
+
+
 # Create FastAPI app
 app = FastAPI(
     title="RUMI AI Agent Backend",
     version=settings.APP_VERSION,
     description="Backend API for RUMI AI Agent - Multilingual chat and verse search",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # CORS middleware — use proper origin URLs
@@ -79,11 +101,18 @@ app.include_router(user.router)
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint."""
+    """Health check endpoint (includes RAG readiness)."""
+    rag_status = {"ready": False, "documents": 0, "faiss_available": False}
+    try:
+        from app.services.rag_service import get_rag_status
+        rag_status = get_rag_status()
+    except Exception:
+        pass
     return {
         "status": "healthy",
         "service": "RUMI AI Agent Backend",
-        "version": settings.APP_VERSION
+        "version": settings.APP_VERSION,
+        "rag": rag_status,
     }
 
 

@@ -1,0 +1,58 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { jsonError, parseBackendError } from '@/lib/api/bff';
+
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+export const runtime = 'nodejs';
+
+/**
+ * GET /api/sessions/:id/messages — list messages for a session.
+ * Proxies to backend GET /api/chat/sessions/:id/messages.
+ * Requires authentication.
+ */
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    
+    // Validate UUID format to prevent path traversal
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return jsonError('Invalid session ID format', 400);
+    }
+    
+    const cookieStore = await cookies();
+    const token = cookieStore.get('rumi_token')?.value;
+
+    // Require authentication for session messages
+    if (!token) {
+      return jsonError('Unauthorized', 401);
+    }
+
+    const headers: HeadersInit = {
+      'Authorization': `Bearer ${token}`,
+    };
+
+    // Use encodeURIComponent for additional safety
+    const encodedId = encodeURIComponent(id);
+    const resp = await fetch(
+      `${BACKEND_URL}/api/chat/sessions/${encodedId}/messages`,
+      { headers },
+    );
+
+    if (!resp.ok) {
+      const msg = await parseBackendError(resp);
+      return jsonError(msg, resp.status);
+    }
+
+    const data = await resp.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return jsonError(
+      error instanceof Error ? error.message : 'Failed to fetch messages',
+      500,
+    );
+  }
+}

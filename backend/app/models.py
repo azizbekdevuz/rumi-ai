@@ -55,6 +55,14 @@ class Message(Base):
     verse_id = Column(UUID(as_uuid=True), ForeignKey("verses.id", ondelete="SET NULL"), nullable=True)
     citation_ids = Column(ARRAY(UUID(as_uuid=True)), nullable=True)  # Array of citation UUIDs
     feedback = Column(Text, nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    # Monotonic per-session turn index to guarantee deterministic ordering
+    turn_index = Column(Integer, nullable=True)
+    # Structured data snapshots for assistant messages (for history restoration)
+    interpretation_text = Column(Text, nullable=True)  # Parsed interpretation section
+    advice_json = Column(Text, nullable=True)  # JSON string of advice (list[str] or str)
+    verse_json = Column(Text, nullable=True)  # JSON string of verse data {fa, en, kr}
+    citations_json = Column(Text, nullable=True)  # JSON string of citations array
 
     # Relationships
     chat_session = relationship("ChatSession", back_populates="messages")
