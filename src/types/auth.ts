@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string;
   preferred_lang: string | null;
   theme: string | null;
+  avatar_url: string | null;
   created_at: string;
   last_login: string | null;
   is_deleted: boolean;
