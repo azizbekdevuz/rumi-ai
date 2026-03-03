@@ -4,11 +4,13 @@ Authentication router - User registration and login.
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import bcrypt
-from datetime import timedelta
+from datetime import timedelta, datetime
+import httpx
+from typing import Optional
 
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserResponse, UserLogin, SignupRequest, SignupResponse, LoginResponse
+from app.schemas import UserCreate, UserResponse, UserLogin, SignupRequest, SignupResponse, LoginResponse, KakaoOAuthRequest
 from app.middleware.auth import create_access_token
 from app.config import settings
 
@@ -44,10 +46,12 @@ async def signup(
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Create new user
+    # Create new user with provider='email' (password-based authentication)
     user = User(
         email=user_data.email,
         password_hash=get_password_hash(user_data.password),
+        provider='email',
+        provider_user_id=None,
         preferred_lang=None,
         theme=None
     )
@@ -69,7 +73,17 @@ async def login(
         User.is_deleted == False
     ).first()
     
-    if not user or not verify_password(credentials.password, user.password_hash):
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Reject OAuth users (users without password_hash) attempting password login
+    if user.password_hash is None:
+        raise HTTPException(
+            status_code=400,
+            detail="This account uses OAuth authentication. Please use the OAuth login method."
+        )
+    
+    if not verify_password(credentials.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
     # Update last login
@@ -85,3 +99,141 @@ async def login(
     )
     
     return LoginResponse(token=access_token)
+
+
+@router.post("/kakao", response_model=LoginResponse)
+async def kakao_oauth(
+    oauth_data: KakaoOAuthRequest,
+    db: Session = Depends(get_db)
+):
+    """Handle Kakao OAuth callback and authenticate user."""
+    if not settings.KAKAO_REST_API_KEY:
+        raise HTTPException(status_code=500, detail="Kakao OAuth not configured")
+    
+    # Step 1: Exchange authorization code for access token
+    token_url = "https://kauth.kakao.com/oauth/token"
+    token_data = {
+        "grant_type": "authorization_code",
+        "client_id": settings.KAKAO_REST_API_KEY,
+        "redirect_uri": oauth_data.redirect_uri,
+        "code": oauth_data.code,
+    }
+    
+    # Add client_secret if configured (required for some Kakao app types)
+    if settings.KAKAO_CLIENT_SECRET:
+        token_data["client_secret"] = settings.KAKAO_CLIENT_SECRET
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            token_response = await client.post(
+                token_url,
+                data=token_data,
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                timeout=10.0
+            )
+            token_response.raise_for_status()
+            token_result = token_response.json()
+            access_token = token_result.get("access_token")
+            
+            if not access_token:
+                raise HTTPException(status_code=400, detail="Failed to obtain access token from Kakao")
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(status_code=400, detail=f"Kakao token exchange failed: {e.response.text}")
+        except httpx.RequestError as e:
+            raise HTTPException(status_code=503, detail=f"Failed to connect to Kakao: {str(e)}")
+        
+        # Step 2: Fetch user info from Kakao
+        user_info_url = "https://kapi.kakao.com/v2/user/me"
+        try:
+            user_info_response = await client.get(
+                user_info_url,
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=10.0
+            )
+            user_info_response.raise_for_status()
+            kakao_user_data = user_info_response.json()
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(status_code=400, detail=f"Failed to fetch user info from Kakao: {e.response.text}")
+        except httpx.RequestError as e:
+            raise HTTPException(status_code=503, detail=f"Failed to connect to Kakao: {str(e)}")
+    
+    # Step 3: Extract Kakao user ID and email
+    kakao_user_id = str(kakao_user_data.get("id"))
+    if not kakao_user_id:
+        raise HTTPException(status_code=400, detail="Kakao user ID not found")
+    
+    # Extract email from kakao_account if available
+    kakao_account = kakao_user_data.get("kakao_account", {})
+    kakao_email: Optional[str] = None
+    if kakao_account.get("has_email") and kakao_account.get("email"):
+        kakao_email = kakao_account.get("email")
+    
+    # Extract profile image URL from Kakao
+    kakao_avatar_url: Optional[str] = None
+    # Try kakao_account.profile.profile_image_url first (most common)
+    kakao_profile = kakao_account.get("profile", {})
+    if kakao_profile.get("profile_image_url"):
+        kakao_avatar_url = kakao_profile.get("profile_image_url")
+    # Fallback to properties.profile_image (alternative location)
+    elif kakao_user_data.get("properties", {}).get("profile_image"):
+        kakao_avatar_url = kakao_user_data.get("properties", {}).get("profile_image")
+    
+    # Step 4: Look up or create user
+    # First, check if user exists with provider='kakao' and provider_user_id
+    user = db.query(User).filter(
+        User.provider == 'kakao',
+        User.provider_user_id == kakao_user_id,
+        User.is_deleted == False
+    ).first()
+    
+    if user:
+        # Existing Kakao user - update last_login and avatar_url if provided
+        user.last_login = datetime.utcnow()
+        # Only update avatar_url if present and user doesn't already have one
+        if kakao_avatar_url and not user.avatar_url:
+            user.avatar_url = kakao_avatar_url
+        elif kakao_avatar_url:
+            # Update avatar_url if new one is provided (allows refreshing)
+            user.avatar_url = kakao_avatar_url
+        db.commit()
+    else:
+        # New user - check for email conflicts
+        if kakao_email:
+            existing_email_user = db.query(User).filter(
+                User.email == kakao_email,
+                User.provider == 'email',
+                User.is_deleted == False
+            ).first()
+            
+            if existing_email_user:
+                raise HTTPException(
+                    status_code=409,
+                    detail="Email already registered. Please log in with email first."
+                )
+        
+        # Create new Kakao user
+        user_email = kakao_email if kakao_email else f"kakao_{kakao_user_id}@kakao.local"
+        
+        user = User(
+            email=user_email,
+            password_hash=None,  # OAuth users don't have passwords
+            provider='kakao',
+            provider_user_id=kakao_user_id,
+            avatar_url=kakao_avatar_url,  # Set avatar URL if available
+            preferred_lang=None,
+            theme=None,
+            is_guest=False,
+            is_deleted=False
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    
+    # Step 5: Create and return JWT token
+    access_token_expires = timedelta(hours=settings.JWT_EXPIRATION_HOURS)
+    jwt_token = create_access_token(
+        data={"sub": str(user.id), "email": user.email},
+        expires_delta=access_token_expires
+    )
+    
+    return LoginResponse(token=jwt_token)
