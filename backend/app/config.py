@@ -3,7 +3,7 @@ Configuration management for RUMI AI backend.
 All env vars are loaded via pydantic-settings from the .env file.
 Do NOT use os.getenv() elsewhere — always use `settings.<FIELD>`.
 """
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings
 from pydantic import ConfigDict
 
@@ -46,6 +46,7 @@ class Settings(BaseSettings):
                 # Add common dev ports for non-URL hosts
                 origins.append(f"http://{host}")
                 origins.append(f"http://{host}:3000")
+                origins.append(f"http://{host}:3003")
                 origins.append(f"http://{host}:8000")
         return origins
     
@@ -79,6 +80,11 @@ class Settings(BaseSettings):
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     EMBED_MODEL: str = "nomic-embed-text:latest"
     BOOK_VERSE_DIR: str = ""
+    
+    # Kakao OAuth Configuration
+    KAKAO_REST_API_KEY: str = ""
+    KAKAO_CLIENT_SECRET: Optional[str] = None
+    KAKAO_REDIRECT_URI: str = ""
 
 
 settings = Settings()
