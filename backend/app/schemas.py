@@ -3,9 +3,10 @@ Pydantic schemas for request/response validation in RUMI AI Agent Backend API.
 Based on ERD: Users, Chat_Sessions, Messages, Feedback_Reports, Verses, Books, Citations
 """
 from pydantic import BaseModel, Field, EmailStr, validator, ConfigDict
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 from uuid import UUID
+import json
 
 
 # User Schemas
@@ -100,8 +101,61 @@ class MessageResponse(MessageBase):
     """Schema for message response."""
     id: UUID
     session_id: UUID
+    created_at: Optional[datetime] = None
+    turn_index: Optional[int] = None
+    # Structured data for assistant messages (from JSON snapshots)
+    interpretation: Optional[str] = None
+    advice: Optional[List[str]] = None  # Always normalized to a list of strings
+    verse: Optional[Dict[str, str]] = None  # {fa, en, kr}
+    citations: Optional[List[Dict[str, Any]]] = None  # CitationSummary-like dicts
 
     model_config = ConfigDict(from_attributes=True)
+    
+    @classmethod
+    def from_orm_with_structured(cls, obj: Any) -> "MessageResponse":
+        """Create MessageResponse from Message ORM object, parsing JSON fields."""
+        data = {
+            "id": obj.id,
+            "session_id": obj.session_id,
+            "role": obj.role,
+            "message_text": obj.message_text,
+            "language": obj.language,
+            "verse_id": obj.verse_id,
+            "citation_ids": obj.citation_ids,
+            "feedback": obj.feedback,
+            "created_at": obj.created_at,
+            "turn_index": obj.turn_index,
+        }
+        
+        # For assistant messages, parse structured JSON fields
+        if obj.role == "assistant":
+            data["interpretation"] = obj.interpretation_text
+            
+            if obj.advice_json:
+                try:
+                    loaded = json.loads(obj.advice_json)
+                    if isinstance(loaded, list):
+                        data["advice"] = [str(x) for x in loaded]
+                    elif isinstance(loaded, str):
+                        data["advice"] = [loaded]
+                    else:
+                        data["advice"] = None
+                except (json.JSONDecodeError, TypeError):
+                    data["advice"] = None
+            
+            if obj.verse_json:
+                try:
+                    data["verse"] = json.loads(obj.verse_json)
+                except (json.JSONDecodeError, TypeError):
+                    data["verse"] = None
+            
+            if obj.citations_json:
+                try:
+                    data["citations"] = json.loads(obj.citations_json)
+                except (json.JSONDecodeError, TypeError):
+                    data["citations"] = None
+        
+        return cls(**data)
 
 
 class MessageListResponse(BaseModel):
@@ -296,7 +350,7 @@ class ChatResponse(BaseModel):
     session_id: Optional[UUID] = None
     verse: VerseMultilingual
     interpretation: str
-    advice: str
+    advice: List[str]
     citations: List[CitationSummary]
     retrieved_candidates: Optional[List[RetrievedCandidate]] = None
     grounded: bool = Field(True, description="True when response is grounded in retrieved corpus data")
