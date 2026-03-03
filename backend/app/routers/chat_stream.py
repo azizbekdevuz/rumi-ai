@@ -4,6 +4,7 @@ Returns server-sent events for progressive response streaming.
 """
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import Dict, List, Optional
