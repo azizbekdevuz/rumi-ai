@@ -182,9 +182,16 @@ class ChatService:
         if not retrieved_candidates:
             retrieved_candidates = []
 
-        # Ensure advice is never empty / None for schema stability
+        # Ensure interpretation/advice are never empty / None for schema stability
         interpretation = parsed["interpretation"] or raw_text.strip()
-        advice = parsed["advice"] or ""
+
+        raw_advice = parsed["advice"]
+        if isinstance(raw_advice, list):
+            advice = [str(x) for x in raw_advice]
+        elif isinstance(raw_advice, str):
+            advice = [raw_advice] if raw_advice.strip() else []
+        else:
+            advice = []
 
         logger.info(
             "[chat:%s] result | verse_present=%s | citation_count=%d | "

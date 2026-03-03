@@ -166,8 +166,10 @@ def build_user_prompt(
         parts.append("")
 
     # ── User question (bounded to reduce prompt injection surface) ──
+    # Use delimiters to mitigate prompt injection
     safe_message = user_message[:2000] if user_message else ""
-    parts.append(f"{labels['question']}: {safe_message}")
+    safe_message = safe_message.replace('"""', '"')  # Escape triple quotes
+    parts.append(f"{labels['question']}: \"\"\"{safe_message}\"\"\"")
 
     return "\n".join(parts)
 
