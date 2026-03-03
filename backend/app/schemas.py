@@ -27,6 +27,7 @@ class UserResponse(UserBase):
     id: UUID
     created_at: datetime
     last_login: Optional[datetime] = None
+    avatar_url: Optional[str] = None
     is_deleted: bool = False
 
     model_config = ConfigDict(from_attributes=True)
@@ -414,6 +415,12 @@ class SignupResponse(BaseModel):
 class LoginResponse(BaseModel):
     """Schema for /api/auth/login POST response."""
     token: str
+
+
+class KakaoOAuthRequest(BaseModel):
+    """Schema for Kakao OAuth callback request."""
+    code: str = Field(..., description="Authorization code from Kakao")
+    redirect_uri: str = Field(..., description="Redirect URI used in OAuth flow")
 
 
 class UserSettingsUpdate(BaseModel):
