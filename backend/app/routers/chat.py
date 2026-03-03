@@ -11,9 +11,11 @@ GET /api/chat/sessions/{session_id}/messages for the profile page.
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func as sql_func
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List, Optional
 from uuid import UUID
 import logging
+import json
 
 from app.database import get_db
 from app.models import User, ChatSession, Message
@@ -27,7 +29,7 @@ from app.schemas import (
     RetrievedCandidate,
     VerseMultilingual,
 )
-from app.middleware.auth import get_optional_user
+from app.middleware.auth import get_optional_user, get_current_user
 from app.services.chat_service import ChatService
 from app.services.guest_user_service import get_or_create_guest_user
 from app.routers._session import resolve_user_id, resolve_or_create_session
@@ -90,22 +92,66 @@ async def chat(
             history=history_dicts,
         )
 
+        # Normalize advice to a list of strings for API + storage consistency
+        raw_advice = result.get("advice", [])
+        if isinstance(raw_advice, list):
+            advice_list = [str(x) for x in raw_advice]
+        elif isinstance(raw_advice, str):
+            advice_list = [raw_advice] if raw_advice.strip() else []
+        else:
+            advice_list = []
+
         # ── Persist messages ──
-        db.add(Message(
-            session_id=session.id,
-            role="user",
-            message_text=request.question,
-            language=language,
-        ))
-        db.add(Message(
-            session_id=session.id,
-            role="assistant",
-            message_text=result["response_text"],
-            language=language,
-            verse_id=result["verse_id"],
-            citation_ids=result["citation_ids"],
-        ))
-        db.commit()
+        # Compute next turn_index for this session in a transaction to avoid races
+        for attempt in range(2):
+            try:
+                # Lock the session row to serialize turn assignment for this session
+                db.query(ChatSession).filter(ChatSession.id == session.id).with_for_update().one()
+
+                last_turn = (
+                    db.query(sql_func.coalesce(sql_func.max(Message.turn_index), 0))
+                    .filter(Message.session_id == session.id)
+                    .scalar()
+                )
+                user_turn = last_turn + 1
+                assistant_turn = user_turn + 1
+
+                db.add(Message(
+                    session_id=session.id,
+                    role="user",
+                    message_text=request.question,
+                    language=language,
+                    turn_index=user_turn,
+                ))
+
+                # Serialize structured data for assistant message
+                advice_json = json.dumps(advice_list) if advice_list else None
+
+                verse_data = result.get("verse_data", {})
+                verse_json = json.dumps(verse_data) if verse_data else None
+
+                citations_data = result.get("citations_summary", [])
+                citations_json = json.dumps(citations_data) if citations_data else None
+
+                db.add(Message(
+                    session_id=session.id,
+                    role="assistant",
+                    message_text=result["response_text"],
+                    language=language,
+                    verse_id=result["verse_id"],
+                    citation_ids=result["citation_ids"],
+                    turn_index=assistant_turn,
+                    interpretation_text=result.get("interpretation"),
+                    advice_json=advice_json,
+                    verse_json=verse_json,
+                    citations_json=citations_json,
+                ))
+                db.commit()
+                break
+            except IntegrityError:
+                db.rollback()
+                if attempt == 1:
+                    raise
 
         # ── Map to response schema ──
         candidates = result["retrieved_candidates"]
@@ -113,7 +159,7 @@ async def chat(
             session_id=session.id,
             verse=VerseMultilingual(**result["verse_data"]),
             interpretation=result["interpretation"],
-            advice=result["advice"],
+            advice=advice_list,
             citations=[
                 CitationSummary(**c) for c in result["citations_summary"]
             ],
@@ -135,7 +181,7 @@ async def chat(
         db.rollback()
         logger.error("Unexpected chat error: %s", exc, exc_info=True)
         raise HTTPException(
-            status_code=500, detail=f"Error processing chat: {exc}",
+            status_code=500, detail="An internal error occurred while processing your request.",
         )
 
 
@@ -145,15 +191,17 @@ async def chat(
 @router.get("/sessions", response_model=List[ChatSessionWithPreview])
 def list_sessions(
     limit: int = Query(50, ge=1, le=200),
-    current_user: Optional[User] = Depends(get_optional_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """List chat sessions for the current user (newest first).
+    """List chat sessions for the current authenticated user (newest first).
 
     Each session includes ``message_count`` and ``preview`` (the first
     user message) so the frontend never needs N+1 queries.
+    
+    Requires authentication. Returns empty list if user has no sessions.
     """
-    user_id = resolve_user_id(current_user, db)
+    user_id = current_user.id
 
     # Sub-query: message count per session
     count_sq = (
@@ -209,16 +257,17 @@ def list_sessions(
 @router.get("/sessions/{session_id}/messages", response_model=List[MessageResponse])
 def get_session_messages(
     session_id: UUID,
-    current_user: Optional[User] = Depends(get_optional_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Retrieve all messages for a given session (chronological order)."""
-    user_id = resolve_user_id(current_user, db)
-
+    """Retrieve all messages for a given session (chronological order).
+    
+    Requires authentication. Only returns messages for sessions owned by the authenticated user.
+    """
     # Verify session belongs to this user
     session = (
         db.query(ChatSession)
-        .filter(ChatSession.id == session_id, ChatSession.user_id == user_id)
+        .filter(ChatSession.id == session_id, ChatSession.user_id == current_user.id)
         .first()
     )
     if not session:
@@ -227,7 +276,8 @@ def get_session_messages(
     messages = (
         db.query(Message)
         .filter(Message.session_id == session_id)
-        .order_by(Message.id)  # UUID v4 doesn't sort chronologically, but insertion order works
+        .order_by(Message.turn_index.asc())
         .all()
     )
-    return messages
+    # Convert to MessageResponse with structured data parsing
+    return [MessageResponse.from_orm_with_structured(msg) for msg in messages]

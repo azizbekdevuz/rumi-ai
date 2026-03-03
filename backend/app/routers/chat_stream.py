@@ -5,6 +5,7 @@ Returns server-sent events for progressive response streaming.
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import Dict, List, Optional
 from uuid import UUID
 import json
@@ -12,7 +13,7 @@ import asyncio
 import logging
 
 from app.database import get_db
-from app.models import User, Message
+from app.models import User, Message, ChatSession
 from app.schemas import ChatRequest
 from app.middleware.auth import get_optional_user
 from app.services.chat_service import ChatService
@@ -74,32 +75,87 @@ async def stream_chat_response(
 
         # ── Persist messages (same contract as non-streaming) ──
         try:
-            db.add(Message(
-                session_id=session_id,
-                role="user",
-                message_text=user_message,
-                language=language,
-            ))
-            db.add(Message(
-                session_id=session_id,
-                role="assistant",
-                message_text=response_text,
-                language=language,
-                verse_id=result.get("verse_id"),
-                citation_ids=result.get("citation_ids", []),
-            ))
-            db.commit()
+            # Normalize advice to a list of strings for API + storage consistency
+            raw_advice = result.get("advice", [])
+            if isinstance(raw_advice, list):
+                advice_list = [str(x) for x in raw_advice]
+            elif isinstance(raw_advice, str):
+                advice_list = [raw_advice] if raw_advice.strip() else []
+            else:
+                advice_list = []
+
+            # Compute next turn_index for this session in a transaction to avoid races
+            for attempt in range(2):
+                try:
+                    # Lock the session row to serialize turn assignment for this session
+                    db.query(ChatSession).filter(ChatSession.id == session_id).with_for_update().one()
+
+                    last_turn = (
+                        db.query(func.coalesce(func.max(Message.turn_index), 0))
+                        .filter(Message.session_id == session_id)
+                        .scalar()
+                    )
+                    user_turn = last_turn + 1
+                    assistant_turn = user_turn + 1
+
+                    db.add(Message(
+                        session_id=session_id,
+                        role="user",
+                        message_text=user_message,
+                        language=language,
+                        turn_index=user_turn,
+                    ))
+                    # Serialize structured data for assistant message
+                    advice_json = json.dumps(advice_list) if advice_list else None
+
+                    verse_data = result.get("verse_data", {})
+                    verse_json = json.dumps(verse_data) if verse_data else None
+
+                    citations_data = result.get("citations_summary", [])
+                    citations_json = json.dumps(citations_data) if citations_data else None
+
+                    db.add(Message(
+                        session_id=session_id,
+                        role="assistant",
+                        message_text=response_text,
+                        language=language,
+                        verse_id=result.get("verse_id"),
+                        citation_ids=result.get("citation_ids", []),
+                        turn_index=assistant_turn,
+                        interpretation_text=result.get("interpretation"),
+                        advice_json=advice_json,
+                        verse_json=verse_json,
+                        citations_json=citations_json,
+                    ))
+                    db.commit()
+                    break
+                except IntegrityError:
+                    db.rollback()
+                    if attempt == 1:
+                        raise
         except Exception as persist_err:
             logger.error("Failed to persist stream messages: %s", persist_err)
             db.rollback()
 
         # ── Final event with full structured response ──
+        # Reuse normalized advice_list where available, otherwise fall back
+        if 'advice_list' in locals():
+            final_advice = advice_list
+        else:
+            raw_advice = result.get("advice", [])
+            if isinstance(raw_advice, list):
+                final_advice = [str(x) for x in raw_advice]
+            elif isinstance(raw_advice, str):
+                final_advice = [raw_advice] if raw_advice.strip() else []
+            else:
+                final_advice = []
+
         yield _sse_event({
             "type": "done",
             "session_id": str(session_id),
             "verse": result.get("verse_data", {}),
             "interpretation": result.get("interpretation", ""),
-            "advice": result.get("advice", ""),
+            "advice": final_advice,
             "citations": result.get("citations_summary", []),
             "retrieved_candidates": result.get("retrieved_candidates", []),
             "verse_id": result.get("verse_id"),
