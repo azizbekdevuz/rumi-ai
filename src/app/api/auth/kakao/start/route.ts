@@ -27,3 +27,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=oauth_failed', request.url));
   }
 }
+
