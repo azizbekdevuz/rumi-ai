@@ -423,6 +423,12 @@ class KakaoOAuthRequest(BaseModel):
     redirect_uri: str = Field(..., description="Redirect URI used in OAuth flow")
 
 
+class GoogleOAuthRequest(BaseModel):
+    """Schema for Google OAuth callback request."""
+    code: str = Field(..., description="Authorization code from Google")
+    redirect_uri: str = Field(..., description="Redirect URI used in OAuth flow")
+
+
 class UserSettingsUpdate(BaseModel):
     """Schema for /api/user/settings PATCH request."""
     preferred_lang: Optional[str] = Field(None, description="Language: fa, en, or kr")
