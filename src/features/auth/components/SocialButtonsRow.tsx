@@ -28,8 +28,7 @@ export default function SocialButtonsRow({
   }, [toastMessage]);
 
   const handleGoogleClick = () => {
-    // Placeholder - replace with actual Google OAuth
-    console.log('Google sign in clicked');
+    window.location.assign('/api/auth/google/start');
   };
 
   const handleKakaoClick = () => {

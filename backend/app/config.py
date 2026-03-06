@@ -86,5 +86,10 @@ class Settings(BaseSettings):
     KAKAO_CLIENT_SECRET: Optional[str] = None
     KAKAO_REDIRECT_URI: str = ""
 
+    # Google OAuth Configuration
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    GOOGLE_REDIRECT_URI: str = ""
+
 
 settings = Settings()

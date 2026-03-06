@@ -110,6 +110,9 @@ Key variables:
 | `KAKAO_REST_API_KEY` | Kakao OAuth REST API key | — |
 | `KAKAO_CLIENT_SECRET` | Kakao OAuth client secret (optional) | — |
 | `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3000/api/auth/kakao/callback` |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | — |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | — |
+| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3000/api/auth/google/callback` |
 | `REDIS_URL` | Redis URL (optional) | `redis://localhost:6379/0` |
 | `JWT_ALGORITHM` | JWT algorithm | `HS256` |
 | `JWT_EXPIRATION_HOURS` | Token TTL | `24` |
