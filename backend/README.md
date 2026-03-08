@@ -109,10 +109,10 @@ Key variables:
 | `ALLOWED_HOSTS` | CORS origins (comma-separated) | `localhost,127.0.0.1` |
 | `KAKAO_REST_API_KEY` | Kakao OAuth REST API key | — |
 | `KAKAO_CLIENT_SECRET` | Kakao OAuth client secret (optional) | — |
-| `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3000/api/auth/kakao/callback` |
+| `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3003/api/auth/kakao/callback` |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | — |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | — |
-| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3000/api/auth/google/callback` |
+| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3003/api/auth/google/callback` |
 | `REDIS_URL` | Redis URL (optional) | `redis://localhost:6379/0` |
 | `JWT_ALGORITHM` | JWT algorithm | `HS256` |
 | `JWT_EXPIRATION_HOURS` | Token TTL | `24` |
@@ -143,6 +143,7 @@ Users
 ├── provider (email/kakao/guest, default: email)
 ├── provider_user_id (nullable, OAuth provider's user ID)
 ├── avatar_url (nullable, profile image URL from OAuth)
+├── display_name (nullable, OAuth or user display name)
 ├── preferred_lang (fa/en/kr)
 ├── theme (light/dark)
 ├── is_guest
@@ -204,6 +205,7 @@ Feedback_Reports
 | `POST` | `/api/auth/signup` | — | Register new user |
 | `POST` | `/api/auth/login` | — | Login, receive JWT |
 | `POST` | `/api/auth/kakao` | — | Kakao OAuth login (exchanges code for JWT) |
+| `POST` | `/api/auth/google` | — | Google OAuth login (exchanges code for JWT) |
 | `POST` | `/api/chat` | Optional | Submit question, receive structured JSON |
 | `POST` | `/api/chat/stream` | Optional | SSE streaming chat |
 | `GET` | `/api/search?query=…&lang=fa` | — | Search verses |

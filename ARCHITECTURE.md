@@ -34,7 +34,7 @@ Comprehensive system overview with diagrams for the Rumi AI Agent: a multilingua
 │                                                                 │
 │  Languages: Persian (FA) · English (EN) · Korean (KR)           │
 │  Themes:    Light (parchment) · Dark                            │
-│  Auth:      JWT + OAuth (Kakao) + anonymous guest               │
+│  Auth:      JWT + OAuth (Google, Kakao) + anonymous guest               │
 │  Chat:      Real-time SSE streaming + non-streaming fallback    │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -213,6 +213,8 @@ Frontend BFF Route              →  Backend Endpoint
 ─────────────────────────────────────────────────────
 POST /api/auth/login            →  POST /api/auth/login
 POST /api/auth/signup           →  POST /api/auth/signup
+GET  /api/auth/google/start    →  (redirects to Google OAuth)
+GET  /api/auth/google/callback →  POST /api/auth/google (backend)
 GET  /api/auth/kakao/start      →  (redirects to Kakao OAuth)
 GET  /api/auth/kakao/callback   →  POST /api/auth/kakao (backend)
 POST /api/auth/logout           →  (clears httpOnly cookie)
@@ -494,6 +496,29 @@ PATCH /api/user/settings        →  PATCH /api/user/settings
       │                            │  4. Chat proceeds normally  │
 
 
+  ── Google OAuth Flow ──
+
+      │  1. Click Google button     │                            │
+      │     GET /api/auth/google/   │                            │
+      │     start                   │                            │
+      │ ─────────────────────────▶ │                            │
+      │                            │  2. Redirect to Google       │
+      │                            │     authorization page      │
+      │                            │ ─────────────────────────▶ │
+      │  3. User authorizes        │                            │
+      │     Google redirects to     │                            │
+      │     /api/auth/google/      │                            │
+      │     callback?code=...       │                            │
+      │ ◀───────────────────────── │                            │
+      │  4. GET callback → POST    │                            │
+      │     /api/auth/google       │                            │
+      │     Backend uses server-   │                            │
+      │     configured redirect_uri│                            │
+      │  5. Set-Cookie + redirect  │                            │
+      │     to /chat               │                            │
+      │ ◀───────────────────────── │                            │
+      │                            │                            │
+
   ── Kakao OAuth Flow ──
 
       │  1. Click Kakao button      │                            │
@@ -514,7 +539,8 @@ PATCH /api/user/settings        →  PATCH /api/user/settings
       │     callback?code=...       │                            │
       │ ─────────────────────────▶ │                            │
       │                            │  5. POST /api/auth/kakao    │
-      │                            │  {code, redirect_uri}       │
+      │                            │  {code} (redirect_uri from  │
+      │                            │  server config)             │
       │                            │ ─────────────────────────▶ │
       │                            │                            │
       │                            │  6. Exchange code for token │
@@ -550,6 +576,7 @@ PATCH /api/user/settings        →  PATCH /api/user/settings
 │ provider_user_ │       └──────────────────┘       │ language       │
 │   id           │                                  │ verse_id  (FK) │
 │ avatar_url     │                                  │ citation_ids[] │
+│ display_name   │                                  │                │
 │ preferred_lang │                                  │ feedback       │
 │ theme          │                                  │ created_at     │
 │ is_guest       │                                  │                │
@@ -672,7 +699,8 @@ Message.citation_ids  ──>  Citation[]  (UUID array)
 │  email:         string       │
 │  preferredLang: string?      │
 │  theme:         string?      │
-│  avatarUrl:     string?      │  (OAuth profile image)
+│  avatar_url:    string?      │  (OAuth profile image)
+│  display_name:  string?      │  (OAuth or user display name)
 │  createdAt:     string       │
 │  lastLogin:     string?      │
 │  isDeleted:     boolean      │
@@ -795,7 +823,7 @@ Language Codes:
 │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐ │
 │  │  Next.js    │    │  FastAPI    │    │  Docker     │ │
 │  │  dev server │    │  uvicorn   │    │  ─────────  │ │
-│  │  :3000      │───▶│  :8000     │───▶│  PostgreSQL │ │
+│  │  :3003      │───▶│  :8000     │───▶│  PostgreSQL │ │
 │  │             │    │            │    │  :5432      │ │
 │  │  (pnpm dev) │    │  (reload)  │    │  (Adminer   │ │
 │  └─────────────┘    └─────────────┘    │   :8080)    │ │

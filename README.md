@@ -39,7 +39,7 @@ rumi-ai2/
 │   │   ├── layout.tsx            #   Root layout (providers, nav, footer)
 │   │   ├── globals.css           #   Global styles + component classes
 │   │   └── api/                  #   BFF routes (proxy to backend)
-│   │       ├── auth/             #     login / signup / logout / me / kakao
+│   │       ├── auth/             #     login / signup / logout / me / google / kakao
 │   │       ├── chat/             #     POST /api/chat + /api/chat/stream
 │   │       ├── books/            #     GET /api/books, /api/books/:id/pages/:n
 │   │       ├── citations/        #     GET /api/citations/:refId
@@ -146,11 +146,11 @@ uvicorn main:app --reload --port 8000
 ```bash
 # from project root
 pnpm install
-cp .env.local.example .env.local   # set BACKEND_URL=http://localhost:8000
+cp .env.local.example .env.local   # set BACKEND_URL, OAuth keys for Google/Kakao
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3003](http://localhost:3003) (dev server runs on port 3003).
 
 ## Environment Variables
 
@@ -160,9 +160,9 @@ Open [http://localhost:3000](http://localhost:3000).
 |----------|-------------|---------|
 | `BACKEND_URL` | Backend API base URL | `http://localhost:8000` |
 | `KAKAO_REST_API_KEY` | Kakao OAuth REST API key | — |
-| `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3000/api/auth/kakao/callback` |
+| `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3003/api/auth/kakao/callback` |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | — |
-| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3000/api/auth/google/callback` |
+| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3003/api/auth/google/callback` |
 
 ### Backend (`.env`)
 
@@ -178,10 +178,10 @@ Open [http://localhost:3000](http://localhost:3000).
 | `ALLOWED_HOSTS` | CORS allowed hosts (comma-separated) | `localhost,127.0.0.1` |
 | `KAKAO_REST_API_KEY` | Kakao OAuth REST API key | — |
 | `KAKAO_CLIENT_SECRET` | Kakao OAuth client secret (optional) | — |
-| `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3000/api/auth/kakao/callback` |
+| `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3003/api/auth/kakao/callback` |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | — |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | — |
-| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3000/api/auth/google/callback` |
+| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3003/api/auth/google/callback` |
 
 ## Key Features
 
@@ -195,11 +195,11 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Authentication
 - JWT-based auth with httpOnly cookies
-- OAuth support: Kakao Login (Google and Apple coming soon)
+- OAuth support: Google and Kakao Login
 - Guest user support (anonymous chat)
 - Centralised `AuthProvider` context with `useAuth()` hook
 - Login / Signup / Logout flows
-- Profile avatar support (OAuth providers)
+- Profile avatar and display name (OAuth providers)
 
 ### Internationalization
 - Three languages: Persian (FA), English (EN), Korean (KR)
@@ -257,6 +257,9 @@ alembic downgrade -1
 | `POST` | `/api/auth/kakao` | Kakao OAuth login (backend) |
 | `GET` | `/api/auth/kakao/start` | Kakao OAuth start (frontend) |
 | `GET` | `/api/auth/kakao/callback` | Kakao OAuth callback (frontend) |
+| `POST` | `/api/auth/google` | Google OAuth login (backend) |
+| `GET` | `/api/auth/google/start` | Google OAuth start (frontend) |
+| `GET` | `/api/auth/google/callback` | Google OAuth callback (frontend) |
 | `GET` | `/api/user/me` | Current user profile |
 | `PATCH` | `/api/user/settings` | Update language/theme prefs |
 | `POST` | `/api/feedback` | Submit feedback/report |
@@ -265,6 +268,10 @@ alembic downgrade -1
 ## Architecture
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for detailed system architecture with diagrams.
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for development setup, coding standards, and pull request guidelines.
 
 ## License
 
