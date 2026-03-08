@@ -1,6 +1,7 @@
 """
 Authentication router - User registration and login.
 """
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import bcrypt
@@ -10,10 +11,11 @@ from typing import Optional
 
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserResponse, UserLogin, SignupRequest, SignupResponse, LoginResponse, KakaoOAuthRequest
+from app.schemas import UserCreate, UserResponse, UserLogin, SignupRequest, SignupResponse, LoginResponse, KakaoOAuthRequest, GoogleOAuthRequest
 from app.middleware.auth import create_access_token
 from app.config import settings
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 
@@ -110,12 +112,14 @@ async def kakao_oauth(
     if not settings.KAKAO_REST_API_KEY:
         raise HTTPException(status_code=500, detail="Kakao OAuth not configured")
     
-    # Step 1: Exchange authorization code for access token
+    # Step 1: Exchange authorization code for access token (use server config, not request body)
+    if not settings.KAKAO_REDIRECT_URI:
+        raise HTTPException(status_code=500, detail="Kakao redirect URI not configured")
     token_url = "https://kauth.kakao.com/oauth/token"
     token_data = {
         "grant_type": "authorization_code",
         "client_id": settings.KAKAO_REST_API_KEY,
-        "redirect_uri": oauth_data.redirect_uri,
+        "redirect_uri": settings.KAKAO_REDIRECT_URI,
         "code": oauth_data.code,
     }
     
@@ -136,12 +140,14 @@ async def kakao_oauth(
             access_token = token_result.get("access_token")
             
             if not access_token:
-                raise HTTPException(status_code=400, detail="Failed to obtain access token from Kakao")
+                raise HTTPException(status_code=400, detail="Kakao authentication failed")
         except httpx.HTTPStatusError as e:
-            raise HTTPException(status_code=400, detail=f"Kakao token exchange failed: {e.response.text}")
+            logger.warning("Kakao token exchange failed: %s", e.response.text)
+            raise HTTPException(status_code=400, detail="Kakao authentication failed") from e
         except httpx.RequestError as e:
-            raise HTTPException(status_code=503, detail=f"Failed to connect to Kakao: {str(e)}")
-        
+            logger.warning("Failed to connect to Kakao: %s", e)
+            raise HTTPException(status_code=503, detail="Unable to reach Kakao. Please try again later.") from e
+
         # Step 2: Fetch user info from Kakao
         user_info_url = "https://kapi.kakao.com/v2/user/me"
         try:
@@ -153,10 +159,12 @@ async def kakao_oauth(
             user_info_response.raise_for_status()
             kakao_user_data = user_info_response.json()
         except httpx.HTTPStatusError as e:
-            raise HTTPException(status_code=400, detail=f"Failed to fetch user info from Kakao: {e.response.text}")
+            logger.warning("Kakao user info fetch failed: %s", e.response.text)
+            raise HTTPException(status_code=400, detail="Kakao authentication failed") from e
         except httpx.RequestError as e:
-            raise HTTPException(status_code=503, detail=f"Failed to connect to Kakao: {str(e)}")
-    
+            logger.warning("Failed to connect to Kakao: %s", e)
+            raise HTTPException(status_code=503, detail="Unable to reach Kakao. Please try again later.") from e
+
     # Step 3: Extract Kakao user ID and email
     kakao_user_id = str(kakao_user_data.get("id"))
     if not kakao_user_id:
@@ -168,16 +176,17 @@ async def kakao_oauth(
     if kakao_account.get("has_email") and kakao_account.get("email"):
         kakao_email = kakao_account.get("email")
     
-    # Extract profile image URL from Kakao
+    # Extract profile image URL and display name from Kakao
     kakao_avatar_url: Optional[str] = None
-    # Try kakao_account.profile.profile_image_url first (most common)
+    kakao_display_name: Optional[str] = None
     kakao_profile = kakao_account.get("profile", {})
     if kakao_profile.get("profile_image_url"):
         kakao_avatar_url = kakao_profile.get("profile_image_url")
-    # Fallback to properties.profile_image (alternative location)
     elif kakao_user_data.get("properties", {}).get("profile_image"):
         kakao_avatar_url = kakao_user_data.get("properties", {}).get("profile_image")
-    
+    if kakao_profile.get("nickname"):
+        kakao_display_name = kakao_profile.get("nickname")
+
     # Step 4: Look up or create user
     # First, check if user exists with provider='kakao' and provider_user_id
     user = db.query(User).filter(
@@ -187,30 +196,30 @@ async def kakao_oauth(
     ).first()
     
     if user:
-        # Existing Kakao user - update last_login and avatar_url if provided
+        # Existing Kakao user - update last_login, avatar_url, display_name if provided
         user.last_login = datetime.utcnow()
-        # Only update avatar_url if present and user doesn't already have one
-        if kakao_avatar_url and not user.avatar_url:
+        if kakao_avatar_url:
             user.avatar_url = kakao_avatar_url
-        elif kakao_avatar_url:
-            # Update avatar_url if new one is provided (allows refreshing)
-            user.avatar_url = kakao_avatar_url
+        if kakao_display_name:
+            user.display_name = kakao_display_name
         db.commit()
     else:
-        # New user - check for email conflicts
+        # New user - check for email conflict with any existing account
         if kakao_email:
             existing_email_user = db.query(User).filter(
                 User.email == kakao_email,
-                User.provider == 'email',
-                User.is_deleted == False
+                User.is_deleted == False,
             ).first()
-            
             if existing_email_user:
+                _provider = existing_email_user.provider
+                display = {"email": "email", "kakao": "Kakao", "google": "Google"}.get(
+                    _provider, _provider
+                )
                 raise HTTPException(
                     status_code=409,
-                    detail="Email already registered. Please log in with email first."
+                    detail=f"Email already registered. Please log in with {display} first.",
                 )
-        
+
         # Create new Kakao user
         user_email = kakao_email if kakao_email else f"kakao_{kakao_user_id}@kakao.local"
         
@@ -219,7 +228,8 @@ async def kakao_oauth(
             password_hash=None,  # OAuth users don't have passwords
             provider='kakao',
             provider_user_id=kakao_user_id,
-            avatar_url=kakao_avatar_url,  # Set avatar URL if available
+            avatar_url=kakao_avatar_url,
+            display_name=kakao_display_name,
             preferred_lang=None,
             theme=None,
             is_guest=False,
@@ -228,12 +238,140 @@ async def kakao_oauth(
         db.add(user)
         db.commit()
         db.refresh(user)
-    
+
     # Step 5: Create and return JWT token
     access_token_expires = timedelta(hours=settings.JWT_EXPIRATION_HOURS)
     jwt_token = create_access_token(
         data={"sub": str(user.id), "email": user.email},
         expires_delta=access_token_expires
     )
-    
+
+    return LoginResponse(token=jwt_token)
+
+
+@router.post("/google", response_model=LoginResponse)
+async def google_oauth(
+    oauth_data: GoogleOAuthRequest,
+    db: Session = Depends(get_db)
+):
+    """Handle Google OAuth callback and authenticate user."""
+    if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+        raise HTTPException(status_code=500, detail="Google OAuth not configured")
+
+    # Step 1: Exchange authorization code for access token (use server config, not request body)
+    if not settings.GOOGLE_REDIRECT_URI:
+        raise HTTPException(status_code=500, detail="Google redirect URI not configured")
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "grant_type": "authorization_code",
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "client_secret": settings.GOOGLE_CLIENT_SECRET,
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+        "code": oauth_data.code,
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            token_response = await client.post(
+                token_url,
+                data=token_data,
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                timeout=10.0,
+            )
+            token_response.raise_for_status()
+            token_result = token_response.json()
+            google_access_token = token_result.get("access_token")
+
+            if not google_access_token:
+                raise HTTPException(status_code=400, detail="Google authentication failed")
+        except httpx.HTTPStatusError as e:
+            logger.warning("Google token exchange failed: %s", e.response.text)
+            raise HTTPException(status_code=400, detail="Google authentication failed") from e
+        except httpx.RequestError as e:
+            logger.warning("Failed to connect to Google: %s", e)
+            raise HTTPException(status_code=503, detail="Unable to reach Google. Please try again later.") from e
+
+        # Step 2: Fetch user info from Google
+        user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+        try:
+            user_info_response = await client.get(
+                user_info_url,
+                headers={"Authorization": f"Bearer {google_access_token}"},
+                timeout=10.0,
+            )
+            user_info_response.raise_for_status()
+            google_user_data = user_info_response.json()
+        except httpx.HTTPStatusError as e:
+            logger.warning("Google user info fetch failed: %s", e.response.text)
+            raise HTTPException(status_code=400, detail="Google authentication failed") from e
+        except httpx.RequestError as e:
+            logger.warning("Failed to connect to Google: %s", e)
+            raise HTTPException(status_code=503, detail="Unable to reach Google. Please try again later.") from e
+
+    # Step 3: Extract Google user ID, email, and avatar
+    google_user_id = google_user_data.get("id")
+    if not google_user_id:
+        raise HTTPException(status_code=400, detail="Google user ID not found")
+
+    google_email: Optional[str] = google_user_data.get("email")
+    google_avatar_url: Optional[str] = google_user_data.get("picture")
+    google_display_name: Optional[str] = google_user_data.get("name")
+
+    # Step 4: Look up or create user
+    user = db.query(User).filter(
+        User.provider == "google",
+        User.provider_user_id == str(google_user_id),
+        User.is_deleted == False,
+    ).first()
+
+    if user:
+        # Existing Google user — refresh last_login, avatar, display_name
+        user.last_login = datetime.utcnow()
+        if google_avatar_url:
+            user.avatar_url = google_avatar_url
+        if google_display_name:
+            user.display_name = google_display_name
+        db.commit()
+    else:
+        # New Google user — guard against email conflict with any existing account
+        if google_email:
+            existing_email_user = db.query(User).filter(
+                User.email == google_email,
+                User.is_deleted == False,
+            ).first()
+            if existing_email_user:
+                _provider = existing_email_user.provider
+                display = {"email": "email", "kakao": "Kakao", "google": "Google"}.get(
+                    _provider, _provider
+                )
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Email already registered. Please log in with {display} first.",
+                )
+
+        user_email = google_email if google_email else f"google_{google_user_id}@google.local"
+
+        user = User(
+            email=user_email,
+            password_hash=None,  # OAuth users don't have passwords
+            provider="google",
+            provider_user_id=str(google_user_id),
+            avatar_url=google_avatar_url,
+            display_name=google_display_name,
+            preferred_lang=None,
+            theme=None,
+            is_guest=False,
+            is_deleted=False,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    # Step 5: Create and return JWT token
+    access_token_expires = timedelta(hours=settings.JWT_EXPIRATION_HOURS)
+    jwt_token = create_access_token(
+        data={"sub": str(user.id), "email": user.email},
+        expires_delta=access_token_expires,
+    )
+
     return LoginResponse(token=jwt_token)

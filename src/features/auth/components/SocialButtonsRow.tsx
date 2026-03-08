@@ -9,6 +9,8 @@ interface SocialButtonsRowProps {
   appleLabel: string;
   kakaoLabel: string;
   appleComingSoon: string;
+  /** Shown once when present (e.g. OAuth email conflict from redirect). Reuses same toast UI. */
+  initialOAuthErrorToast?: string | null;
 }
 
 export default function SocialButtonsRow({
@@ -16,9 +18,16 @@ export default function SocialButtonsRow({
   appleLabel,
   kakaoLabel,
   appleComingSoon,
+  initialOAuthErrorToast,
 }: SocialButtonsRowProps) {
   const reducedMotion = useReducedMotion();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!initialOAuthErrorToast) return;
+    const id = setTimeout(() => setToastMessage(initialOAuthErrorToast), 0);
+    return () => clearTimeout(id);
+  }, [initialOAuthErrorToast]);
 
   useEffect(() => {
     if (toastMessage) {
@@ -28,8 +37,7 @@ export default function SocialButtonsRow({
   }, [toastMessage]);
 
   const handleGoogleClick = () => {
-    // Placeholder - replace with actual Google OAuth
-    console.log('Google sign in clicked');
+    window.location.assign('/api/auth/google/start');
   };
 
   const handleKakaoClick = () => {

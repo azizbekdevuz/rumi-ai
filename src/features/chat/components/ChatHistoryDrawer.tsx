@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MessageSquare, Plus } from 'lucide-react';
+import { useAuth } from '@/lib/auth/auth-context';
 import { useReducedMotion } from '@/lib/hooks';
 
 // ── Types ─────────────────────────────────────────────────────────
@@ -32,21 +34,43 @@ export default function ChatHistoryDrawer({
   currentSessionId,
 }: ChatHistoryDrawerProps) {
   const reducedMotion = useReducedMotion();
+  const { user: authUser, status: authStatus } = useAuth();
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [signedOut, setSignedOut] = useState(false);
   const fetchedRef = useRef(false);
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Reset cached session state when auth identity changes (logout / login / switch user)
+  const authIdentity = authStatus === 'authenticated' ? authUser?.id ?? null : null;
+  useEffect(() => {
+    fetchedRef.current = false;
+    setSessions([]);
+    setError('');
+    setSignedOut(false);
+  }, [authIdentity]);
 
   const fetchSessions = useCallback(async () => {
     if (fetchedRef.current) return;
     setLoading(true);
     setError('');
+    setSignedOut(false);
     try {
       const resp = await fetch('/api/sessions');
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      if (!resp.ok) {
+        if (resp.status === 401) {
+          setSignedOut(true);
+          setSessions([]);
+        } else {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+        fetchedRef.current = true;
+        return;
+      }
       const data: SessionItem[] = await resp.json();
       setSessions(data);
+      setSignedOut(false);
       fetchedRef.current = true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load');
@@ -163,13 +187,20 @@ export default function ChatHistoryDrawer({
                 <p className="chat-history-drawer-status">Loading...</p>
               )}
 
+              {signedOut && (
+                <div className="chat-history-drawer-status">
+                  <p>Sign in to view chat history.</p>
+                  <Link href="/login" className="chat-history-drawer-signin">Sign in</Link>
+                </div>
+              )}
+
               {error && (
                 <p className="chat-history-drawer-status chat-history-drawer-error">
                   {error}
                 </p>
               )}
 
-              {!loading && !error && sessions.length === 0 && (
+              {!loading && !error && !signedOut && sessions.length === 0 && (
                 <p className="chat-history-drawer-status">No past chats yet.</p>
               )}
 
