@@ -275,4 +275,4 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for development setup, coding standards
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE) for details.
