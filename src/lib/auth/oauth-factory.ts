@@ -219,6 +219,10 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
 
       const isProduction = process.env.NODE_ENV === 'production';
       const response = NextResponse.redirect(new URL('/chat', request.url));
+      // TODO(auth, follow-up): Support carrying a safe internal `next` path through the OAuth start -> callback flow
+      // and use it as the post-login redirect target for all providers.
+      // This should be implemented centrally here instead of per-provider route duplication.
+      // Only allow validated internal relative paths; otherwise fall back to `/chat`.
 
       // Persist the session JWT
       response.cookies.set('rumi_token', token, {
