@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/i18n-context';
@@ -14,6 +14,18 @@ import AuthTabs from '@/features/auth/components/AuthTabs';
 import AuthFormLogin from '@/features/auth/components/AuthFormLogin';
 import AuthFormSignup from '@/features/auth/components/AuthFormSignup';
 import SocialButtonsRow from '@/features/auth/components/SocialButtonsRow';
+
+/** Safe messages for OAuth callback error codes (never trust URL message param). */
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+    email_exists: "This email is already registered with another sign-in method.",
+    oauth_failed: "Sign-in failed. Please try again.",
+    oauth_state_mismatch: "Sign-in session expired. Please try again.",
+    oauth_denied: "Sign-in was cancelled.",
+    oauth_no_code: "Sign-in did not complete. Please try again.",
+    oauth_no_token: "Sign-in failed. Please try again.",
+    oauth_config: "Sign-in is not configured. Please try another method.",
+    oauth_exception: "Something went wrong. Please try again.",
+};
 
 function toErrorMessage(x: unknown, fallback: string): string {
     if (!x) return fallback;
@@ -80,6 +92,17 @@ export default function LoginPageClient() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSignupLoading, setIsSignupLoading] = useState(false);
     const [signupError, setSignupError] = useState("");
+
+    // OAuth callback errors: map known codes to safe messages only (never trust URL message param)
+    const [oauthErrorToast, setOauthErrorToast] = useState<string | null>(null);
+    useEffect(() => {
+        const error = searchParams?.get("error");
+        if (!error) return;
+        const message = OAUTH_ERROR_MESSAGES[error] ?? "Sign-in failed. Please try again.";
+        setOauthErrorToast(message);
+        const base = searchParams?.get("tab") === "signup" ? "/login?tab=signup" : "/login";
+        router.replace(base, { scroll: false });
+    }, [searchParams, router]);
 
     const content = {
         en: {
@@ -217,7 +240,9 @@ export default function LoginPageClient() {
 
             // Refresh global auth state so Navbar updates immediately
             await refreshAuth();
-            router.push('/chat');
+            const next = searchParams?.get("next");
+            const safeNext = next && next.startsWith("/") && !next.includes("//") ? next : "/chat";
+            router.push(safeNext);
         } catch (error) {
             setLoginError(toErrorMessage(error, c.loginError));
         } finally {
@@ -258,7 +283,9 @@ export default function LoginPageClient() {
 
             // Refresh global auth state so Navbar updates immediately
             await refreshAuth();
-            router.push('/chat');
+            const next = searchParams?.get("next");
+            const safeNext = next && next.startsWith("/") && !next.includes("//") ? next : "/chat";
+            router.push(safeNext);
         } catch (error) {
             setSignupError(toErrorMessage(error, c.signupError));
         } finally {
@@ -371,6 +398,7 @@ export default function LoginPageClient() {
                         kakaoLabel={c.kakao}
                         appleLabel={c.apple}
                         appleComingSoon={c.appleComingSoon}
+                        initialOAuthErrorToast={oauthErrorToast}
                     />
 
                     {/* Bottom Link */}

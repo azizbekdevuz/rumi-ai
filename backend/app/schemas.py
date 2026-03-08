@@ -28,6 +28,7 @@ class UserResponse(UserBase):
     created_at: datetime
     last_login: Optional[datetime] = None
     avatar_url: Optional[str] = None
+    display_name: Optional[str] = None
     is_deleted: bool = False
 
     model_config = ConfigDict(from_attributes=True)
@@ -420,6 +421,12 @@ class LoginResponse(BaseModel):
 class KakaoOAuthRequest(BaseModel):
     """Schema for Kakao OAuth callback request."""
     code: str = Field(..., description="Authorization code from Kakao")
+    redirect_uri: str = Field(..., description="Redirect URI used in OAuth flow")
+
+
+class GoogleOAuthRequest(BaseModel):
+    """Schema for Google OAuth callback request."""
+    code: str = Field(..., description="Authorization code from Google")
     redirect_uri: str = Field(..., description="Redirect URI used in OAuth flow")
 
 

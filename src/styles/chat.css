@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    CHAT PAGE
 ============================================ */
 
@@ -2328,6 +2328,22 @@ body:has(.chat-page-shell) .background-wrapper {
 
 .chat-history-drawer-error {
   color: var(--error, #c0392b);
+}
+
+.chat-history-drawer-signin {
+  display: inline-block;
+  margin-top: var(--space-2);
+  color: var(--accent, #2c5282);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.chat-history-drawer-signin:hover {
+  text-decoration: underline;
+}
+
+[data-theme='dark'] .chat-history-drawer-signin {
+  color: var(--accent, #7eb8da);
 }
 
 .chat-history-drawer-item {

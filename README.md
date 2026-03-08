@@ -161,6 +161,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | `BACKEND_URL` | Backend API base URL | `http://localhost:8000` |
 | `KAKAO_REST_API_KEY` | Kakao OAuth REST API key | — |
 | `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3000/api/auth/kakao/callback` |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | — |
+| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3000/api/auth/google/callback` |
 
 ### Backend (`.env`)
 
@@ -177,6 +179,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | `KAKAO_REST_API_KEY` | Kakao OAuth REST API key | — |
 | `KAKAO_CLIENT_SECRET` | Kakao OAuth client secret (optional) | — |
 | `KAKAO_REDIRECT_URI` | Kakao OAuth redirect URI | `http://localhost:3000/api/auth/kakao/callback` |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | — |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | — |
+| `GOOGLE_REDIRECT_URI` | Google OAuth redirect URI | `http://localhost:3000/api/auth/google/callback` |
 
 ## Key Features
 
