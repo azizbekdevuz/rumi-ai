@@ -106,9 +106,9 @@ export default function ProfilePage() {
     router.push(`/chat?session=${sessionId}`);
   };
 
-  // Derive display values from auth state (graceful fallbacks)
+  // Derive display values from auth state (provider display name preferred for OAuth)
   const user = {
-    name: authUser?.email?.split('@')[0] ?? 'Default User',
+    name: authUser?.display_name ?? authUser?.email?.split('@')[0] ?? 'Default User',
     email: authUser?.email ?? '',
     avatar: authUser?.avatar_url ?? null,
   };
