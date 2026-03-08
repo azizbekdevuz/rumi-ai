@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/i18n-context';
@@ -80,6 +80,26 @@ export default function LoginPageClient() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSignupLoading, setIsSignupLoading] = useState(false);
     const [signupError, setSignupError] = useState("");
+
+    // OAuth email conflict: show backend message in existing toast, then clear URL
+    const [oauthErrorToast, setOauthErrorToast] = useState<string | null>(null);
+    useEffect(() => {
+        const error = searchParams?.get("error");
+        const rawMessage = searchParams?.get("message");
+        if (error === "email_exists") {
+            let message = "This email is already registered with another sign-in method.";
+            if (rawMessage) {
+                try {
+                    const decoded = decodeURIComponent(rawMessage);
+                    if (decoded.length > 0) message = decoded;
+                } catch {
+                    // keep fallback
+                }
+            }
+            setOauthErrorToast(message);
+            router.replace("/login", { scroll: false });
+        }
+    }, [searchParams, router]);
 
     const content = {
         en: {
@@ -371,6 +391,7 @@ export default function LoginPageClient() {
                         kakaoLabel={c.kakao}
                         appleLabel={c.apple}
                         appleComingSoon={c.appleComingSoon}
+                        initialOAuthErrorToast={oauthErrorToast}
                     />
 
                     {/* Bottom Link */}
