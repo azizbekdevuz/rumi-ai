@@ -278,23 +278,23 @@ export default function ProfilePage() {
           animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          {mounted && authStatus === 'unauthenticated' ? (
+          {!mounted || authStatus === 'loading' ? (
+            <div className="profile-empty-state">
+              <p>Loading...</p>
+            </div>
+          ) : authStatus === 'unauthenticated' ? (
             <div className="profile-empty-state">
               <p>{c.signInToView}</p>
               <div className="profile-auth-actions">
-                <Link href="/login" className="profile-auth-link">
+                <Link href="/login?next=/profile" className="profile-auth-link">
                   <LogIn size={18} aria-hidden />
                   <span>{c.signIn}</span>
                 </Link>
-                <Link href="/login?tab=signup" className="profile-auth-link">
+                <Link href="/login?tab=signup&next=/profile" className="profile-auth-link">
                   <UserPlus size={18} aria-hidden />
                   <span>{c.signUp}</span>
                 </Link>
               </div>
-            </div>
-          ) : mounted && authStatus === 'loading' ? (
-            <div className="profile-empty-state">
-              <p>Loading...</p>
             </div>
           ) : (
             <>
