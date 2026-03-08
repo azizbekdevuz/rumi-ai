@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    PROFILE PAGE - Premium Editorial Design
    ============================================ */
 
@@ -500,6 +500,41 @@
   text-align: center;
   color: var(--text-muted);
   font-size: 15px;
+}
+
+/* Unauthenticated profile: Sign in / Sign up link buttons (same accent as chat-history-drawer-signin) */
+.profile-auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.profile-auth-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  color: var(--accent, #2c5282);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.profile-auth-link:hover {
+  text-decoration: none;
+  background: rgba(44, 82, 130, 0.08);
+}
+
+[data-theme='dark'] .profile-auth-link {
+  color: var(--accent, #7eb8da);
+}
+
+[data-theme='dark'] .profile-auth-link:hover {
+  background: rgba(126, 184, 218, 0.12);
 }
 
 /* Chat History List */

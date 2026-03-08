@@ -9,7 +9,7 @@ import { useI18n } from '@/lib/i18n/i18n-context';
 import { useTheme } from '@/lib/theme/theme-context';
 import { useAuth } from '@/lib/auth/auth-context';
 import { useReducedMotion } from '@/lib/hooks';
-import { ChevronRight, ChevronLeft, Sun, Moon, MessageSquare } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Sun, Moon, MessageSquare, LogIn, UserPlus } from 'lucide-react';
 import ProfilePageShell from '@/features/profile/components/ProfilePageShell';
 import ProfileSidebar, { type ProfileSection } from '@/features/profile/components/ProfileSidebar';
 import SegmentedControl from '@/features/profile/components/SegmentedControl';
@@ -107,8 +107,9 @@ export default function ProfilePage() {
   };
 
   // Derive display values from auth state (provider display name preferred for OAuth)
+  const displayName = authUser?.display_name?.trim();
   const user = {
-    name: authUser?.display_name ?? authUser?.email?.split('@')[0] ?? 'Default User',
+    name: (displayName && displayName.length > 0) ? displayName : (authUser?.email?.split('@')[0] ?? 'Default User'),
     email: authUser?.email ?? '',
     avatar: authUser?.avatar_url ?? null,
   };
@@ -135,6 +136,9 @@ export default function ProfilePage() {
       noHistory: 'No chat history yet. Start a conversation!',
       noQuotes: 'No saved quotes yet. Save verses you love!',
       saved: 'Changes saved successfully',
+      signInToView: 'Sign in to view your profile and chat history.',
+      signIn: 'Sign in',
+      signUp: 'Sign up',
     },
     fa: {
       title: 'پروفایل شما',
@@ -157,6 +161,9 @@ export default function ProfilePage() {
       noHistory: 'هنوز تاریخچه چتی وجود ندارد. گفتگو را شروع کنید!',
       noQuotes: 'هنوز نقل‌قولی ذخیره نشده است. ابیاتی که دوست دارید را ذخیره کنید!',
       saved: 'تغییرات با موفقیت ذخیره شد',
+      signInToView: 'برای مشاهده پروفایل و تاریخچه چت وارد شوید.',
+      signIn: 'ورود',
+      signUp: 'ثبت‌نام',
     },
     kr: {
       title: '프로필',
@@ -179,6 +186,9 @@ export default function ProfilePage() {
       noHistory: '아직 채팅 기록이 없습니다. 대화를 시작하세요!',
       noQuotes: '아직 저장된 인용구가 없습니다. 좋아하는 시구를 저장하세요!',
       saved: '변경 사항이 성공적으로 저장되었습니다',
+      signInToView: '프로필과 채팅 기록을 보려면 로그인하세요.',
+      signIn: '로그인',
+      signUp: '회원가입',
     },
   };
 
@@ -268,6 +278,26 @@ export default function ProfilePage() {
           animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
+          {mounted && authStatus === 'unauthenticated' ? (
+            <div className="profile-empty-state">
+              <p>{c.signInToView}</p>
+              <div className="profile-auth-actions">
+                <Link href="/login" className="profile-auth-link">
+                  <LogIn size={18} aria-hidden />
+                  <span>{c.signIn}</span>
+                </Link>
+                <Link href="/login?tab=signup" className="profile-auth-link">
+                  <UserPlus size={18} aria-hidden />
+                  <span>{c.signUp}</span>
+                </Link>
+              </div>
+            </div>
+          ) : mounted && authStatus === 'loading' ? (
+            <div className="profile-empty-state">
+              <p>Loading...</p>
+            </div>
+          ) : (
+            <>
           {/* Panel Header Section */}
           <div className="profile-panel-header">
             <div className="profile-avatar-wrapper">
@@ -480,6 +510,8 @@ export default function ProfilePage() {
               )}
                 </div>
               </div>
+            </>
+          )}
         </motion.div>
 
         {/* Footer Links */}
