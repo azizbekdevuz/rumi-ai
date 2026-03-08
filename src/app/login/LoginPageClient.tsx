@@ -87,15 +87,10 @@ export default function LoginPageClient() {
         const error = searchParams?.get("error");
         const rawMessage = searchParams?.get("message");
         if (error === "email_exists") {
-            let message = "This email is already registered with another sign-in method.";
-            if (rawMessage) {
-                try {
-                    const decoded = decodeURIComponent(rawMessage);
-                    if (decoded.length > 0) message = decoded;
-                } catch {
-                    // keep fallback
-                }
-            }
+            const message =
+                rawMessage && rawMessage.trim().length > 0
+                    ? rawMessage.trim()
+                    : "This email is already registered with another sign-in method.";
             setOauthErrorToast(message);
             router.replace("/login", { scroll: false });
         }
