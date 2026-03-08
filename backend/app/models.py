@@ -22,6 +22,7 @@ class User(Base):
     preferred_lang = Column(Text, nullable=True)
     theme = Column(Text, nullable=True)
     avatar_url = Column(Text, nullable=True)  # Profile image URL from OAuth providers
+    display_name = Column(Text, nullable=True)  # Provider or user display name (OAuth/email)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     last_login = Column(TIMESTAMP(timezone=True), nullable=True)
     is_deleted = Column(Boolean, default=False, nullable=False)
