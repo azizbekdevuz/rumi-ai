@@ -17,10 +17,19 @@ import { parseBackendError } from '@/lib/api/bff';
 // Constants
 // ---------------------------------------------------------------------------
 
-const BACKEND_URL = process.env.BACKEND_URL ?? 'http://localhost:8000';
+function getBackendUrl(): string {
+  const env = process.env.BACKEND_URL;
+  const nodeEnv = process.env.NODE_ENV;
+  if (nodeEnv && nodeEnv !== 'development' && !env) {
+    throw new Error(
+      'BACKEND_URL is required in non-development environments for OAuth callbacks'
+    );
+  }
+  return env ?? 'http://localhost:8000';
+}
 
-/** Cookie name used to persist the CSRF state value between start → callback. */
-const STATE_COOKIE = 'oauth_state';
+/** Cookie name prefix for per-attempt CSRF state (full name: prefix + state). */
+const STATE_COOKIE_PREFIX = 'oauth_state_';
 
 /** State cookie TTL in seconds — long enough for any reasonable OAuth round-trip. */
 const STATE_TTL_SECONDS = 60 * 10; // 10 minutes
@@ -102,11 +111,11 @@ export function createOAuthStartHandler(cfg: OAuthStartConfig) {
         authUrl.searchParams.set(key, value);
       }
 
-      // Persist the state in a short-lived, httpOnly cookie so the callback
-      // route can verify it and reject forged requests.
+      // Persist the state in a short-lived, httpOnly cookie (per-attempt name)
+      // so the callback can verify it and reject forged requests.
       const isProduction = process.env.NODE_ENV === 'production';
       const response = NextResponse.redirect(authUrl.toString());
-      response.cookies.set(STATE_COOKIE, state, stateCookieOptions(isProduction, STATE_TTL_SECONDS));
+      response.cookies.set(`${STATE_COOKIE_PREFIX}${state}`, state, stateCookieOptions(isProduction, STATE_TTL_SECONDS));
 
       return response;
     } catch (error) {
@@ -142,12 +151,11 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
       }
 
       // --- CSRF state verification ---
-      // Read the state we stored during the start phase from the httpOnly cookie.
-      // The Cookies API in Next.js route handlers is read-only for incoming
-      // cookies; we clear the state cookie via the response headers below.
+      // Read the per-attempt state cookie (name = prefix + state from URL).
       const { cookies } = await import('next/headers');
       const cookieStore = await cookies();
-      const storedState = cookieStore.get(STATE_COOKIE)?.value;
+      const stateCookieName = `${STATE_COOKIE_PREFIX}${state}`;
+      const storedState = cookieStore.get(stateCookieName)?.value;
 
       if (!state || !storedState || state !== storedState) {
         console.error(`[${cfg.providerName} OAuth] State mismatch — possible CSRF attack`);
@@ -164,12 +172,27 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
         return NextResponse.redirect(new URL('/login?error=oauth_config', request.url));
       }
 
-      // Exchange the authorization code for a JWT via the backend
-      const backendResponse = await fetch(`${BACKEND_URL}${cfg.backendPath}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, redirect_uri: cfg.redirectUri }),
-      });
+      // Exchange the authorization code for a JWT via the backend (with timeout)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10_000);
+      let backendResponse: Response;
+      try {
+        backendResponse = await fetch(`${getBackendUrl()}${cfg.backendPath}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, redirect_uri: cfg.redirectUri }),
+          signal: controller.signal,
+        });
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err instanceof Error && err.name === 'AbortError') {
+          console.error(`[${cfg.providerName} OAuth] Backend request timed out`);
+        } else {
+          console.error(`[${cfg.providerName} OAuth] Backend request failed:`, err);
+        }
+        return NextResponse.redirect(new URL('/login?error=oauth_failed', request.url));
+      }
+      clearTimeout(timeoutId);
 
       if (!backendResponse.ok) {
         const errorMessage = await parseBackendError(backendResponse);
@@ -206,8 +229,8 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
         maxAge: 60 * 60 * 24, // 24 hours — matches backend JWT_EXPIRATION_HOURS
       });
 
-      // Clear the state cookie — it has served its purpose
-      response.cookies.set(STATE_COOKIE, '', stateCookieOptions(isProduction, 0));
+      // Clear the per-attempt state cookie
+      response.cookies.set(stateCookieName, '', stateCookieOptions(isProduction, 0));
 
       return response;
     } catch (error) {
