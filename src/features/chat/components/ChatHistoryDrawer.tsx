@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MessageSquare, Plus } from 'lucide-react';
+import { useAuth } from '@/lib/auth/auth-context';
 import { useReducedMotion } from '@/lib/hooks';
 
 // ── Types ─────────────────────────────────────────────────────────
@@ -33,12 +34,22 @@ export default function ChatHistoryDrawer({
   currentSessionId,
 }: ChatHistoryDrawerProps) {
   const reducedMotion = useReducedMotion();
+  const { user: authUser, status: authStatus } = useAuth();
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [signedOut, setSignedOut] = useState(false);
   const fetchedRef = useRef(false);
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Reset cached session state when auth identity changes (logout / login / switch user)
+  const authIdentity = authStatus === 'authenticated' ? authUser?.id ?? null : null;
+  useEffect(() => {
+    fetchedRef.current = false;
+    setSessions([]);
+    setError('');
+    setSignedOut(false);
+  }, [authIdentity]);
 
   const fetchSessions = useCallback(async () => {
     if (fetchedRef.current) return;
