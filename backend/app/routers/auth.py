@@ -112,12 +112,14 @@ async def kakao_oauth(
     if not settings.KAKAO_REST_API_KEY:
         raise HTTPException(status_code=500, detail="Kakao OAuth not configured")
     
-    # Step 1: Exchange authorization code for access token
+    # Step 1: Exchange authorization code for access token (use server config, not request body)
+    if not settings.KAKAO_REDIRECT_URI:
+        raise HTTPException(status_code=500, detail="Kakao redirect URI not configured")
     token_url = "https://kauth.kakao.com/oauth/token"
     token_data = {
         "grant_type": "authorization_code",
         "client_id": settings.KAKAO_REST_API_KEY,
-        "redirect_uri": oauth_data.redirect_uri,
+        "redirect_uri": settings.KAKAO_REDIRECT_URI,
         "code": oauth_data.code,
     }
     
@@ -256,13 +258,15 @@ async def google_oauth(
     if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
         raise HTTPException(status_code=500, detail="Google OAuth not configured")
 
-    # Step 1: Exchange authorization code for access token
+    # Step 1: Exchange authorization code for access token (use server config, not request body)
+    if not settings.GOOGLE_REDIRECT_URI:
+        raise HTTPException(status_code=500, detail="Google redirect URI not configured")
     token_url = "https://oauth2.googleapis.com/token"
     token_data = {
         "grant_type": "authorization_code",
         "client_id": settings.GOOGLE_CLIENT_ID,
         "client_secret": settings.GOOGLE_CLIENT_SECRET,
-        "redirect_uri": oauth_data.redirect_uri,
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI,
         "code": oauth_data.code,
     }
 
