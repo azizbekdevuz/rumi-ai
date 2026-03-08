@@ -9,6 +9,11 @@ const KAKAO_REDIRECT_URI = process.env.KAKAO_REDIRECT_URI;
 // Ensure Node.js runtime for cookie support
 export const runtime = 'nodejs';
 
+/**
+ * Handle the Kakao OAuth callback: validate query parameters, exchange the authorization code with the backend for an auth token, set an httpOnly authentication cookie, and redirect the client.
+ *
+ * @returns A NextResponse that redirects to `/chat` on success or to `/login` with an appropriate `error` (and optional `message`) query parameter on failure.
+ */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -84,3 +89,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=oauth_exception', request.url));
   }
 }
+

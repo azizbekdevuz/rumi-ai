@@ -11,6 +11,14 @@ interface SocialButtonsRowProps {
   appleComingSoon: string;
 }
 
+/**
+ * Render a row of social sign-in buttons with a transient toast shown when the Apple button is used.
+ *
+ * The Google and Kakao buttons initiate OAuth by navigating to their respective start endpoints; the Apple button displays `appleComingSoon` as an inline toast that clears after a short delay.
+ *
+ * @param appleComingSoon - Message displayed in the transient toast when the Apple button is clicked
+ * @returns The component's JSX containing three social sign-in buttons (Google, Kakao, Apple) and a transient toast area
+ */
 export default function SocialButtonsRow({
   googleLabel,
   appleLabel,
@@ -28,8 +36,7 @@ export default function SocialButtonsRow({
   }, [toastMessage]);
 
   const handleGoogleClick = () => {
-    // Placeholder - replace with actual Google OAuth
-    console.log('Google sign in clicked');
+    window.location.assign('/api/auth/google/start');
   };
 
   const handleKakaoClick = () => {

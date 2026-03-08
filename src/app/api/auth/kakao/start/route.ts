@@ -7,6 +7,15 @@ const KAKAO_REDIRECT_URI = process.env.KAKAO_REDIRECT_URI;
 // Ensure Node.js runtime
 export const runtime = 'nodejs';
 
+/**
+ * Initiates the Kakao OAuth flow by redirecting the client to Kakao's authorization endpoint.
+ *
+ * If the required environment variables are not set, redirects to `/login?error=oauth_config`.
+ * On unexpected errors, redirects to `/login?error=oauth_failed`.
+ *
+ * @param request - The incoming NextRequest; used as the base for constructing redirect URLs.
+ * @returns A NextResponse that redirects the client to the Kakao authorization URL, or to the login page with an error query parameter when configuration or runtime errors occur.
+ */
 export async function GET(request: NextRequest) {
   try {
     if (!KAKAO_REST_API_KEY || !KAKAO_REDIRECT_URI) {
@@ -27,3 +36,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=oauth_failed', request.url));
   }
 }
+
