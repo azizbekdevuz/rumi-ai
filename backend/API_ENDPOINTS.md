@@ -50,10 +50,11 @@ Handles Kakao OAuth callback and authenticates user.
 **Request Body:**
 ```json
 {
-  "code": "authorization_code_from_kakao",
-  "redirect_uri": "http://localhost:3000/api/auth/kakao/callback"
+  "code": "authorization_code_from_kakao"
 }
 ```
+
+**Note:** The backend uses server-configured `KAKAO_REDIRECT_URI` for the token exchange. Client-supplied `redirect_uri` is ignored for security.
 
 **Response:**
 ```json
@@ -72,8 +73,42 @@ Handles Kakao OAuth callback and authenticates user.
 1. Frontend redirects to `/api/auth/kakao/start` → redirects to Kakao authorization
 2. User authorizes → Kakao redirects to `/api/auth/kakao/callback?code=...`
 3. Frontend calls backend `POST /api/auth/kakao` with code
-4. Backend exchanges code for access token, fetches user info
-5. Backend creates/updates user with `provider='kakao'` and `provider_user_id`
+4. Backend exchanges code for access token (using `KAKAO_REDIRECT_URI` from config), fetches user info
+5. Backend creates/updates user with `provider='kakao'`, `provider_user_id`, `avatar_url`, `display_name`
+6. Backend returns JWT token
+7. Frontend sets `rumi_token` cookie and redirects to `/chat`
+
+### POST /api/auth/google
+Handles Google OAuth callback and authenticates user.
+
+**Request Body:**
+```json
+{
+  "code": "authorization_code_from_google"
+}
+```
+
+**Note:** The backend uses server-configured `GOOGLE_REDIRECT_URI` for the token exchange. Client-supplied `redirect_uri` is ignored for security.
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Error Responses:**
+- `400` - Invalid authorization code or failed token exchange
+- `409` - Email already registered with email provider (must login with email first)
+- `500` - Google OAuth not configured
+- `503` - Failed to connect to Google API
+
+**Flow:**
+1. Frontend redirects to `/api/auth/google/start` → redirects to Google authorization
+2. User authorizes → Google redirects to `/api/auth/google/callback?code=...`
+3. Frontend calls backend `POST /api/auth/google` with code
+4. Backend exchanges code for access token (using `GOOGLE_REDIRECT_URI` from config), fetches user info
+5. Backend creates/updates user with `provider='google'`, `provider_user_id`, `avatar_url`, `display_name`
 6. Backend returns JWT token
 7. Frontend sets `rumi_token` cookie and redirects to `/chat`
 
@@ -203,13 +238,14 @@ Retrieves the current authenticated user's profile data.
   "preferred_lang": "fa",
   "theme": "light",
   "avatar_url": "https://k.kakaocdn.net/dn/.../img_640x640.jpg",
+  "display_name": "User Name",
   "created_at": "2025-01-22T10:00:00Z",
   "last_login": "2025-01-22T12:00:00Z",
   "is_deleted": false
 }
 ```
 
-**Note:** `avatar_url` is `null` for email users, populated for OAuth users (e.g., Kakao).
+**Note:** `avatar_url` and `display_name` are `null` for email users, populated for OAuth users (Google, Kakao).
 
 ### PATCH /api/user/settings
 Updates user preferences such as language or interface theme.

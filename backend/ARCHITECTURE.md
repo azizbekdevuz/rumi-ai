@@ -77,7 +77,7 @@ CORS → Request Validator → Rate Limiter → Router (with auth dependency)
 
 | File | Prefix | Endpoints |
 |------|--------|-----------|
-| `auth.py` | `/api/auth` | `POST /login`, `POST /signup`, `POST /kakao` |
+| `auth.py` | `/api/auth` | `POST /login`, `POST /signup`, `POST /kakao`, `POST /google` |
 | `chat.py` | `/api/chat` | `POST /` — non-streaming chat |
 | `chat_stream.py` | `/api/chat` | `POST /stream` — SSE streaming chat |
 | `search.py` | `/api/search` | `GET /` — verse search |
@@ -107,15 +107,21 @@ Authentication endpoints:
 - **`POST /api/auth/login`** — Email/password login. Rejects OAuth users (users with `password_hash=NULL`).
 - **`POST /api/auth/signup`** — Creates new user with `provider='email'` and hashed password.
 - **`POST /api/auth/kakao`** — Kakao OAuth login:
-  1. Exchanges authorization code for access token
+  1. Exchanges authorization code for access token (uses server-configured `KAKAO_REDIRECT_URI`)
   2. Fetches user info from Kakao API
-  3. Creates or updates user with `provider='kakao'`, `provider_user_id`, and `avatar_url`
+  3. Creates or updates user with `provider='kakao'`, `provider_user_id`, `avatar_url`, `display_name`
+  4. Returns JWT token
+- **`POST /api/auth/google`** — Google OAuth login:
+  1. Exchanges authorization code for access token (uses server-configured `GOOGLE_REDIRECT_URI`)
+  2. Fetches user info from Google API
+  3. Creates or updates user with `provider='google'`, `provider_user_id`, `avatar_url`, `display_name`
   4. Returns JWT token
 
 **User Model OAuth Fields:**
-- `provider` — `'email'`, `'kakao'`, or `'guest'` (default: `'email'`)
+- `provider` — `'email'`, `'google'`, `'kakao'`, or `'guest'` (default: `'email'`)
 - `provider_user_id` — OAuth provider's user ID (nullable, unique with provider)
 - `avatar_url` — Profile image URL from OAuth provider (nullable)
+- `display_name` — Display name from OAuth or user (nullable)
 - `password_hash` — Nullable for OAuth users
 
 **OAuth User Creation Rules:**
@@ -223,7 +229,7 @@ Messages.citation_ids ──> Citations[] (UUID array)
 
 | Table | Key Fields |
 |-------|-----------|
-| **Users** | `id` (UUID PK), `email` (unique), `password_hash` (nullable), `provider` (email/kakao/guest), `provider_user_id` (nullable), `avatar_url` (nullable), `preferred_lang`, `theme`, `is_guest`, `is_deleted`, `created_at`, `last_login` |
+| **Users** | `id` (UUID PK), `email` (unique), `password_hash` (nullable), `provider` (email/google/kakao/guest), `provider_user_id` (nullable), `avatar_url` (nullable), `display_name` (nullable), `preferred_lang`, `theme`, `is_guest`, `is_deleted`, `created_at`, `last_login` |
 | **Chat_Sessions** | `id` (UUID PK), `user_id` (FK→Users), `source_mode`, `created_at` |
 | **Messages** | `id` (UUID PK), `session_id` (FK→Sessions), `role`, `message_text`, `language`, `verse_id` (FK→Verses), `citation_ids` (UUID[]), `feedback`, `created_at` |
 | **Feedback_Reports** | `id` (UUID PK), `message_id` (FK→Messages, optional), `user_id` (FK→Users), `session_id` (optional), `issue_type`, `comment`, `created_at` |
@@ -246,6 +252,7 @@ Migrations managed by **Alembic** (`alembic/versions/`).
 | `POST` | `/api/auth/signup` | Register |
 | `POST` | `/api/auth/login` | Login (returns JWT) |
 | `POST` | `/api/auth/kakao` | Kakao OAuth login (exchanges code for JWT) |
+| `POST` | `/api/auth/google` | Google OAuth login (exchanges code for JWT) |
 
 ### Optional Auth (works for guests)
 
@@ -319,6 +326,9 @@ data: {"type": "error", "message": "..."}
 | `KAKAO_REST_API_KEY` | str | — | Kakao OAuth REST API key |
 | `KAKAO_CLIENT_SECRET` | str | — | Kakao OAuth client secret (optional) |
 | `KAKAO_REDIRECT_URI` | str | — | Kakao OAuth redirect URI |
+| `GOOGLE_CLIENT_ID` | str | — | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | str | — | Google OAuth client secret |
+| `GOOGLE_REDIRECT_URI` | str | — | Google OAuth redirect URI |
 | `RATE_LIMIT_REQUESTS` | int | `100` | Requests per window |
 | `RATE_LIMIT_WINDOW` | int | `60` | Window in seconds |
 | `REDIS_URL` | str | `redis://localhost:6379/0` | Redis (optional) |
