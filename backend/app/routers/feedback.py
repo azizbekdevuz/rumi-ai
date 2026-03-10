@@ -17,6 +17,9 @@ from app.models import User, FeedbackReport, ChatSession, Message
 from app.schemas import FeedbackRequest, FeedbackResponse
 from app.middleware.auth import get_optional_user
 from app.services.guest_user_service import get_or_create_guest_user
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 router = APIRouter(prefix="/api/feedback", tags=["feedback"])
 
@@ -64,8 +67,14 @@ async def create_feedback(
         if session:
             message = (
                 db.query(Message)
-                .filter(Message.session_id == feedback_data.session_id)
-                .order_by(Message.id.desc())
+                .filter(
+                    Message.session_id == feedback_data.session_id,
+                    Message.role == "assistant",
+                )
+                .order_by(
+                    Message.turn_index.desc().nullslast(),
+                    Message.created_at.desc(),
+                )
                 .first()
             )
 
