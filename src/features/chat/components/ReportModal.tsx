@@ -4,15 +4,21 @@ import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { X } from 'lucide-react';
 
+/** UUID regex for validating message IDs */
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 interface ReportModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Specific message ID when reporting a particular message. Omit for session-linked (latest) report. */
   messageId?: string;
+  /** Chat session ID for session-linked feedback. Backend resolves latest message when only this is provided. */
+  sessionId?: string;
 }
 
 type ReportCategory = 'incorrect' | 'offensive' | 'ocr_error' | 'other';
 
-export default function ReportModal({ isOpen, onClose, messageId }: ReportModalProps) {
+export default function ReportModal({ isOpen, onClose, messageId, sessionId }: ReportModalProps) {
   const { language, dir } = useI18n();
   const direction = dir;
   const [category, setCategory] = useState<ReportCategory>('incorrect');
@@ -130,14 +136,23 @@ export default function ReportModal({ isOpen, onClose, messageId }: ReportModalP
     setSubmitError(false);
 
     try {
+      // Build payload: message-specific (message_id) or session-linked (chat_session_id)
+      // Only send message_id if it's a valid UUID; otherwise use session_id for backend to resolve latest
+      const payload: Record<string, string> = {
+        type: category,
+        message: description.trim(),
+      };
+      if (messageId && UUID_REGEX.test(messageId)) {
+        payload.message_id = messageId;
+      }
+      if (sessionId && UUID_REGEX.test(sessionId)) {
+        payload.chat_session_id = sessionId;
+      }
+
       const resp = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: category,
-          message: description.trim(),
-          ...(messageId ? { message_id: messageId } : {}),
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!resp.ok) {
