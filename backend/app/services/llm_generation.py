@@ -188,6 +188,19 @@ class LLMGenerationService:
             )
 
         choices = data.get("choices", [])
-        if choices:
-            return choices[0]["message"]["content"]
-        raise RuntimeError("No choices in OpenAI-compatible response")
+        if not choices:
+            raise RuntimeError("No choices in OpenAI-compatible response")
+        first = choices[0]
+        if not isinstance(first, dict):
+            raise RuntimeError(
+                f"Unexpected choices[0] type: {type(first).__name__}"
+            )
+        msg = first.get("message")
+        if not isinstance(msg, dict):
+            raise RuntimeError(
+                f"Unexpected choices[0].message: {type(msg).__name__ if msg is not None else 'missing'}"
+            )
+        content = msg.get("content")
+        if content is None:
+            raise RuntimeError("No content in OpenAI-compatible response message")
+        return str(content)
