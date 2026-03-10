@@ -1,5 +1,10 @@
 """
 Request validation middleware for API Gateway.
+
+NOTE: We return JSONResponse instead of raising HTTPException because
+Starlette's HTTP middleware does not let FastAPI's exception handlers
+intercept exceptions — an HTTPException raised here would surface as
+a raw 500 to the client. See rate_limit_middleware for the same pattern.
 """
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
@@ -16,14 +21,10 @@ async def request_validator_middleware(request: Request, call_next):
                 return JSONResponse(
                     status_code=415,
                     content={
-                        "error": {
-                            "code": "UNSUPPORTED_MEDIA_TYPE",
-                            "message": "Unsupported Media Type. Expected application/json or multipart/form-data",
-                            "details": {}
-                        }
-                    }
+                        "detail": "Unsupported Media Type. Expected application/json or multipart/form-data"
+                    },
                 )
-    
+
     # Check request size (basic validation)
     content_length = request.headers.get("content-length")
     if content_length:
@@ -33,13 +34,7 @@ async def request_validator_middleware(request: Request, call_next):
             if size > max_size:
                 return JSONResponse(
                     status_code=413,
-                    content={
-                        "error": {
-                            "code": "REQUEST_TOO_LARGE",
-                            "message": f"Request entity too large. Maximum size is {max_size} bytes",
-                            "details": {}
-                        }
-                    }
+                    content={"detail": f"Request entity too large. Maximum size is {max_size} bytes"},
                 )
         except ValueError:
             pass

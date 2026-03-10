@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     if (!backendResponse.ok) {
       const errorMessage = await parseBackendError(backendResponse);
-      return jsonError(errorMessage, 502);
+      return jsonError(errorMessage, backendResponse.status);
     }
 
     // Return streaming response

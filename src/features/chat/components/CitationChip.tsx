@@ -34,7 +34,7 @@ export default function CitationChip({ citation, onClick, variant = 'default' }:
       variants={chipVariants}
       whileHover={reducedMotion || !onClick ? {} : 'hover'}
       whileTap={reducedMotion || !onClick ? {} : 'tap'}
-      aria-label={`Citation from ${citation.book}, page ${citation.page}`}
+      aria-label={`Citation from ${citation.book}, page ${citation.page ?? 'N/A'}`}
     >
       <BooksIcon style={{ width: 14, height: 14 }} aria-hidden="true" />
       <span>{formatCitation()}</span>

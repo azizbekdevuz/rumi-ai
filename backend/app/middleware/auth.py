@@ -55,8 +55,12 @@ async def get_current_user(
     ).first()
     
     if not user:
-        raise HTTPException(status_code=401, detail="User not found or has been deleted")
-    
+        raise HTTPException(
+            status_code=401,
+            detail="User not found. Token may be invalid or expired.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     return user
 
 

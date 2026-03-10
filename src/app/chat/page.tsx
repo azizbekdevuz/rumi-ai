@@ -338,7 +338,9 @@ function ChatPageContent() {
   };
 
   const handleReport = () => {
-    setReportMessageId('current');
+    // Chat-linked report: use latest assistant message ID if available, else session for backend to resolve
+    const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant');
+    setReportMessageId(lastAssistant?.id ?? 'current');
   };
 
   const emptyStateVariants = reducedMotion
@@ -461,6 +463,7 @@ function ChatPageContent() {
         isOpen={reportMessageId !== null}
         onClose={() => setReportMessageId(null)}
         messageId={reportMessageId || undefined}
+        sessionId={sessionId}
       />
     </ChatPageShell>
   );
