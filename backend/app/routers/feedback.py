@@ -65,7 +65,7 @@ async def create_feedback(
             message = (
                 db.query(Message)
                 .filter(Message.session_id == feedback_data.session_id)
-                .order_by(Message.id.desc())
+                .order_by(Message.created_at.desc())
                 .first()
             )
 

@@ -15,7 +15,7 @@ export default function CitationChip({ citation, onClick, variant = 'default' }:
   const reducedMotion = useReducedMotion();
 
   const formatCitation = () => {
-    return `${citation.book}, Volume ${citation.page || 'N/A'} : Page ${citation.page || 'N/A'}`;
+    return `${citation.book} : Page ${citation.page ?? 'N/A'}`;
   };
 
   const chipVariants = reducedMotion

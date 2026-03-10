@@ -189,5 +189,10 @@ class LLMGenerationService:
 
         choices = data.get("choices", [])
         if choices:
-            return choices[0]["message"]["content"]
+            try:
+                return choices[0]["message"]["content"]
+            except (KeyError, IndexError, TypeError) as exc:
+                raise RuntimeError(
+                    f"Malformed OpenAI-compatible response: {exc}"
+                ) from exc
         raise RuntimeError("No choices in OpenAI-compatible response")

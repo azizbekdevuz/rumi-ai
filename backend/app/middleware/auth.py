@@ -55,7 +55,7 @@ async def get_current_user(
     ).first()
     
     if not user:
-        raise RuntimeError("Guest user creation race failed")
+        raise HTTPException(status_code=401, detail="User not found or has been deleted")
     
     return user
 

@@ -1,10 +1,9 @@
 """
 Request validation middleware for API Gateway.
 """
-from fastapi import Request, HTTPException
+from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse
-import json
 
 
 async def request_validator_middleware(request: Request, call_next):
@@ -14,9 +13,15 @@ async def request_validator_middleware(request: Request, call_next):
         content_type = request.headers.get("content-type", "")
         if "application/json" not in content_type and "multipart/form-data" not in content_type:
             if request.url.path not in ["/docs", "/openapi.json"]:
-                raise HTTPException(
+                return JSONResponse(
                     status_code=415,
-                    detail="Unsupported Media Type. Expected application/json or multipart/form-data"
+                    content={
+                        "error": {
+                            "code": "UNSUPPORTED_MEDIA_TYPE",
+                            "message": "Unsupported Media Type. Expected application/json or multipart/form-data",
+                            "details": {}
+                        }
+                    }
                 )
     
     # Check request size (basic validation)
@@ -26,9 +31,15 @@ async def request_validator_middleware(request: Request, call_next):
             size = int(content_length)
             max_size = 10 * 1024 * 1024  # 10MB
             if size > max_size:
-                raise HTTPException(
+                return JSONResponse(
                     status_code=413,
-                    detail=f"Request entity too large. Maximum size is {max_size} bytes"
+                    content={
+                        "error": {
+                            "code": "REQUEST_TOO_LARGE",
+                            "message": f"Request entity too large. Maximum size is {max_size} bytes",
+                            "details": {}
+                        }
+                    }
                 )
         except ValueError:
             pass
