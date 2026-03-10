@@ -38,7 +38,7 @@ describe('chat/stream route status passthrough', () => {
       }),
     });
 
-    const res = await POST(req as any);
+    const res = await POST(req as unknown as Parameters<typeof POST>[0]);
     expect(res.status).toBe(401);
     const json = await res.json();
     expect(json.message).toBe('Unauthorized');
@@ -65,7 +65,7 @@ describe('chat/stream route status passthrough', () => {
       }),
     });
 
-    const res = await POST(req as any);
+    const res = await POST(req as unknown as Parameters<typeof POST>[0]);
     expect(res.status).toBe(429);
     const json = await res.json();
     expect(json.message).toContain('Rate limit');

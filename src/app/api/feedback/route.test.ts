@@ -36,7 +36,7 @@ describe('feedback API route', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    await POST(req as any);
+    await POST(req as unknown as Parameters<typeof POST>[0]);
 
     expect(mockFetch).toHaveBeenCalledWith(
       expect.any(String),
@@ -65,7 +65,7 @@ describe('feedback API route', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    await POST(req as any);
+    await POST(req as unknown as Parameters<typeof POST>[0]);
 
     const sentBody = JSON.parse(mockFetch.mock.calls[0][1].body);
     expect(sentBody.message_id).toBe(messageId);
@@ -84,7 +84,7 @@ describe('feedback API route', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    await POST(req as any);
+    await POST(req as unknown as Parameters<typeof POST>[0]);
 
     const sentBody = JSON.parse(mockFetch.mock.calls[0][1].body);
     expect(sentBody.session_id).toBeNull();
