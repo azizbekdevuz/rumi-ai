@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
     if (!backendResponse.ok) {
       const errorMessage = await parseBackendError(backendResponse);
       console.log('[BFF Chat] Backend error:', errorMessage);
-      return jsonError(errorMessage, 502);
+      return jsonError(errorMessage, backendResponse.status);
     }
 
     // Parse backend response

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { ChatRequest, HistoryTurn } from '../../../../types/chat';
-import { jsonError } from '@/lib/api/bff';
+import { jsonError, parseBackendError } from '@/lib/api/bff';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
 export const runtime = 'nodejs';
@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
     });
 
     if (!backendResponse.ok) {
-      return jsonError('Backend streaming failed', 502);
+      const errorMessage = await parseBackendError(backendResponse);
+      return jsonError(errorMessage, backendResponse.status);
     }
 
     // Return streaming response
