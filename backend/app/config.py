@@ -78,7 +78,7 @@ class Settings(BaseSettings):
 
     # RAG / Ollama embedding configuration
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    EMBED_MODEL: str = "nomic-embed-text:latest"
+    EMBED_MODEL: str = "nomic-embed-text-v2-moe:latest"
     BOOK_VERSE_DIR: str = ""
     
     # Kakao OAuth Configuration
