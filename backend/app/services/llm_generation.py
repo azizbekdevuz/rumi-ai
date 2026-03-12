@@ -144,8 +144,8 @@ class LLMGenerationService:
             payload = {
                 "model": self.model,
                 "messages": messages,
-                "temperature": 0.7,
-                "max_tokens": 1000,
+                "temperature": 0.5, # lower for strict mode (less creative, more accurate) and higher for creative mode (more creative, less accurate)
+                "max_tokens": 1000, # max number of tokens in the response
             }
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
