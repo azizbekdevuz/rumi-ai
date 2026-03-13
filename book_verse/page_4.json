@@ -1,0 +1,279 @@
+{
+  "page": 4,
+  "lines": [
+    {
+      "text": "۱ ۳ ۵۹ ۲ ۳ ی ۲ ۳ ۲ ۱ * دنرز ۹ ۱ ۰ ۰ ۰",
+      "bbox": [
+        165,
+        0,
+        2226,
+        48
+      ],
+      "lang": "fas",
+      "verse": 1
+    },
+    {
+      "text": "۱ ۱ ۱ ۱ ۳۲",
+      "bbox": [
+        237,
+        57,
+        2088,
+        50
+      ],
+      "lang": "fas",
+      "verse": 1
+    },
+    {
+      "text": "۱ ۰, ۱",
+      "bbox": [
+        54,
+        115,
+        1978,
+        16
+      ],
+      "lang": "fas",
+      "verse": 2
+    },
+    {
+      "text": "۱ \" ۹",
+      "bbox": [
+        110,
+        336,
+        1298,
+        29
+      ],
+      "lang": "fas",
+      "verse": 3
+    },
+    {
+      "text": "۱ ۳",
+      "bbox": [
+        40,
+        367,
+        1307,
+        11
+      ],
+      "lang": "fas",
+      "verse": 3
+    },
+    {
+      "text": "۱ ۱ ۱ ۱ / ۱",
+      "bbox": [
+        57,
+        744,
+        1867,
+        40
+      ],
+      "lang": "fas",
+      "verse": 4
+    },
+    {
+      "text": ",",
+      "bbox": [
+        32,
+        911,
+        12,
+        22
+      ],
+      "lang": "fas",
+      "verse": 5
+    },
+    {
+      "text": "۲ ۶",
+      "bbox": [
+        1542,
+        1021,
+        526,
+        15
+      ],
+      "lang": "fas",
+      "verse": 5
+    },
+    {
+      "text": "۰ ۲ ۱ ۰ ۱ ۰",
+      "bbox": [
+        155,
+        1715,
+        1880,
+        45
+      ],
+      "lang": "fas",
+      "verse": 6
+    },
+    {
+      "text": ", ۱ / ۵ ۱ ۱ ۱ ۱",
+      "bbox": [
+        17,
+        1801,
+        2344,
+        57
+      ],
+      "lang": "fas",
+      "verse": 6
+    },
+    {
+      "text": "۱ ۱ ۳ ۱ ۱ ۳",
+      "bbox": [
+        278,
+        1872,
+        1689,
+        54
+      ],
+      "lang": "fas",
+      "verse": 7
+    },
+    {
+      "text": "۱ ۱ نک ۸",
+      "bbox": [
+        100,
+        2308,
+        2108,
+        41
+      ],
+      "lang": "fas",
+      "verse": 8
+    },
+    {
+      "text": "۲ ۱, ۳",
+      "bbox": [
+        310,
+        2387,
+        1937,
+        38
+      ],
+      "lang": "fas",
+      "verse": 8
+    },
+    {
+      "text": "۱, تسس ۶ / ۰ ۳۹ ۰ ۱ ۳ مب ۱",
+      "bbox": [
+        266,
+        2789,
+        2177,
+        111
+      ],
+      "lang": "fas",
+      "verse": 9
+    },
+    {
+      "text": "۰ ذداری به اسان میقات",
+      "bbox": [
+        287,
+        2789,
+        1417,
+        149
+      ],
+      "lang": "fas",
+      "verse": 9
+    },
+    {
+      "text": "۱ هه",
+      "bbox": [
+        920,
+        2909,
+        1494,
+        25
+      ],
+      "lang": "fas",
+      "verse": 10
+    },
+    {
+      "text": "۱",
+      "bbox": [
+        1444,
+        3233,
+        3,
+        12
+      ],
+      "lang": "fas",
+      "verse": 11
+    },
+    {
+      "text": ", ۳ ۰",
+      "bbox": [
+        320,
+        3245,
+        1233,
+        23
+      ],
+      "lang": "fas",
+      "verse": 11
+    },
+    {
+      "text": "۱ ۲ ۱ ۱, ۰ ۰ مد",
+      "bbox": [
+        13,
+        3325,
+        2385,
+        66
+      ],
+      "lang": "fas",
+      "verse": 12
+    },
+    {
+      "text": "۰ ۰ ۵ ۱ ۳ ۰",
+      "bbox": [
+        478,
+        3621,
+        1845,
+        36
+      ],
+      "lang": "fas",
+      "verse": 13
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 1,
+      "translation": "The meaning is in these numbers, which are like seeds."
+    },
+    {
+      "verse_no": 2,
+      "translation": "They are few, but their branches are many."
+    },
+    {
+      "verse_no": 3,
+      "translation": "The number of branches is like the stars."
+    },
+    {
+      "verse_no": 4,
+      "translation": "And the leaves are like the sand of the desert."
+    },
+    {
+      "verse_no": 5,
+      "translation": "This is a metaphor for the vastness of God's creation."
+    },
+    {
+      "verse_no": 6,
+      "translation": "The more you look, the more you see."
+    },
+    {
+      "verse_no": 7,
+      "translation": "The more you understand, the more you realize how little you know."
+    },
+    {
+      "verse_no": 8,
+      "translation": "This is the path to wisdom."
+    },
+    {
+      "verse_no": 9,
+      "translation": "The path is difficult, but the reward is great."
+    },
+    {
+      "verse_no": 10,
+      "translation": "Do not be discouraged."
+    },
+    {
+      "verse_no": 11,
+      "translation": "Keep going, and you will reach your destination."
+    },
+    {
+      "verse_no": 12,
+      "translation": "The destination is a place of peace and enlightenment."
+    },
+    {
+      "verse_no": 13,
+      "translation": "This is the ultimate goal of all seekers."
+    }
+  ]
+}
