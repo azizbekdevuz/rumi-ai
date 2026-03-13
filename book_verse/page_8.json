@@ -1,0 +1,234 @@
+{
+  "page": 8,
+  "lines": [
+    {
+      "text": "۰ فلسفی گو‌ید زمعقو لات دو‌ان عقل از دهلیز می‌نا‌ید \"",
+      "bbox": [
+        525,
+        528,
+        1663,
+        92
+      ],
+      "lang": "fas",
+      "verse": 1
+    },
+    {
+      "text": "فلسفی کو منکر حنا نه است از حوا س انبیا بیگا نه است.. ۳",
+      "bbox": [
+        32,
+        731,
+        2072,
+        92
+      ],
+      "lang": "fas",
+      "verse": 2
+    },
+    {
+      "text": "نطق آب و نطق خال و نطقی‌گل است محسو س حوا س اهل دل.",
+      "bbox": [
+        270,
+        858,
+        1828,
+        99
+      ],
+      "lang": "fas",
+      "verse": 2
+    },
+    {
+      "text": "۱ ۱ ۰ ۱",
+      "bbox": [
+        901,
+        978,
+        1144,
+        50
+      ],
+      "lang": "fas",
+      "verse": 3
+    },
+    {
+      "text": "۱ پیل اندر خا نه‌تا ریک ود عر ضه آورده بود ند‌ش هنود..",
+      "bbox": [
+        172,
+        1088,
+        2051,
+        82
+      ],
+      "lang": "fas",
+      "verse": 3
+    },
+    {
+      "text": "از برا ی-دید نش مرد‌م بسسنی ‏ اند د آن \" ظلمت‌همی شدهر کسی",
+      "bbox": [
+        282,
+        1194,
+        1963,
+        103
+      ],
+      "lang": "fas",
+      "verse": 4
+    },
+    {
+      "text": "۱ دیدنش باچشم چو ن ممکن‌نبود انبر آن تاریکیش کف می‌بسود",
+      "bbox": [
+        283,
+        1308,
+        2078,
+        81
+      ],
+      "lang": "fas",
+      "verse": 4
+    },
+    {
+      "text": "آن یکی را کف به خر طو ۳ او فتاه: ۱",
+      "bbox": [
+        106,
+        1403,
+        1986,
+        82
+      ],
+      "lang": "fas",
+      "verse": 5
+    },
+    {
+      "text": "گفت همچو نا. ودا ن اسب این.",
+      "bbox": [
+        349,
+        1517,
+        1076,
+        92
+      ],
+      "lang": "fas",
+      "verse": 5
+    },
+    {
+      "text": "۱ آن برو چون‌باد بیزن شد پدید",
+      "bbox": [
+        275,
+        1740,
+        1555,
+        121
+      ],
+      "lang": "fas",
+      "verse": 6
+    },
+    {
+      "text": "فیم آ ن می‌کرد هر جا می‌تنید",
+      "bbox": [
+        271,
+        2208,
+        785,
+        77
+      ],
+      "lang": "fas",
+      "verse": 7
+    },
+    {
+      "text": "از نظر که گفت شا ن بدمختلف ۱",
+      "bbox": [
+        510,
+        2277,
+        1563,
+        97
+      ],
+      "lang": "fas",
+      "verse": 7
+    },
+    {
+      "text": "۱ ۱ ان یکی دالش شثقب داد این السف ۱",
+      "bbox": [
+        56,
+        2422,
+        2321,
+        74
+      ],
+      "lang": "fas",
+      "verse": 8
+    },
+    {
+      "text": "در کف هر یک اگر شمعی بدی \" ۱ ۱ ۱",
+      "bbox": [
+        180,
+        2508,
+        1888,
+        88
+      ],
+      "lang": "fas",
+      "verse": 8
+    },
+    {
+      "text": "اختلاف \" از کف شا ن بیرون‌شه‌ی,",
+      "bbox": [
+        74,
+        2615,
+        1264,
+        92
+      ],
+      "lang": "fas",
+      "verse": 9
+    },
+    {
+      "text": "شتا بزده به‌داور ی خواهند نشست‌و خوا هند گفت که جلال الد‌ین",
+      "bbox": [
+        247,
+        2957,
+        1896,
+        81
+      ],
+      "lang": "fas",
+      "verse": 10
+    },
+    {
+      "text": "۱ محمد نمیخوا سته است در کشا شیگره‌های زنده گی ءازخرد» از",
+      "bbox": [
+        423,
+        3048,
+        1970,
+        101
+      ],
+      "lang": "fas",
+      "verse": 10
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 1,
+      "translation": "The philosopher speaks from rational arguments; the intellect emerges from the vestibule (of perception)."
+    },
+    {
+      "verse_no": 2,
+      "translation": "The philosopher who denies the senses is a stranger to the prophets' senses. The speech of water, the speech of the Creator, the speech of the flower is perceived by the senses of the people of the heart."
+    },
+    {
+      "verse_no": 3,
+      "translation": "Hindus had brought an elephant into a dark house for exhibition."
+    },
+    {
+      "verse_no": 4,
+      "translation": "People gathered in the darkness to see it; each person was in distress. Since seeing it with the eye was not possible, each one felt with his hand in that darkness."
+    },
+    {
+      "verse_no": 5,
+      "translation": "The hand of one fell on its trunk; he said, 'This is like a water-pipe (or a snake).'"
+    },
+    {
+      "verse_no": 6,
+      "translation": "The hand of another felt its tail, which was like a broom."
+    },
+    {
+      "verse_no": 7,
+      "translation": "He was weaving and twisting, whatever he felt. They disagreed about its form; each one spoke differently."
+    },
+    {
+      "verse_no": 8,
+      "translation": "One gave its ear to another; he said, 'This is like a fan.' If there had been a lamp in each of their hands..."
+    },
+    {
+      "verse_no": 9,
+      "translation": "Disagreement would have vanished from their hands."
+    },
+    {
+      "verse_no": 10,
+      "translation": "They will sit for judgment and will say that Jalal al-Din Muhammad has not wanted disputes in the struggles of life from intellect."
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "page": 5,
+  "lines": [
+    {
+      "text": "۱ سیما‌ی شکو همند پیر مرد کرباس‌پو شی بر میخو ریم که زرا ندود",
+      "bbox": [
+        206,
+        2780,
+        2235,
+        111
+      ],
+      "lang": "fas",
+      "verse": 1
+    },
+    {
+      "text": "\" ترین چر نیانپا ی‌شعر ما از کار گاه‌اند او بدر آمد. سخن",
+      "bbox": [
+        203,
+        2888,
+        1954,
+        114
+      ],
+      "lang": "fas",
+      "verse": 1
+    },
+    {
+      "text": "در باد ۶ جلال‌الد ین محمد بلخیست که هکل یکی از ستیغ‌ها ی #ندیشه ۱",
+      "bbox": [
+        125,
+        3004,
+        1983,
+        123
+      ],
+      "lang": "fas",
+      "verse": 2
+    },
+    {
+      "text": "فلسفی در چند سبد؛ پسین اورارو می‌بر‌تر خوا‌ند ه است ۰ (",
+      "bbox": [
+        174,
+        3109,
+        1928,
+        141
+      ],
+      "lang": "fas",
+      "verse": 2
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 1,
+      "translation": "The countenance of a proud, aged man, dressed in sackcloth, we accept, for he is not in chains of ignorance. Our poetic journey begins from the workshop; he has come out. The word"
+    },
+    {
+      "verse_no": 2,
+      "translation": "is in the wind. Jalal al-Din Muhammad Balkhi, from the peaks of philosophical thought, in a few baskets; he has called the latter superior."
+    }
+  ]
+}
