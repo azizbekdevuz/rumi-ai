@@ -22,6 +22,20 @@ TEST_EMAIL = f"test_{uuid4().hex[:8]}@example.com"
 TEST_PASSWORD = "testpassword123"
 OAUTH_TEST_EMAIL = f"oauth_test_{uuid4().hex[:8]}@example.com"
 
+# Shown in docs/SQL examples only — must not echo the runtime-generated OAuth test address.
+_OAUTH_SQL_EMAIL_PLACEHOLDER = "YOUR_OAUTH_TEST_EMAIL@example.com"
+
+
+def mask_email(email: str) -> str:
+    """Redact most of the local part for console output (keeps domain for context)."""
+    if "@" not in email:
+        return "***"
+    local, _, domain = email.partition("@")
+    if len(local) <= 2:
+        return f"{'*' * len(local)}@{domain}"
+    return f"{local[0]}{'*' * (len(local) - 2)}{local[-1]}@{domain}"
+
+
 def print_section(title):
     print(f"\n{'='*60}")
     print(f"  {title}")
@@ -89,10 +103,11 @@ def test_oauth_user_rejection():
     print_section("Test 4: OAuth User Password Login Rejection")
     
     print("⚠️  This test requires manual setup:")
-    print("   1. Create an OAuth user in database:")
-    print(f"      INSERT INTO users (id, email, password_hash, provider, provider_user_id, is_guest, is_deleted)")
-    print(f"      VALUES (gen_random_uuid(), '{OAUTH_TEST_EMAIL}', NULL, 'kakao', 'kakao_12345', false, false);")
-    print(f"   2. Then run this test with email: {OAUTH_TEST_EMAIL}")
+    print("   1. Create an OAuth user in database (replace the email placeholder):")
+    print("      INSERT INTO users (id, email, password_hash, provider, provider_user_id, is_guest, is_deleted)")
+    print(f"      VALUES (gen_random_uuid(), '{_OAUTH_SQL_EMAIL_PLACEHOLDER}', NULL, 'kakao', 'kakao_12345', false, false);")
+    print("   2. Set that INSERT email equal to OAUTH_TEST_EMAIL in this file, then run the script again")
+    print("      (login uses OAUTH_TEST_EMAIL internally; it is not printed here).")
     
     # Try to login with OAuth user (will fail if user doesn't exist, that's OK)
     response = requests.post(
@@ -120,7 +135,7 @@ def main():
     print("OAuth Prerequisite Verification Script")
     print("=" * 60)
     print(f"Backend URL: {BACKEND_URL}")
-    print(f"Test Email: {TEST_EMAIL}")
+    print(f"Test Email: {mask_email(TEST_EMAIL)}")
     
     results = []
     
