@@ -35,6 +35,15 @@ def _sse_event(payload: dict) -> str:
     return f"data: {json.dumps(payload, default=str)}\n\n"
 
 
+# Client-visible SSE errors must never include exception text, tracebacks, or paths.
+_SSE_INTERNAL_ERROR_CLIENT_MESSAGE = "An internal error occurred. Please try again."
+
+
+def _sse_error_event(client_safe_message: str) -> str:
+    """Build one SSE `data:` line for type=error with a non-sensitive *client_safe_message*."""
+    return _sse_event({"type": "error", "message": client_safe_message})
+
+
 async def stream_chat_response(
     user_message: str,
     language: str,
@@ -170,14 +179,11 @@ async def stream_chat_response(
             _LLM_TIMEOUT_SECONDS,
             session_id,
         )
-        yield _sse_event({
-            "type": "error",
-            "message": "Response timed out. Please try again.",
-        })
+        yield _sse_error_event("Response timed out. Please try again.")
 
     except Exception as exc:
         logger.error("Stream chat error: %s", exc, exc_info=True)
-        yield _sse_event({"type": "error", "message": str(exc)})
+        yield _sse_error_event(_SSE_INTERNAL_ERROR_CLIENT_MESSAGE)
 
 
 @router.post("/stream")
@@ -238,7 +244,8 @@ async def chat_stream(
         logger.error("Stream endpoint error: %s", exc, exc_info=True)
 
         async def error_stream():
-            yield _sse_event({"type": "error", "message": str(exc)})
+            # Fixed message only — do not close over *exc* or leak internal details to the client.
+            yield _sse_error_event(_SSE_INTERNAL_ERROR_CLIENT_MESSAGE)
 
         return StreamingResponse(
             error_stream(),
