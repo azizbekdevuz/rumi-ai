@@ -20,7 +20,7 @@ python-dotenv = "^0.18.0"
 alembic = "^1.7.1"
 celery = {extras = ["redis"], version = "^5.1.2"}
 requests = "^2.26.0"
-Pillow = "^10.3.0"
+Pillow = "^12.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.4"
