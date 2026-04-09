@@ -1,6 +1,7 @@
 /**
  * Regression test: chat (non-streaming) passes through backend status instead of 502.
  */
+import type { NextRequest } from 'next/server';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockFetch = vi.fn();
@@ -35,7 +36,7 @@ describe('chat route status passthrough', () => {
       }),
     });
 
-    const res = await POST(req as any);
+    const res = await POST(req as unknown as NextRequest);
     expect(res.status).toBe(401);
     const json = await res.json();
     expect(json.message).toBe('Unauthorized');

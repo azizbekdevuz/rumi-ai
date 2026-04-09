@@ -6,7 +6,7 @@
     "dev": "next dev -p 3003",
     "build": "next build",
     "start": "next start -p 3003",
-    "lint": "eslint .",
+    "lint": "eslint",
     "test": "vitest run",
     "unused": "next-unused",
     "knip": "knip"
@@ -15,7 +15,7 @@
     "@fontsource/vazirmatn": "^5.2.8",
     "framer-motion": "^12.29.0",
     "lucide-react": "^0.562.0",
-    "next": "16.1.2",
+    "next": "16.2.2",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
@@ -31,13 +31,14 @@
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.1.2",
+    "eslint-config-next": "16.2.2",
     "jsdom": "^28.1.0",
     "knip": "^5.82.1",
     "next-unused": "^0.0.6",
     "postcss": "^8.5.6",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vite": "^8.0.5",
     "vitest": "^4.0.18"
   },
   "packageManager": "pnpm@10.15.0+sha512.486ebc259d3e999a4e8691ce03b5cac4a71cbeca39372a9b762cb500cfdf0873e2cb16abe3d951b1ee2cf012503f027b98b6584e4df22524e0c7450d9ec7aa7b"
