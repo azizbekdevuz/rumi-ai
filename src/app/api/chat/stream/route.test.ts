@@ -2,6 +2,7 @@
  * Regression test: chat/stream passes through backend status (401/429) instead of 502.
  * Mocks fetch to simulate backend responses.
  */
+import type { NextRequest } from 'next/server';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock fetch before importing the route (which uses fetch)
@@ -38,7 +39,7 @@ describe('chat/stream route status passthrough', () => {
       }),
     });
 
-    const res = await POST(req as any);
+    const res = await POST(req as unknown as NextRequest);
     expect(res.status).toBe(401);
     const json = await res.json();
     expect(json.message).toBe('Unauthorized');
@@ -65,7 +66,7 @@ describe('chat/stream route status passthrough', () => {
       }),
     });
 
-    const res = await POST(req as any);
+    const res = await POST(req as unknown as NextRequest);
     expect(res.status).toBe(429);
     const json = await res.json();
     expect(json.message).toContain('Rate limit');
