@@ -16,6 +16,8 @@ import logging
 import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import re
+from collections import defaultdict
 
 import numpy as np
 import httpx
@@ -152,6 +154,15 @@ class RAGService:
 
     # ── Private: document loading ─────────────────────────────────
 
+    def clean_text(self, text: str) -> str:
+        if not text:
+            return ""
+        
+        text = re.sub(r"[\u200c\u200d\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069]", "", text)
+        text = re.sub(r"\s+", " ", text)
+
+        return text.strip()
+
     def _load_documents(self) -> None:
         """Load text chunks from book_verse/page_*.json files."""
         verse_dir = Path(self._book_verse_dir)
@@ -165,23 +176,47 @@ class RAGService:
             try:
                 with open(jf, encoding="utf-8") as fh:
                     data = json.load(fh)
+
                 page_num = data.get("page", 0)
-                for line in data.get("lines", []):
-                    text = line.get("text", "").strip()
+                book_num = data.get("book")
+                lines = data.get("lines", [])
+
+                grouped = defaultdict(list)
+                meta = {}
+                for line in lines:
+                    raw_text = line.get("text", "")
+                    text = self.clean_text(raw_text)
                     if len(text) < 5:
                         continue
-                    self.documents.append({
-                        "text": text,
-                        "page": page_num,
-                        "lang": line.get("lang", "fas"),
-                        "bbox": line.get("bbox"),
-                        "source_file": jf.name,
-                    })
+                    
+                    chapter = line.get("chapter")
+                    verse = line.get("verse")
+                    lang = line.get("lang", "fas")
+                    key= (chapter,verse)
+
+                    grouped[key].append(text)
+                    if key not in meta:
+                        meta[key] = {
+                            "chapter": chapter,
+                            "verse": verse,
+                            "book": line.get("book", book_num),
+                            "page": page_num,
+                            "lang": lang,
+                            "soucrce_file": jf.name,
+                        }
+                for key, text_parts in grouped.items():
+                    full_text = self.clean_text(" ".join(text_parts))
+                    if len(full_text) < 5:
+                        continue
+                    item = {
+                        "text": full_text,
+                        **meta[key],
+                    }
+                    self.documents.append(item)
             except Exception as exc:
                 logger.error("Failed to read %s: %s", jf, exc)
 
         logger.info("Loaded %d text chunks from book_verse", len(self.documents))
-
     # ── Private: embedding ────────────────────────────────────────
 
     def _embed_texts(self, texts: List[str]) -> np.ndarray:
