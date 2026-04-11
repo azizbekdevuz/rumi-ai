@@ -192,7 +192,7 @@ class RAGService:
                     chapter = line.get("chapter")
                     verse = line.get("verse")
                     lang = line.get("lang", "fas")
-                    key= (chapter,verse)
+                    key= (chapter, verse)
 
                     grouped[key].append(text)
                     if key not in meta:
@@ -202,7 +202,7 @@ class RAGService:
                             "book": line.get("book", book_num),
                             "page": page_num,
                             "lang": lang,
-                            "soucrce_file": jf.name,
+                            "source_file": jf.name,
                         }
                 for key, text_parts in grouped.items():
                     full_text = self.clean_text(" ".join(text_parts))
