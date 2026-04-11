@@ -1,0 +1,211 @@
+{
+  "page": 15,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "قدپا. برپایشمقدمه‌های ذمنی‌استوارباشد. دا نش تازه یی چد ید نمیسم: ‏ ۷",
+      "bbox": [
+        66,
+        542,
+        2077,
+        125
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 101,
+      "book": 1
+    },
+    {
+      "text": ". این \" با‌ند اسلو ب کاو شنبا ی علمی زا ذگر گوان: سا خت",
+      "bbox": [
+        242,
+        661,
+        1968,
+        126
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 101,
+      "book": 1
+    },
+    {
+      "text": "وله تجر به ولشا هد ه وا ستقراعگرا بید: او هیگقت. ‏",
+      "bbox": [
+        474,
+        783,
+        1712,
+        100
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 102,
+      "book": 1
+    },
+    {
+      "text": ".۰۰ «این انبواه نو شته‌های علوم‌ید ابا میناز ند چه پوشننا بی‌بر تب و",
+      "bbox": [
+        0,
+        880,
+        2424,
+        149
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 102,
+      "book": 1
+    },
+    {
+      "text": "تنواعی آجزادر شنیو ۶ نگار‌ش وآو رد‌ان متا لبا و شوااقد به تال ار",
+      "bbox": [
+        17,
+        1242,
+        2135,
+        130
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 103,
+      "book": 1
+    },
+    {
+      "text": "پی در عین خاال پیو‌ند هایمکا الیکی میان.. ‏",
+      "bbox": [
+        28,
+        1470,
+        1739,
+        133
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 104,
+      "book": 1
+    },
+    {
+      "text": "دید هو دز نظر‌گر فتن یف مکانیز گد که رابظه. ‏ ۷",
+      "bbox": [
+        47,
+        1577,
+        2112,
+        128
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 104,
+      "book": 1
+    },
+    {
+      "text": "هنای دژوانی. آن آنرا بطه ها‌ی مکانیکیشت",
+      "bbox": [
+        950,
+        1699,
+        1210,
+        109
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 105,
+      "book": 1
+    },
+    {
+      "text": "\" و همگا م است > و لی با لش نیروها ی ساز تدم ش پیکازهای.۰",
+      "bbox": [
+        7,
+        1816,
+        2182,
+        130
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 105,
+      "book": 1
+    },
+    {
+      "text": "عی درااین روش پحث را پابیا ن امور وا. قع یا اند. یشه هاایی",
+      "bbox": [
+        234,
+        2413,
+        1714,
+        130
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 106,
+      "book": 1
+    },
+    {
+      "text": ". آغااز می‌کند». که شود سرا رابه‌تلا منبابا مقضود. خویشن ‏",
+      "bbox": [
+        242,
+        2532,
+        1975,
+        131
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 106,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 101,
+      "translation": "The footsteps are established on the ground. New knowledge does not come. This is the scientific basis of observation and contemplation, construction."
+    },
+    {
+      "verse_no": 102,
+      "translation": "And by experience and observation, and by deduction, is the acquired knowledge? They did not write these acquired sciences. What is hidden is revealed."
+    },
+    {
+      "verse_no": 103,
+      "translation": "The author has brought examples of writing and research, and evidence for the purpose of debate."
+    },
+    {
+      "verse_no": 104,
+      "translation": "And in the midst of this, the mechanical connections between them are seen. Considering the mechanism that relates."
+    },
+    {
+      "verse_no": 105,
+      "translation": "These mechanical relationships are the same. But by the forces of nature, the structures."
+    },
+    {
+      "verse_no": 106,
+      "translation": "Thus, in this method, the discussion begins with reality or ideas. That which leads to the purpose of the self."
+    }
+  ]
+}

@@ -1,5 +1,26 @@
 {
   "page": 7,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    }
+  ],
   "lines": [
     {
       "text": "گذاری به نیستان میقا ت با و",
@@ -10,7 +31,11 @@
         134
       ],
       "lang": "fas",
-      "verse": 1
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 17,
+      "book": 1
     },
     {
       "text": "ما گدا یا ن کور و لال‌که بر سرگنجینة گرا اند یشه‌ای..",
@@ -21,7 +46,11 @@
         117
       ],
       "lang": "fas",
-      "verse": 2
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 18,
+      "book": 1
     },
     {
       "text": "ابری از اقصا‌ی مغر پ فراز آیدو خشکستا ن اند یشة ما زا سیراب ۱",
@@ -32,7 +61,11 @@
         124
       ],
       "lang": "fas",
-      "verse": 3
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 19,
+      "book": 1
     },
     {
       "text": "سازد بی انکه به اصا لت آزادی‌و آزاد‌ی اصیل دد قلمر و پژو هش ۱",
@@ -43,7 +76,11 @@
         120
       ],
       "lang": "fas",
-      "verse": 3
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 19,
+      "book": 1
     },
     {
       "text": ". های علمی واد بی و برابر ی‌شعوری‌خود با غر ب و غر بیان باورمند. ۰.",
@@ -54,7 +91,11 @@
         85
       ],
       "lang": "fas",
-      "verse": 4
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 20,
+      "book": 1
     },
     {
       "text": "با شیم پژو هند هگا ن چند کشوردیکر هم اگر چه در گفتار یا به پیش",
@@ -65,7 +106,11 @@
         100
       ],
       "lang": "fas",
-      "verse": 4
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 20,
+      "book": 1
     },
     {
       "text": "\" یا عقب نازاند ن‌محمل تارخ‌دمسازکر ی ند اد‌ند. جلالا لدین محید ۰",
@@ -76,7 +121,11 @@
         137
       ],
       "lang": "fas",
-      "verse": 5
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 21,
+      "book": 1
     },
     {
       "text": "\" را از جا یگا ه خا ص تاریخی او بایک طی زما ن دیا لکتیکی فرو ترمی",
@@ -87,7 +136,11 @@
         76
       ],
       "lang": "fas",
-      "verse": 5
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 21,
+      "book": 1
     },
     {
       "text": "آرند وتامرزیاور مندی به‌مس‌اده‌کرا بی جد لی میر سا نند.",
@@ -98,7 +151,11 @@
         96
       ],
       "lang": "fas",
-      "verse": 6
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 22,
+      "book": 1
     },
     {
       "text": "۱ «در این میا ن ما رو شنفکر ان ار خود بیکا ثة ایسم» زده که همواره ۱ ۱ ۱",
@@ -109,7 +166,11 @@
         128
       ],
       "lang": "fas",
-      "verse": 6
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 22,
+      "book": 1
     },
     {
       "text": "ر که‌ها ی برجستة جیا نبینی‌ما را مبا حث وا پسین کتا یی که.",
@@ -120,7 +181,11 @@
         102
       ],
       "lang": "fas",
-      "verse": 7
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 23,
+      "book": 1
     },
     {
       "text": "۰ خوا‌ند» میسا زد در شتاخت جلال الد‌ین هحمد. و بزرگا ن دیگری ۱",
@@ -131,7 +196,11 @@
         102
       ],
       "lang": "fas",
-      "verse": 7
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 23,
+      "book": 1
     },
     {
       "text": ". از این دسشت بر سرچند را هی‌قرارمیگر یمی به‌دشواریپای ناکرانمندی.",
@@ -142,7 +211,11 @@
         100
       ],
       "lang": "fas",
-      "verse": 8
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 24,
+      "book": 1
     },
     {
       "text": "بر میخو ریم. چه‌بسا که گرو هسی‌از ما بر آآن با شند که.",
@@ -153,7 +226,11 @@
         119
       ],
       "lang": "fas",
-      "verse": 8
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 24,
+      "book": 1
     },
     {
       "text": ". تاریخ با نفی همه ار ز شببا ومیرا ثبای فر هنکی کبنی به پیشسس",
@@ -164,7 +241,11 @@
         117
       ],
       "lang": "fas",
-      "verse": 9
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 25,
+      "book": 1
     },
     {
       "text": "میشتا بد واز این چشم‌انداز: جلال‌الدین محمد و نا مورا ن و فرزا نه",
@@ -175,7 +256,11 @@
         111
       ],
       "lang": "fas",
-      "verse": 9
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 25,
+      "book": 1
     },
     {
       "text": "گان هما نند او. را مر تجمءتاریک‌اند ش ۰ خ و د ستیزو یاوه سرا",
@@ -186,7 +271,11 @@
         94
       ],
       "lang": "fas",
-      "verse": 10
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 26,
+      "book": 1
     },
     {
       "text": "این گرو ه هنگا میکه در مثنو ی‌به این گو نه‌اند پشه هابرمیخورند:...",
@@ -197,7 +286,11 @@
         111
       ],
       "lang": "fas",
-      "verse": 11
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 27,
+      "book": 1
     },
     {
       "text": "با ۱ ۱ ۱ ۱",
@@ -208,56 +301,60 @@
         49
       ],
       "lang": "fas",
-      "verse": 12
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 28,
+      "book": 1
     }
   ],
   "translations": [
     {
-      "verse_no": 1,
-      "translation": "A reed was I, and I was plucked from the reed bed;"
+      "verse_no": 17,
+      "translation": "A reed from the Nile, a place of singing"
     },
     {
-      "verse_no": 2,
-      "translation": "My cries since then have been mixed with the cries of men and women."
+      "verse_no": 18,
+      "translation": "We are like beggars, blind and mute, who sit upon a treasure of ideas."
     },
     {
-      "verse_no": 3,
-      "translation": "A cloud from the farthest reaches of the north rises, and quenches the drought of our thought, without affecting the authenticity of freedom and genuine freedom, the realm of research."
+      "verse_no": 19,
+      "translation": "A cloud from the farthest west rises and waters our dry land of ideas, without needing the origin of freedom and true freedom to pen the domain of research."
     },
     {
-      "verse_no": 4,
-      "translation": "Scientific and literary knowledge, and equality of consciousness with the West and believers in its principles. We should be researchers from several other countries, though in speech or in advance."
+      "verse_no": 20,
+      "translation": "Let us be scholars and men of letters and equal in consciousness with the western and eastern believers."
     },
     {
-      "verse_no": 5,
-      "translation": "They may claim to be in line with history. Jalal al-Din Muhammad, from his special historical position, is reduced by a dialectical passage of time."
+      "verse_no": 21,
+      "translation": "They have presented the 'pride of historical narratives' by creating a dialogue with a dialectical passage of time, lowering him from his special historical position."
     },
     {
-      "verse_no": 6,
-      "translation": "And they bring it to the battlefield of a rug. In the meantime, we have considered ourselves to be the \"thinkers of the era,\" who always"
+      "verse_no": 22,
+      "translation": "And they bring us to the brink of a conversation. In the meantime, we intellectuals have made ourselves idle, always looking for the prominent figures on our side."
     },
     {
-      "verse_no": 7,
-      "translation": "The prominent figures of our time are facing backward discussions in the books they read. Jalal al-Din Muhammad and other great ones."
+      "verse_no": 23,
+      "translation": "In the final discussions of the book, the book which he read, in recognizing Jalal al-Din Muhammad and other great men."
     },
     {
-      "verse_no": 8,
-      "translation": "We arrive at a crossroads with great difficulty. We encounter the boundless. Perhaps a group of us will be there."
+      "verse_no": 24,
+      "translation": "We stand at a crossroads with difficulty, and encounter the boundless. Perhaps a group of us will be on that path."
     },
     {
-      "verse_no": 9,
-      "translation": "History progresses by negating all values and cultural heritage. From this perspective: Jalal al-Din Muhammad and the famous and wise."
+      "verse_no": 25,
+      "translation": "History progresses by negating all values and cultural heritage, and from this perspective, Jalal al-Din Muhammad and the wise and intelligent like him."
     },
     {
-      "verse_no": 10,
-      "translation": "Those like him are a collection of dark thoughts and self-inflicted, nonsensical."
+      "verse_no": 26,
+      "translation": "Are a gathering of dark thoughts, self-contention, and nonsensical chatter."
     },
     {
-      "verse_no": 11,
-      "translation": "This group, when they encounter such thoughts in the Masnavi..."
+      "verse_no": 27,
+      "translation": "This group, when they encounter such ideas in the Masnavi..."
     },
     {
-      "verse_no": 12,
+      "verse_no": 28,
       "translation": ""
     }
   ]

@@ -1,0 +1,291 @@
+{
+  "page": 20,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "۵ ۰ بخ و‌ای هد ۳ یهت + ۰ مه",
+      "bbox": [
+        412,
+        646,
+        1760,
+        39
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 133,
+      "book": 1
+    },
+    {
+      "text": "امیر! آند. او در باز بو طبیعت جا هعه",
+      "bbox": [
+        698,
+        1078,
+        1396,
+        91
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 134,
+      "book": 1
+    },
+    {
+      "text": ",نت نی که هر اکلیت جو-با اب: آن‌می‌کفت دو بار در ایک در. یا نمیتوان",
+      "bbox": [
+        346,
+        1181,
+        1917,
+        94
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 134,
+      "book": 1
+    },
+    {
+      "text": "شتا واری کرد ء میگو یه ایا الم ه دیش",
+      "bbox": [
+        381,
+        1274,
+        1873,
+        83
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 135,
+      "book": 1
+    },
+    {
+      "text": "۱ این جبا ن نو می‌شود دئیا وها اه اس",
+      "bbox": [
+        376,
+        1398,
+        1994,
+        81
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 135,
+      "book": 1
+    },
+    {
+      "text": "بی‌خبر از نو شد ن بقا ۱",
+      "bbox": [
+        767,
+        1505,
+        1382,
+        98
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 136,
+      "book": 1
+    },
+    {
+      "text": "- الد‌ین محمد: ذز تازه همانی‌ضند‌ها که‌پایة وبنیان",
+      "bbox": [
+        693,
+        1830,
+        1554,
+        94
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 137,
+      "book": 1
+    },
+    {
+      "text": "۰ ۳ ۱ ۴ ۰ ۰ ۴۹ ۰ / ۱, ۴ و ۱ ام",
+      "bbox": [
+        375,
+        1939,
+        1754,
+        46
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 137,
+      "book": 1
+    },
+    {
+      "text": "هر‌ین ۳ ۱",
+      "bbox": [
+        1393,
+        2219,
+        755,
+        58
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 138,
+      "book": 1
+    },
+    {
+      "text": "صلح اضداد است عمر‌ای تیان له ارب ۴ ۹",
+      "bbox": [
+        455,
+        2262,
+        1697,
+        116
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 138,
+      "book": 1
+    },
+    {
+      "text": "و ۲ ۱ او ره ۲",
+      "bbox": [
+        457,
+        2272,
+        778,
+        36
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 139,
+      "book": 1
+    },
+    {
+      "text": "۱ لطف حق این شیر را و گور نهد ی؛ شفا. - ۲",
+      "bbox": [
+        45,
+        2490,
+        2323,
+        90
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 140,
+      "book": 1
+    },
+    {
+      "text": "آن دو انبا زا ن گاز اه لا ط",
+      "bbox": [
+        44,
+        2713,
+        2174,
+        91
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 141,
+      "book": 1
+    },
+    {
+      "text": "آن یکی کر پا س ۵ چه مت ری یت ما لو ۱",
+      "bbox": [
+        93,
+        2911,
+        2128,
+        103
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 142,
+      "book": 1
+    },
+    {
+      "text": "بکد ۰ ۹۹ ۱ ۱ ۳",
+      "bbox": [
+        366,
+        3017,
+        1230,
+        63
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 142,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 133,
+      "translation": "O King, the door of Thy benevolence is open, O exalted one!"
+    },
+    {
+      "verse_no": 134,
+      "translation": "O Prince! He is that King who, by the nature of His dominion, is not bound by the temporal world, nor is He anything but the soul of the world. He is like the sun, which is reflected in a mirror; it is not bound to the mirror, nor is the mirror able to confine it."
+    },
+    {
+      "verse_no": 135,
+      "translation": "Is it haste or delay? He says, 'The world is made new, and all the souls are renewed.'"
+    },
+    {
+      "verse_no": 136,
+      "translation": "Unaware of the renewal of existence."
+    },
+    {
+      "verse_no": 137,
+      "translation": "God, the Exalted, says: 'That which is renewed is My decree and My command.'"
+    },
+    {
+      "verse_no": 138,
+      "translation": "The harmony of opposites is the life of the world, O thou who art a seeker of union."
+    },
+    {
+      "verse_no": 139,
+      "translation": "A lover cannot rest from loving."
+    },
+    {
+      "verse_no": 140,
+      "translation": "The grace of God makes this lioness yield, and gives her healing."
+    },
+    {
+      "verse_no": 141,
+      "translation": "That twofold, by means of which the world is made to turn."
+    },
+    {
+      "verse_no": 142,
+      "translation": "One is the moon, the other is the sun, one is the shepherd, the other is the flock, one is the lion, the other is the lamb."
+    }
+  ]
+}

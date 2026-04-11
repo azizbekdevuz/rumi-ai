@@ -1,5 +1,24 @@
 {
   "page": 8,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ]
+    }
+  ],
   "lines": [
     {
       "text": "۰ فلسفی گو‌ید زمعقو لات دو‌ان عقل از دهلیز می‌نا‌ید \"",
@@ -10,7 +29,11 @@
         92
       ],
       "lang": "fas",
-      "verse": 1
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 29,
+      "book": 1
     },
     {
       "text": "فلسفی کو منکر حنا نه است از حوا س انبیا بیگا نه است.. ۳",
@@ -21,7 +44,11 @@
         92
       ],
       "lang": "fas",
-      "verse": 2
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 30,
+      "book": 1
     },
     {
       "text": "نطق آب و نطق خال و نطقی‌گل است محسو س حوا س اهل دل.",
@@ -32,7 +59,11 @@
         99
       ],
       "lang": "fas",
-      "verse": 2
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 30,
+      "book": 1
     },
     {
       "text": "۱ ۱ ۰ ۱",
@@ -43,7 +74,11 @@
         50
       ],
       "lang": "fas",
-      "verse": 3
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 31,
+      "book": 1
     },
     {
       "text": "۱ پیل اندر خا نه‌تا ریک ود عر ضه آورده بود ند‌ش هنود..",
@@ -54,7 +89,11 @@
         82
       ],
       "lang": "fas",
-      "verse": 3
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 31,
+      "book": 1
     },
     {
       "text": "از برا ی-دید نش مرد‌م بسسنی ‏ اند د آن \" ظلمت‌همی شدهر کسی",
@@ -65,7 +104,11 @@
         103
       ],
       "lang": "fas",
-      "verse": 4
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 32,
+      "book": 1
     },
     {
       "text": "۱ دیدنش باچشم چو ن ممکن‌نبود انبر آن تاریکیش کف می‌بسود",
@@ -76,7 +119,11 @@
         81
       ],
       "lang": "fas",
-      "verse": 4
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 32,
+      "book": 1
     },
     {
       "text": "آن یکی را کف به خر طو ۳ او فتاه: ۱",
@@ -87,7 +134,11 @@
         82
       ],
       "lang": "fas",
-      "verse": 5
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 33,
+      "book": 1
     },
     {
       "text": "گفت همچو نا. ودا ن اسب این.",
@@ -98,7 +149,11 @@
         92
       ],
       "lang": "fas",
-      "verse": 5
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 33,
+      "book": 1
     },
     {
       "text": "۱ آن برو چون‌باد بیزن شد پدید",
@@ -109,7 +164,11 @@
         121
       ],
       "lang": "fas",
-      "verse": 6
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 34,
+      "book": 1
     },
     {
       "text": "فیم آ ن می‌کرد هر جا می‌تنید",
@@ -120,7 +179,11 @@
         77
       ],
       "lang": "fas",
-      "verse": 7
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 35,
+      "book": 1
     },
     {
       "text": "از نظر که گفت شا ن بدمختلف ۱",
@@ -131,7 +194,11 @@
         97
       ],
       "lang": "fas",
-      "verse": 7
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 35,
+      "book": 1
     },
     {
       "text": "۱ ۱ ان یکی دالش شثقب داد این السف ۱",
@@ -142,7 +209,11 @@
         74
       ],
       "lang": "fas",
-      "verse": 8
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 36,
+      "book": 1
     },
     {
       "text": "در کف هر یک اگر شمعی بدی \" ۱ ۱ ۱",
@@ -153,7 +224,11 @@
         88
       ],
       "lang": "fas",
-      "verse": 8
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 36,
+      "book": 1
     },
     {
       "text": "اختلاف \" از کف شا ن بیرون‌شه‌ی,",
@@ -164,7 +239,11 @@
         92
       ],
       "lang": "fas",
-      "verse": 9
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 37,
+      "book": 1
     },
     {
       "text": "شتا بزده به‌داور ی خواهند نشست‌و خوا هند گفت که جلال الد‌ین",
@@ -175,7 +254,11 @@
         81
       ],
       "lang": "fas",
-      "verse": 10
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 38,
+      "book": 1
     },
     {
       "text": "۱ محمد نمیخوا سته است در کشا شیگره‌های زنده گی ءازخرد» از",
@@ -186,49 +269,53 @@
         101
       ],
       "lang": "fas",
-      "verse": 10
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 38,
+      "book": 1
     }
   ],
   "translations": [
     {
-      "verse_no": 1,
-      "translation": "The philosopher speaks from rational arguments; the intellect emerges from the vestibule (of perception)."
+      "verse_no": 29,
+      "translation": "The philosopher says, from the logic of the spheres, intellect emanates from the antechamber."
     },
     {
-      "verse_no": 2,
-      "translation": "The philosopher who denies the senses is a stranger to the prophets' senses. The speech of water, the speech of the Creator, the speech of the flower is perceived by the senses of the people of the heart."
+      "verse_no": 30,
+      "translation": "The philosopher who denies the senses is ignorant of the prophets' senses. The speech of water, the speech of the Creator, and the speech of the flower are perceived by the senses of the people of the heart."
     },
     {
-      "verse_no": 3,
-      "translation": "Hindus had brought an elephant into a dark house for exhibition."
+      "verse_no": 31,
+      "translation": "They brought an elephant into a dark house, and the Hindus had displayed it."
     },
     {
-      "verse_no": 4,
-      "translation": "People gathered in the darkness to see it; each person was in distress. Since seeing it with the eye was not possible, each one felt with his hand in that darkness."
+      "verse_no": 32,
+      "translation": "People came to see it, but they were all in the dark. Since seeing it with the eyes was not possible, each one began to grope in the darkness."
     },
     {
-      "verse_no": 5,
-      "translation": "The hand of one fell on its trunk; he said, 'This is like a water-pipe (or a snake).'"
+      "verse_no": 33,
+      "translation": "One person's hand fell on its trunk, and he said, 'This is like a water spout.'"
     },
     {
-      "verse_no": 6,
-      "translation": "The hand of another felt its tail, which was like a broom."
+      "verse_no": 34,
+      "translation": "It appeared to him like a wind-blown fan."
     },
     {
-      "verse_no": 7,
-      "translation": "He was weaving and twisting, whatever he felt. They disagreed about its form; each one spoke differently."
+      "verse_no": 35,
+      "translation": "He would describe it wherever he touched it. From their perspective, they all spoke differently."
     },
     {
-      "verse_no": 8,
-      "translation": "One gave its ear to another; he said, 'This is like a fan.' If there had been a lamp in each of their hands..."
+      "verse_no": 36,
+      "translation": "One person gave its leg a thigh. If there had been a candle in each of their hands..."
     },
     {
-      "verse_no": 9,
-      "translation": "Disagreement would have vanished from their hands."
+      "verse_no": 37,
+      "translation": "The disagreement would have vanished from their hands."
     },
     {
-      "verse_no": 10,
-      "translation": "They will sit for judgment and will say that Jalal al-Din Muhammad has not wanted disputes in the struggles of life from intellect."
+      "verse_no": 38,
+      "translation": "They will hasten to the judge, sit, and say that Jalal al-Din Muhammad did not want the struggles of life from intellect."
     }
   ]
 }
