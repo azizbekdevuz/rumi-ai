@@ -1,0 +1,216 @@
+{
+  "page": 18,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "فلسفی شست و پس از آنکه غز نو پا ن با فلسفه پژو هی. به دطیعفیز:. \"",
+      "bbox": [
+        13,
+        731,
+        2235,
+        143
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 121,
+      "book": 1
+    },
+    {
+      "text": "دوز یرو میگر فت و فرزانهگا ن‌نا مبر دار نی چو ن بحاق",
+      "bbox": [
+        364,
+        1214,
+        1699,
+        112
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 122,
+      "book": 1
+    },
+    {
+      "text": "بیرو نی این دستگا ه‌اند یشه گیرا آما ج انتقاد‌ها ی و نگری.",
+      "bbox": [
+        333,
+        1359,
+        1918,
+        105
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 122,
+      "book": 1
+    },
+    {
+      "text": "۱ سوالمبا ۳ قرار داد که نه او و گرد‌ش ادوعبد معصو می",
+      "bbox": [
+        364,
+        1717,
+        1932,
+        123
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 123,
+      "book": 1
+    },
+    {
+      "text": "توا نستند به آنپا پا سخ گویند.) ۱۷ ‏ ۱ ۱ ۳",
+      "bbox": [
+        107,
+        1845,
+        2148,
+        101
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 123,
+      "book": 1
+    },
+    {
+      "text": "است و بخش دیگر‌ی را و ن و برده گان. ۱ - ۹ ۵ ۳ ۰",
+      "bbox": [
+        41,
+        2460,
+        2221,
+        121
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 124,
+      "book": 1
+    },
+    {
+      "text": "۱ سخن کو تا ه. در روز گاد زنده‌گا نی جلال الد‌ین محمد ۱۳",
+      "bbox": [
+        373,
+        2599,
+        1977,
+        107
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 124,
+      "book": 1
+    },
+    {
+      "text": "میلادی (پا ن لو ژیزم ار سطو یب یکه مد عی بود همه حقا یق راازاحکام,",
+      "bbox": [
+        355,
+        2723,
+        1913,
+        114
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 125,
+      "book": 1
+    },
+    {
+      "text": "کلی ضروری میتوان استخرا ج کرد» هوا خو! ها ن زیاد‌ی شسست. ۱",
+      "bbox": [
+        17,
+        2836,
+        2257,
+        117
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 125,
+      "book": 1
+    },
+    {
+      "text": "۱ و آشکار است که این مپره با زی‌با اصطلا حاات و مقو له‌ها ومفنیو- ۱",
+      "bbox": [
+        89,
+        2942,
+        2288,
+        124
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 126,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱",
+      "bbox": [
+        678,
+        3437,
+        1634,
+        42
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 127,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 121,
+      "translation": "The philosopher washed, and after that, with new effort, he pursued philosophy. He said: 'Oh, a scholar!'"
+    },
+    {
+      "verse_no": 122,
+      "translation": "The wise and nameless, like a scholar, are outside this apparatus of thought. But they are criticized for their objections and criticisms."
+    },
+    {
+      "verse_no": 123,
+      "translation": "He made a contract with me: neither he nor the infallible servant could answer it. (17, 11, 3)"
+    },
+    {
+      "verse_no": 124,
+      "translation": "And others were taken away. -9530/ A short saying. In the days of the life of Jalal al-Din Muhammad 13"
+    },
+    {
+      "verse_no": 125,
+      "translation": "AD (Panlogism, Aristotelianism) claimed that all truths could be extracted from necessary general principles. 'Hawa!' Many went."
+    },
+    {
+      "verse_no": 126,
+      "translation": "And it is clear that this is a game with terms, categories, and meanings."
+    },
+    {
+      "verse_no": 127,
+      "translation": ""
+    }
+  ]
+}

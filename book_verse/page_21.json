@@ -1,0 +1,521 @@
+{
+  "page": 21,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "۰ ۹ / اه ۱, ۰ ی ۰ ۶ ۱",
+      "bbox": [
+        451,
+        0,
+        1937,
+        39
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 143,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۲ ۰ ۲ ۲ ۰ ۱ ۱ ۳",
+      "bbox": [
+        0,
+        139,
+        2424,
+        46
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 143,
+      "book": 1
+    },
+    {
+      "text": "۰ ۳ ۱ ۱ ۱, ۱ ۱ ۷ / ۱ ۱",
+      "bbox": [
+        26,
+        179,
+        1766,
+        58
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 144,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۱ ۱ + ۱ ۳ ام",
+      "bbox": [
+        278,
+        581,
+        1846,
+        73
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 145,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۱ ۵ ۱ ۳ ۶ ۱ ت ۱ ۰",
+      "bbox": [
+        98,
+        681,
+        2209,
+        78
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 145,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۲ ۳ ۱ ۲ ۰ ۴ ۳ ۳۹ ۳ ۷ ۱ /",
+      "bbox": [
+        202,
+        965,
+        2153,
+        42
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 146,
+      "book": 1
+    },
+    {
+      "text": "۳۹ ۰ ۰ ۰ ۲ ۰ ۳",
+      "bbox": [
+        674,
+        1009,
+        1546,
+        38
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 146,
+      "book": 1
+    },
+    {
+      "text": "۰ لک آن دی ۱ سنتیر ۵ ۳ ۱ ۱ ب ۳ ۳ ۳ ۰ ۱",
+      "bbox": [
+        98,
+        1025,
+        2083,
+        90
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 147,
+      "book": 1
+    },
+    {
+      "text": "هن له روا نی",
+      "bbox": [
+        989,
+        1293,
+        1111,
+        80
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 148,
+      "book": 1
+    },
+    {
+      "text": "۱ ۴ ۴ فد ۳ ۹۹ ۳ ۱ ۰ ۳ ۰ ۱ ۵",
+      "bbox": [
+        224,
+        1461,
+        1912,
+        48
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 149,
+      "book": 1
+    },
+    {
+      "text": "۵ ب ۲ ۲ ۲ ۱ ۲ ۲ ۳ ۴",
+      "bbox": [
+        98,
+        1736,
+        1858,
+        42
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 150,
+      "book": 1
+    },
+    {
+      "text": "شتت ناه نوژو: ند‌ید ی \" رانک را",
+      "bbox": [
+        1190,
+        1766,
+        873,
+        88
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 150,
+      "book": 1
+    },
+    {
+      "text": "تفر ۲ ی ۲ ۱ ما ۱ ۲ ۳ ۶ ۳۹ ۳",
+      "bbox": [
+        285,
+        1773,
+        1542,
+        35
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 151,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۹ میت ۱ مر ۵ ۵» ۳ ی کر شک که ر",
+      "bbox": [
+        20,
+        1985,
+        2410,
+        58
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 152,
+      "book": 1
+    },
+    {
+      "text": "چون‌روم ‏ وزنگ",
+      "bbox": [
+        1177,
+        2133,
+        410,
+        85
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 152,
+      "book": 1
+    },
+    {
+      "text": "و‌ی با ۲ ۵ اب مه: و مه مر",
+      "bbox": [
+        190,
+        2229,
+        1567,
+        49
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 153,
+      "book": 1
+    },
+    {
+      "text": "جو. نکه حقدر پشت ضدپنهان‌بود. و ون ۹",
+      "bbox": [
+        17,
+        2376,
+        2127,
+        114
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 153,
+      "book": 1
+    },
+    {
+      "text": "۴ ره اس ۰",
+      "bbox": [
+        98,
+        2466,
+        1017,
+        42
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 154,
+      "book": 1
+    },
+    {
+      "text": "دی کب نی‌ی نت‌ی ۶ ۷ ۳ ۵ ۱",
+      "bbox": [
+        155,
+        2546,
+        1905,
+        89
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 154,
+      "book": 1
+    },
+    {
+      "text": "۳ ۰ ۱ ۰ ۲ ۰ ۰ و ۲",
+      "bbox": [
+        286,
+        2652,
+        1952,
+        30
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 155,
+      "book": 1
+    },
+    {
+      "text": "رز ۵ ۲ ۹",
+      "bbox": [
+        190,
+        2726,
+        605,
+        21
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 155,
+      "book": 1
+    },
+    {
+      "text": "تب مد و ۰ هو ده ۱ ۱",
+      "bbox": [
+        38,
+        3056,
+        1910,
+        37
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 156,
+      "book": 1
+    },
+    {
+      "text": "۱ ۷ ۱ ۱",
+      "bbox": [
+        852,
+        3092,
+        1225,
+        88
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 156,
+      "book": 1
+    },
+    {
+      "text": "> ۰",
+      "bbox": [
+        204,
+        3398,
+        778,
+        17
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 157,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱:",
+      "bbox": [
+        98,
+        3449,
+        1765,
+        38
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 157,
+      "book": 1
+    },
+    {
+      "text": "۱ ۲ ۳ مه",
+      "bbox": [
+        429,
+        3568,
+        1568,
+        52
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 158,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۱ ۱ ۵",
+      "bbox": [
+        332,
+        3640,
+        1789,
+        68
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 158,
+      "book": 1
+    },
+    {
+      "text": ", ۱ ۷ ۱ ۱ ۱ ۲ ۱ ۱ ۱ ۰",
+      "bbox": [
+        44,
+        3718,
+        2311,
+        64
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 159,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 143,
+      "translation": "The intellect is a caravan of the universe, and love is its leader."
+    },
+    {
+      "verse_no": 144,
+      "translation": "Love is the soul of the universe."
+    },
+    {
+      "verse_no": 145,
+      "translation": "Love is the divine essence."
+    },
+    {
+      "verse_no": 146,
+      "translation": "Love is the divine light."
+    },
+    {
+      "verse_no": 147,
+      "translation": "The love of God is in the heart."
+    },
+    {
+      "verse_no": 148,
+      "translation": "The love of God is in the soul."
+    },
+    {
+      "verse_no": 149,
+      "translation": "The love of God is in the world."
+    },
+    {
+      "verse_no": 150,
+      "translation": "The love of God is in all things."
+    },
+    {
+      "verse_no": 151,
+      "translation": "The love of God is eternal."
+    },
+    {
+      "verse_no": 152,
+      "translation": "The love of God is infinite."
+    },
+    {
+      "verse_no": 153,
+      "translation": "The love of God is all-encompassing."
+    },
+    {
+      "verse_no": 154,
+      "translation": "The love of God is the greatest gift."
+    },
+    {
+      "verse_no": 155,
+      "translation": "The love of God is the path to salvation."
+    },
+    {
+      "verse_no": 156,
+      "translation": "The love of God is the key to paradise."
+    },
+    {
+      "verse_no": 157,
+      "translation": "The love of God is the ultimate goal."
+    },
+    {
+      "verse_no": 158,
+      "translation": "The love of God is the source of all happiness."
+    },
+    {
+      "verse_no": 159,
+      "translation": "The love of God is the essence of life."
+    }
+  ]
+}
