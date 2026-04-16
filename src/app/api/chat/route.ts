@@ -155,7 +155,16 @@ export async function POST(request: NextRequest) {
     // Parse backend response
     const backendData = await backendResponse.json();
     console.log('[BFF Chat] Backend response keys:', Object.keys(backendData));
-    console.log('[BFF Chat] Backend advice (first 100 chars):', backendData.advice?.substring(0, 100));
+    {
+      const a = backendData.advice;
+      const advicePreview =
+        typeof a === 'string'
+          ? a.slice(0, 100)
+          : Array.isArray(a)
+            ? `[array len=${a.length}] ${String(a[0] ?? '').slice(0, 80)}`
+            : String(a ?? '').slice(0, 100);
+      console.log('[BFF Chat] Backend advice (preview):', advicePreview);
+    }
 
     // Transform backend response to frontend format
     const frontendResponse = transformResponse(backendData);
