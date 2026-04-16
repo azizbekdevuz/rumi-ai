@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Book, Citation, Verse
 from app.services import prompt_builder
+from app.services.chat_attribution import emit_chat_prompt_attribution
 from app.services.llm_generation import LLMGenerationService
 from app.services.multilingual_generation import MultilingualGenerationService
 
@@ -124,6 +125,11 @@ class ChatService:
                                 "relevance_score": doc.get("score", 0.0),
                                 "_rag_page": doc.get("page"),
                                 "_rag_source": doc.get("source_file", ""),
+                                "_rag_chapter": doc.get("chapter"),
+                                "_rag_verse_num": doc.get("verse"),
+                                "_rag_book_index": doc.get("book"),
+                                "_rag_rank": doc.get("rank"),
+                                "_rag_score": doc.get("score"),
                             }
                             for doc in rag_docs
                         ]
@@ -165,6 +171,18 @@ class ChatService:
             verses=verses_ctx,
             citations=citations_ctx,
             history=history,
+        )
+
+        emit_chat_prompt_attribution(
+            session_id=session_id,
+            user_message=user_message,
+            language=language,
+            source_scope=source_scope,
+            verses_ctx=verses_ctx,
+            citations_ctx=citations_ctx,
+            rag_sourced=rag_sourced,
+            db=self.db,
+            history_turn_count=len(history) if history else 0,
         )
 
         # ── 3. Call LLM ──
