@@ -80,7 +80,7 @@ async def chat(
         if request.history:
             history_dicts = [
                 {"role": h.role, "content": h.content}
-                for h in request.history[-6:]   # bounded window
+                for h in request.history[-4:]   # bounded window (reduces bad-context carryover)
             ]
 
         # ── Delegate to ChatService ──

@@ -95,14 +95,37 @@ class LLMGenerationService:
         Legacy wrapper for callers that still pass a context dict.
         Builds prompts via prompt_builder, then delegates to generate().
         """
-        from app.services.prompt_builder import build_system_prompt, build_user_prompt
+        from app.services.prompt_builder import (
+            build_system_prompt,
+            build_user_prompt,
+            classify_query_response_mode,
+            unclear_user_message,
+        )
 
-        system_prompt = build_system_prompt(language)
+        mode = classify_query_response_mode(user_message)
+        if mode == "unclear":
+            msg = unclear_user_message(language)
+            return {
+                "text": msg,
+                "verse_id": None,
+                "citation_ids": [],
+            }
+
+        verses = context.get("verses", []) or []
+        citations = context.get("citations", []) or []
+        grounded = bool(verses or citations)
+
+        system_prompt = build_system_prompt(
+            language,
+            grounded=grounded,
+            response_mode=mode,
+            context_caution=False,
+        )
         user_prompt = build_user_prompt(
             user_message=user_message,
             language=language,
-            verses=context.get("verses", []),
-            citations=context.get("citations", []),
+            verses=verses,
+            citations=citations,
         )
 
         raw_text = await self.generate(system_prompt, user_prompt, language)
@@ -110,10 +133,10 @@ class LLMGenerationService:
         # Extract IDs from the context that was passed in
         verse_id = None
         citation_ids: list[UUID] = []
-        if context.get("verses"):
-            verse_id = UUID(context["verses"][0]["id"])
-        if context.get("citations"):
-            citation_ids = [UUID(c["id"]) for c in context["citations"]]
+        if verses:
+            verse_id = UUID(verses[0]["id"])
+        if citations:
+            citation_ids = [UUID(c["id"]) for c in citations]
 
         return {
             "text": raw_text,
