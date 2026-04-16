@@ -1,0 +1,231 @@
+{
+  "page": 16,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "چیز با‌ید از مقد ما منطقی منتج‌شود. و لی استد لال. بر کار ۵",
+      "bbox": [
+        34,
+        725,
+        2237,
+        122
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 107,
+      "book": 1
+    },
+    {
+      "text": "با شد پیش می‌رود و هر جا که میلکند با ز میا بستد. روش. فلسفی‌به ۱",
+      "bbox": [
+        58,
+        944,
+        2190,
+        135
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 107,
+      "book": 1
+    },
+    {
+      "text": "جای این شیو ذکار که محکو متفکر بلپو سنا نه واتفا قی است پیر و",
+      "bbox": [
+        217,
+        1064,
+        2033,
+        128
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 108,
+      "book": 1
+    },
+    {
+      "text": "حله پی در مسیر‌ش به حکسسم‌ضرورت منطقی پیمو ده: میشودوید ۳۹",
+      "bbox": [
+        43,
+        1304,
+        2122,
+        109
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 109,
+      "book": 1
+    },
+    {
+      "text": "در,روش استد لال چو ن همواره‌میتوا ن در برا بر هر حچتی نقیض ۱",
+      "bbox": [
+        41,
+        1543,
+        2220,
+        112
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 110,
+      "book": 1
+    },
+    {
+      "text": "آورده + چه پسا که رشتة بحث تا. اید دوام یا بد و لی نتیجه یسبی ۳",
+      "bbox": [
+        35,
+        1642,
+        2092,
+        128
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 110,
+      "book": 1
+    },
+    {
+      "text": ". به دست نیاید (۱۶) ۱",
+      "bbox": [
+        1286,
+        1796,
+        991,
+        72
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 111,
+      "book": 1
+    },
+    {
+      "text": "جپان اکتفا ورز نو نا توانسی‌تجر به گرا یا ن در تعلیل واستنتاج ۱",
+      "bbox": [
+        40,
+        2010,
+        2226,
+        132
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 111,
+      "book": 1
+    },
+    {
+      "text": "مو جپ آن کرد ید که منطقی کاراترو باد وردر بد‌ید آیه … ۰",
+      "bbox": [
+        43,
+        2157,
+        2224,
+        103
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 112,
+      "book": 1
+    },
+    {
+      "text": "است تمثیل و قیا س وا ستقراعو تجربه و تعمیم را پا هم بیا میسزد,",
+      "bbox": [
+        295,
+        2385,
+        1986,
+        138
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 112,
+      "book": 1
+    },
+    {
+      "text": "و با نگیدا شت تنا سب مو جودمیا ن اجزای وا قعیت ۱",
+      "bbox": [
+        53,
+        2510,
+        2217,
+        99
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 113,
+      "book": 1
+    },
+    {
+      "text": "مقو له‌ها را در چا یگا ه خا ص‌منطقی آن یه‌کاد پره.. رب ۱",
+      "bbox": [
+        45,
+        2634,
+        2123,
+        121
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 113,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 107,
+      "translation": "Something must logically result from the premise. But reasoning proceeds by works and wherever it wills, it returns. The philosophical method 1."
+    },
+    {
+      "verse_no": 108,
+      "translation": "Instead of this method of remembrance which is determined by thinking and is accidental, it is old."
+    },
+    {
+      "verse_no": 109,
+      "translation": "The wise man, following the path, has measured the logical necessity of wisdom: 39."
+    },
+    {
+      "verse_no": 110,
+      "translation": "In the method of reasoning, since one can always bring a contradiction against any argument, so that the thread of discussion may continue, but the result 3."
+    },
+    {
+      "verse_no": 111,
+      "translation": "Is not obtained (16) 1 / Do not be satisfied with the human being's inability to learn from experience in reasoning and inference."
+    },
+    {
+      "verse_no": 112,
+      "translation": "It made you logical, but it made you work harder. Analogy, syllogism, induction, experience, and generalization are all together."
+    },
+    {
+      "verse_no": 113,
+      "translation": "And do not neglect the existing proportion between the parts of reality. In its special logical position, the categories are unified. 1."
+    }
+  ]
+}

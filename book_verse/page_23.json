@@ -1,0 +1,211 @@
+{
+  "page": 23,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        170,
+        171,
+        172,
+        173,
+        174,
+        175
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "گلاری به تییتان میا بش ار ار",
+      "bbox": [
+        919,
+        290,
+        1313,
+        134
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 170,
+      "book": 1
+    },
+    {
+      "text": "«بر-‌گر فته.؛ ز مقا له یی به‌همین‌قلم» مر گذصت. رظ سا ۳",
+      "bbox": [
+        50,
+        682,
+        2271,
+        115
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 170,
+      "book": 1
+    },
+    {
+      "text": "...۳۳ ۱۹۷۶ مصهاع ۳۰ لتق ۱",
+      "bbox": [
+        227,
+        923,
+        2140,
+        92
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 171,
+      "book": 1
+    },
+    {
+      "text": "… ۸ ب پر‌گر فته از مقا له نگارندةبه نا مربیا نی» از هرا حل را",
+      "bbox": [
+        33,
+        1248,
+        2300,
+        127
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 171,
+      "book": 1
+    },
+    {
+      "text": "امل منطق» مچلة عر فان ۱۳۶۷۸۱۰ ۱ ۱",
+      "bbox": [
+        363,
+        1372,
+        1981,
+        94
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 172,
+      "book": 1
+    },
+    {
+      "text": "ص ۰ ٫ ۵۸ ۱ ۱ ۳۹۹",
+      "bbox": [
+        4,
+        1702,
+        2326,
+        103
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 172,
+      "book": 1
+    },
+    {
+      "text": "۱۳ طبر‌ی بر خی اند پشه هادر باشمنطق‌نوین ءص ض ۱۸ - ۱۲: ۱",
+      "bbox": [
+        99,
+        2148,
+        2159,
+        97
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 173,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱۳۳ او ۹ ۷ ۱ ۱ ۱ ۵ ۳",
+      "bbox": [
+        4,
+        2377,
+        2429,
+        96
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 173,
+      "book": 1
+    },
+    {
+      "text": "ص ۱ ۱ ۱ ۱",
+      "bbox": [
+        1253,
+        2933,
+        1031,
+        80
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 174,
+      "book": 1
+    },
+    {
+      "text": "۱ ۲ ۱ ۲ ۱ ۷ تک ۱ ۰",
+      "bbox": [
+        36,
+        3469,
+        2227,
+        103
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 175,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۱ ۰ ۱ ۱ ۱ ۱ ۱ ۵",
+      "bbox": [
+        80,
+        3572,
+        2031,
+        82
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 175,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 170,
+      "translation": "Returned from an article by the same pen. Passed by."
+    },
+    {
+      "verse_no": 171,
+      "translation": "Returned from an article by the author, Mr. Bayani. From every solution."
+    },
+    {
+      "verse_no": 172,
+      "translation": "The logic of man, Arfan magazine, 1367."
+    },
+    {
+      "verse_no": 173,
+      "translation": "Tabari, some thoughts and questions in new logic, pp. 12-18."
+    },
+    {
+      "verse_no": 174,
+      "translation": ""
+    },
+    {
+      "verse_no": 175,
+      "translation": ""
+    }
+  ]
+}

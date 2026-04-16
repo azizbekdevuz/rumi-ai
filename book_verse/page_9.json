@@ -1,5 +1,22 @@
 {
   "page": 9,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    }
+  ],
   "lines": [
     {
       "text": "داز بینش, را ز گشای بیره‌جویی کند. لو جپان وپدیس‌ها ی",
@@ -10,7 +27,11 @@
         117
       ],
       "lang": "fas",
-      "verse": 1
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 39,
+      "book": 1
     },
     {
       "text": "بیش نیست و برا‌ی اینکه زودتربه‌قله دا نش رسید با‌ید این بارهای ‏ ۱",
@@ -21,7 +42,11 @@
         121
       ],
       "lang": "fas",
-      "verse": 2
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 40,
+      "book": 1
     },
     {
       "text": "دز هنه زمینه‌ها به خصو ص درزمینه فر هنکک به مقا په مر له",
@@ -32,7 +57,11 @@
         147
       ],
       "lang": "fas",
-      "verse": 3
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 41,
+      "book": 1
     },
     {
       "text": "پیو‌ند,مر حلاتکا مل,وبالنده گی‌با نگپد اشت همه بخشبایانسانی ۱",
@@ -43,7 +72,11 @@
         155
       ],
       "lang": "fas",
-      "verse": 3
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 41,
+      "book": 1
     },
     {
       "text": "زا سر اپا نمیزدا ید بلکه ببره‌های‌شا بسته و پا لودة آنر! به در جة ۱",
@@ -54,7 +87,11 @@
         148
       ],
       "lang": "fas",
-      "verse": 4
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 42,
+      "book": 1
     },
     {
       "text": "\" والا‌تر ی از تکامل و با لنده گسی‌میر سا‌ند ۱ ۱",
@@ -65,7 +102,11 @@
         101
       ],
       "lang": "fas",
-      "verse": 4
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 42,
+      "book": 1
     },
     {
       "text": "پای استد لالیا ن جو بین بود بای چو بین. سخت بی تمکین‌بود ۲",
@@ -76,7 +117,11 @@
         128
       ],
       "lang": "fas",
-      "verse": 5
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 43,
+      "book": 1
     },
     {
       "text": "پیشتلسر مسسورد نکو هش‌و سرزنش گروه‌ی که جز عرامینگرند ۱",
@@ -87,7 +132,11 @@
         139
       ],
       "lang": "fas",
-      "verse": 5
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 43,
+      "book": 1
     },
     {
       "text": "واز دید ن کل چشسم میپو شندءپد ید ه ها را از پرو بز ن انتقاد ۱",
@@ -98,7 +147,11 @@
         109
       ],
       "lang": "fas",
-      "verse": 6
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 44,
+      "book": 1
     },
     {
       "text": "میگذ را نند و لی به ما هیت ندار‌ند. قرار‌گر فته سزاوار",
@@ -109,7 +162,11 @@
         132
       ],
       "lang": "fas",
-      "verse": 6
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 44,
+      "book": 1
     },
     {
       "text": "است نخست ببینیم استدلال جیست. جه سان پدید آمد هداست و سیمای ۱",
@@ -120,7 +177,11 @@
         120
       ],
       "lang": "fas",
-      "verse": 7
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 45,
+      "book": 1
     },
     {
       "text": "۲ ۱",
@@ -131,8 +192,45 @@
         47
       ],
       "lang": "fas",
-      "verse": 8
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 46,
+      "book": 1
     }
   ],
-  "translations": []
+  "translations": [
+    {
+      "verse_no": 39,
+      "translation": "From insight, open the door to seek. Lu Japan and pedestals."
+    },
+    {
+      "verse_no": 40,
+      "translation": "It is not more, and in order to reach the peak of knowledge sooner, these burdens"
+    },
+    {
+      "verse_no": 41,
+      "translation": "in all fields, especially in the field of culture, comparison of stages, completeness and flourishing with all aspects of human existence"
+    },
+    {
+      "verse_no": 42,
+      "translation": "it is not removed from top to bottom, but rather its broken and soiled parts. To a degree higher than evolution and flourishing it reaches."
+    },
+    {
+      "verse_no": 43,
+      "translation": "The stubborn argumentative is a seeker, but very defiant. Bow before the wise and the reproaching group, who do nothing but sin."
+    },
+    {
+      "verse_no": 44,
+      "translation": "And they cover their eyes from seeing the whole. They overlook phenomena through criticism, but they have no essence. It is appropriate to be placed"
+    },
+    {
+      "verse_no": 45,
+      "translation": "First, let's see what is argument. How did it come about, and its face"
+    },
+    {
+      "verse_no": 46,
+      "translation": ""
+    }
+  ]
 }

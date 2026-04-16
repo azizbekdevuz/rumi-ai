@@ -1,0 +1,161 @@
+{
+  "page": 19,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        128,
+        129,
+        130,
+        131,
+        132
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "تا و رو وی اد‌ی اه مه وا دپ ۹",
+      "bbox": [
+        24,
+        0,
+        2420,
+        65
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 128,
+      "book": 1
+    },
+    {
+      "text": "۱ ف ۰ ۱ ۰ ۱ ۰ ورس ۴ ۰ ۹ ۴ ۲ ۳۳ ب",
+      "bbox": [
+        320,
+        596,
+        1936,
+        74
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 128,
+      "book": 1
+    },
+    {
+      "text": "۱ انست خرد مندان بزر گی‌جو ن‌جلالالدین \" محمد. وا به دشنمنی. با خواس را",
+      "bbox": [
+        76,
+        640,
+        2345,
+        113
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 129,
+      "book": 1
+    },
+    {
+      "text": "۳ ین محمد..» پورش بر فلسفه از سطو یی را آغا ز ده تپ",
+      "bbox": [
+        14,
+        1080,
+        2236,
+        99
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 129,
+      "book": 1
+    },
+    {
+      "text": "۰ ۱ ۴ ۰ ۱",
+      "bbox": [
+        219,
+        1374,
+        1899,
+        29
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 130,
+      "book": 1
+    },
+    {
+      "text": "دست ‏ یافت \". نه از را ه استدلالو قیاس. اب ۵",
+      "bbox": [
+        53,
+        1403,
+        2109,
+        87
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 130,
+      "book": 1
+    },
+    {
+      "text": "چا نکه در پیا ن این اند‌ید برا‌ی. آفر ینش نو به. ی رز",
+      "bbox": [
+        14,
+        1843,
+        2152,
+        104
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 131,
+      "book": 1
+    },
+    {
+      "text": "» ۳ با ۲ تالگردد وو یزاگ",
+      "bbox": [
+        497,
+        2815,
+        1882,
+        137
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 132,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 128,
+      "translation": "To see His face, O beloved, let go of your..."
+    },
+    {
+      "verse_no": 129,
+      "translation": "The wise seek greatness, O Jalaluddin Muhammad. And enmity with the desired one... this Muhammad."
+    },
+    {
+      "verse_no": 130,
+      "translation": "It is not attained through reasoning and analogy."
+    },
+    {
+      "verse_no": 131,
+      "translation": "Because in the midst of this thought, for the creation of novelty, O Lord,"
+    },
+    {
+      "verse_no": 132,
+      "translation": "It will be lost and scattered."
+    }
+  ]
+}

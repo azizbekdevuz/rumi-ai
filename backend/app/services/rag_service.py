@@ -16,6 +16,8 @@ import logging
 import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import re
+from collections import defaultdict
 
 import numpy as np
 import httpx
@@ -152,6 +154,15 @@ class RAGService:
 
     # ── Private: document loading ─────────────────────────────────
 
+    def clean_text(self, text: str) -> str:
+        if not text:
+            return ""
+
+        text = re.sub(r"[\u200c\u200d\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069]", "", text)
+        text = re.sub(r"\s+", " ", text)
+
+        return text.strip()
+
     def _load_documents(self) -> None:
         """Load text chunks from book_verse/page_*.json files."""
         verse_dir = Path(self._book_verse_dir)
@@ -165,7 +176,9 @@ class RAGService:
             try:
                 with open(jf, encoding="utf-8") as fh:
                     data = json.load(fh)
+
                 page_num = data.get("page", 0)
+                book_num = data.get("book")
                 raw_lines = data.get("lines")
                 if raw_lines is None:
                     lines: List[Any] = []
@@ -178,34 +191,63 @@ class RAGService:
                     continue
                 else:
                     lines = raw_lines
+
+                grouped = defaultdict(list)
+                meta: Dict[Any, Dict[str, Any]] = {}
                 for line in lines:
-                    if not isinstance(line, dict):
+                    try:
+                        if not isinstance(line, dict):
+                            logger.warning(
+                                "book_verse %s: skipping non-object line (%s)",
+                                jf.name,
+                                type(line).__name__,
+                            )
+                            continue
+                        raw_text = line.get("text")
+                        if raw_text is None:
+                            continue
+                        if not isinstance(raw_text, str):
+                            logger.warning(
+                                "book_verse %s: skipping line with non-string text (%s)",
+                                jf.name,
+                                type(raw_text).__name__,
+                            )
+                            continue
+                        text = self.clean_text(raw_text)
+                        if len(text) < 5:
+                            continue
+
+                        chapter = line.get("chapter")
+                        verse = line.get("verse")
+                        lang = line.get("lang", "fas")
+                        key = (chapter, verse)
+
+                        grouped[key].append(text)
+                        if key not in meta:
+                            meta[key] = {
+                                "chapter": chapter,
+                                "verse": verse,
+                                "book": line.get("book", book_num),
+                                "page": page_num,
+                                "lang": lang,
+                                "source_file": jf.name,
+                            }
+                    except TypeError as exc:
                         logger.warning(
-                            "book_verse %s: skipping non-object line (%s)",
+                            "book_verse %s: skipping line (invalid grouping key: %s)",
                             jf.name,
-                            type(line).__name__,
+                            exc,
                         )
                         continue
-                    raw_text = line.get("text")
-                    if raw_text is None:
+                for key, text_parts in grouped.items():
+                    full_text = self.clean_text(" ".join(text_parts))
+                    if len(full_text) < 5:
                         continue
-                    if not isinstance(raw_text, str):
-                        logger.warning(
-                            "book_verse %s: skipping line with non-string text (%s)",
-                            jf.name,
-                            type(raw_text).__name__,
-                        )
-                        continue
-                    text = raw_text.strip()
-                    if len(text) < 5:
-                        continue
-                    self.documents.append({
-                        "text": text,
-                        "page": page_num,
-                        "lang": line.get("lang", "fas"),
-                        "bbox": line.get("bbox"),
-                        "source_file": jf.name,
-                    })
+                    item = {
+                        "text": full_text,
+                        **meta[key],
+                    }
+                    self.documents.append(item)
             except Exception as exc:
                 logger.error("Failed to read %s: %s", jf, exc)
 

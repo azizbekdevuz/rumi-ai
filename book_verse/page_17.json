@@ -1,0 +1,231 @@
+{
+  "page": 17,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "هلشایی: نا ن ‏ (فلسثه کی) را فرا‌گر فعند واین ره‌آورد: ۵",
+      "bbox": [
+        195,
+        647,
+        1850,
+        119
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 114,
+      "book": 1
+    },
+    {
+      "text": "\" ادن آغاز بسنیا وی از این اندیشه‌و رز انسرا پای آن دستگاه فلسفی ‏.. ‏",
+      "bbox": [
+        14,
+        884,
+        2236,
+        117
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 114,
+      "book": 1
+    },
+    {
+      "text": "را از. آن ار سطو میبندا شتند وختی‌گزاد شگو نه فشر ده از (تاسوت ۹",
+      "bbox": [
+        100,
+        988,
+        2102,
+        131
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 115,
+      "book": 1
+    },
+    {
+      "text": "لپاری پسیاری بر آنا ن گذشستت‌تا. رو شبی از اند پشنه.",
+      "bbox": [
+        281,
+        1218,
+        1916,
+        129
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 115,
+      "book": 1
+    },
+    {
+      "text": "های افلاطو ن وارسطو پیدا کردند...,. ۱",
+      "bbox": [
+        42,
+        1342,
+        2156,
+        114
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 116,
+      "book": 1
+    },
+    {
+      "text": "تراز فا را بی,و ابن مسکویه بودواین رشدیا آن‌که فلسفه ارسطورایه..",
+      "bbox": [
+        281,
+        1595,
+        1922,
+        98
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 116,
+      "book": 1
+    },
+    {
+      "text": "با اینیم نبا‌ید فلسفه گرا یا نا مور جها ن اسلام را تقلیید",
+      "bbox": [
+        283,
+        1933,
+        1880,
+        134
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 117,
+      "book": 1
+    },
+    {
+      "text": "ور فلسفی افلاطو منطو تا حد باز آفر ینی دست.",
+      "bbox": [
+        47,
+        2405,
+        2180,
+        117
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 118,
+      "book": 1
+    },
+    {
+      "text": "۱ \" برد‌ند ۱۳ (۰) و",
+      "bbox": [
+        965,
+        2527,
+        1439,
+        98
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 118,
+      "book": 1
+    },
+    {
+      "text": ".۴ از تکلماان بر گزیده و مبود» دوش معتز لی وا که",
+      "bbox": [
+        6,
+        2774,
+        2290,
+        128
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 119,
+      "book": 1
+    },
+    {
+      "text": "دز توا بسنت ده بی ازکسا نیزا که در پی در یا فت راز, زر",
+      "bbox": [
+        20,
+        2988,
+        2179,
+        139
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 119,
+      "book": 1
+    },
+    {
+      "text": ". شلف بلند ساد؛ یسیار تقش‌بودند: به سو‌ی خود بکشا ند ولی",
+      "bbox": [
+        294,
+        3115,
+        1996,
+        132
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 120,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 114,
+      "translation": "When Plato began his philosophy, he pondered this thought, and thus came forth with this philosophical school of thought."
+    },
+    {
+      "verse_no": 115,
+      "translation": "And when Aristotle embraced this path, he deepened it, and many others followed him, until this thought and perspective emerged."
+    },
+    {
+      "verse_no": 116,
+      "translation": "Plato's and Aristotle's philosophies came to be, and Al-Farabi and Ibn Maskawayh contributed to them, and the growth of Aristotle's philosophy..."
+    },
+    {
+      "verse_no": 117,
+      "translation": "With this, we should not imitate the philosophers or the scholars of the Islamic world."
+    },
+    {
+      "verse_no": 118,
+      "translation": "Plato's and Aristotle's philosophical ideas were revived to the extent of a re-creation."
+    },
+    {
+      "verse_no": 119,
+      "translation": "He chose from the words and ideas of the Mu'tazilites, and also from those who sought to grasp the secret of..."
+    },
+    {
+      "verse_no": 120,
+      "translation": "...The Sufis were very influential; they drew towards themselves."
+    }
+  ]
+}

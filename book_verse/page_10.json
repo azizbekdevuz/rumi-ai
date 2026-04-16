@@ -1,5 +1,26 @@
 {
   "page": 10,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58
+      ]
+    }
+  ],
   "lines": [
     {
       "text": ".۰",
@@ -10,7 +31,11 @@
         3
       ],
       "lang": "fas",
-      "verse": 1
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 47,
+      "book": 1
     },
     {
       "text": "مگذار ی ببره‌های گو \" ناگسون‌آن‌میپر دازد و سپس دهسیا",
@@ -21,7 +46,11 @@
         119
       ],
       "lang": "fas",
-      "verse": 1
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 47,
+      "book": 1
     },
     {
       "text": "انبو تجر ینها وا نتز | عبا می‌شود. ۱ ۳",
@@ -32,7 +61,11 @@
         140
       ],
       "lang": "fas",
-      "verse": 2
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 48,
+      "book": 1
     },
     {
       "text": ". جریان پیدا پی مضبو ی انتزاعی و مجرد با در نظر دا شت. اینکه ۰",
@@ -43,7 +76,11 @@
         134
       ],
       "lang": "fas",
-      "verse": 2
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 48,
+      "book": 1
     },
     {
       "text": "این بندا شت سر ایا تخمینیو بسیار نار سا ست و تنبا بر! ی به‌دست \"",
@@ -54,7 +91,11 @@
         134
       ],
       "lang": "fas",
-      "verse": 3
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 49,
+      "book": 1
     },
     {
       "text": "آورد ده سر زشته پیست از این کلاف در هم پیجید ه» جنین است:",
@@ -65,7 +106,11 @@
         135
       ],
       "lang": "fas",
-      "verse": 3
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 49,
+      "book": 1
     },
     {
       "text": "الف صفا‌ت فصل قر یب وبعید (کود» کر» شنوا» بینا)",
@@ -76,7 +121,11 @@
         120
       ],
       "lang": "fas",
-      "verse": 4
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 50,
+      "book": 1
     },
     {
       "text": "۱ بب جنس - (بز» گاو) ۲ ۱ ۱",
@@ -87,7 +136,11 @@
         129
       ],
       "lang": "fas",
-      "verse": 4
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 50,
+      "book": 1
     },
     {
       "text": "۱ ج -ثو غ - (گیا ه ء آد می‌) ۲",
@@ -98,7 +151,11 @@
         103
       ],
       "lang": "fas",
-      "verse": 5
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 51,
+      "book": 1
     },
     {
       "text": "دب منپو مپا ی کلی - (هستی‌اندیشه» خرد) با‌ید به یاد داشت..",
@@ -109,7 +166,11 @@
         130
       ],
       "lang": "fas",
-      "verse": 5
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 51,
+      "book": 1
     },
     {
       "text": "که‌جدا کرد ن مطلق مجرد ومشخص‌کار پست نا در ست. زیرا هسر ۱",
@@ -120,7 +181,11 @@
         133
       ],
       "lang": "fas",
-      "verse": 6
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 52,
+      "book": 1
     },
     {
       "text": "مفپو ‏ می‌» انتزا عی دارد.",
@@ -131,7 +196,11 @@
         70
       ],
       "lang": "fas",
-      "verse": 7
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 53,
+      "book": 1
     },
     {
       "text": "دگر گو نی مشخص به مجردخود یک دگرکونی چونی است کهدد",
@@ -142,7 +211,11 @@
         144
       ],
       "lang": "fas",
-      "verse": 7
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 53,
+      "book": 1
     },
     {
       "text": "آن سیر تد ریجی و چند‌ی با چسوخدی نا گبا نی و چو نی همرا ه",
@@ -153,7 +226,11 @@
         132
       ],
       "lang": "fas",
-      "verse": 8
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 54,
+      "book": 1
     },
     {
       "text": "است ۲ (۰) پیو‌ند میا ن مفبومپامرحله ها‌ی زیر‌ین دا پیموده است:. ‏",
@@ -164,7 +241,11 @@
         112
       ],
       "lang": "fas",
-      "verse": 8
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 54,
+      "book": 1
     },
     {
       "text": "۱ -دورا ن پیو‌ند تخیل وتمثیل.. ۵ \" ۳",
@@ -175,7 +256,11 @@
         126
       ],
       "lang": "fas",
-      "verse": 9
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 55,
+      "book": 1
     },
     {
       "text": "ردان پیو‌ند تعقل و قیاس.",
@@ -186,7 +271,11 @@
         102
       ],
       "lang": "fas",
-      "verse": 9
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 55,
+      "book": 1
     },
     {
       "text": "۱ ۲۳ دو ران پیو‌ند تجر بوا ء",
@@ -197,7 +286,11 @@
         92
       ],
       "lang": "fas",
-      "verse": 10
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 56,
+      "book": 1
     },
     {
       "text": "۶ دو را پیوندقیاس واستقراءیا تحلیل و‌تر کیب (۲). ۱",
@@ -208,7 +301,11 @@
         100
       ],
       "lang": "fas",
-      "verse": 10
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 56,
+      "book": 1
     },
     {
       "text": "ابه جا ست اگر چنین بپنداریمکه میا ن پیدا بی مضبو مب یمجرد ۱",
@@ -219,7 +316,11 @@
         152
       ],
       "lang": "fas",
-      "verse": 11
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 57,
+      "book": 1
     },
     {
       "text": "۱ و مشخص از سو یی و پیدا یسی‌مفبو مپا و پیو‌ند‌ها از سو ی‌دیگر",
@@ -230,7 +331,11 @@
         113
       ],
       "lang": "fas",
-      "verse": 11
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 57,
+      "book": 1
     },
     {
       "text": "۱ در تاریخزند ۶ انسا نی بعدپیمایش‌پذیر زما ن سا یه گستر بوده‌است ۱",
@@ -241,7 +346,11 @@
         138
       ],
       "lang": "fas",
-      "verse": 12
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 58,
+      "book": 1
     },
     {
       "text": ",زیرا هر مر حلا پسین به گو نساجوانه‌ها در مرحلة پیشین دیشه ‏",
@@ -252,8 +361,61 @@
         132
       ],
       "lang": "fas",
-      "verse": 12
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 58,
+      "book": 1
     }
   ],
-  "translations": []
+  "translations": [
+    {
+      "verse_no": 47,
+      "translation": "Do not let the lions of \"Naqs-un\" roar, and then the ten black..."
+    },
+    {
+      "verse_no": 48,
+      "translation": "...becomes abstract and conceptual. The fact that 0"
+    },
+    {
+      "verse_no": 49,
+      "translation": "This assumption is speculative and very unpleasant, and it is obtained with great difficulty from this tangled knot, such as:"
+    },
+    {
+      "verse_no": 50,
+      "translation": "A. Attributes of proximate and distant (hearer, seer) / B. Genus (goat, cow) 1 1"
+    },
+    {
+      "verse_no": 51,
+      "translation": "C. Substance - (plant, human) 2 / D. Universal concept - (existence, thought, intellect) It should be remembered.."
+    },
+    {
+      "verse_no": 52,
+      "translation": "That the absolute separation of the abstract and the specific is a base and incorrect deed. Because every"
+    },
+    {
+      "verse_no": 53,
+      "translation": "concept has an abstractness. Another specific change is a qualitative change in itself that"
+    },
+    {
+      "verse_no": 54,
+      "translation": "This gradual and quantitative progression is accompanied by sudden and qualitative changes. 2 (0) The link between concepts has traversed the following stages:."
+    },
+    {
+      "verse_no": 55,
+      "translation": "1. The period of connection of imagination and metaphor. 5 \" 3 / The period of connection of intellect and analogy."
+    },
+    {
+      "verse_no": 56,
+      "translation": "1 23 The period of connection of abstraction / 6 The period of connection of analogy and induction, or analysis and synthesis (2)."
+    },
+    {
+      "verse_no": 57,
+      "translation": "It is correct if we assume that the emergence of abstract and specific concepts on the one hand, and the emergence of concepts and connections on the other hand,"
+    },
+    {
+      "verse_no": 58,
+      "translation": "1 In the history of human life, after traversing time, it has cast a shadow. / Because every subsequent stage, like its predecessors, was inherent in the previous stage."
+    }
+  ]
 }
