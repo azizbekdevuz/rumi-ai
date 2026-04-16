@@ -219,7 +219,7 @@ async def chat_stream(
         if request.history:
             history_dicts = [
                 {"role": h.role, "content": h.content}
-                for h in request.history[-6:]
+                for h in request.history[-4:]
             ]
 
         chat_service = ChatService(db)

@@ -25,6 +25,20 @@ from app.services.multilingual_generation import MultilingualGenerationService
 logger = logging.getLogger(__name__)
 
 
+def _rag_retrieval_is_ambiguous(rag_docs: List[Dict[str, Any]]) -> bool:
+    """
+    FAISS L2: lower score = closer. If the #2 hit is almost as close as #1,
+    retrieval is not decisive — tell the model to be cautious.
+    """
+    if len(rag_docs) < 2:
+        return False
+    d0 = float(rag_docs[0].get("score", 0.0))
+    d1 = float(rag_docs[1].get("score", 0.0))
+    if d0 <= 1e-9:
+        return False
+    return (d1 / d0) < 1.35
+
+
 class ChatService:
     """Orchestrates the chat RAG pipeline."""
 
@@ -65,6 +79,22 @@ class ChatService:
             session_id, user_message, language, source_scope,
         )
 
+        response_mode = prompt_builder.classify_query_response_mode(user_message)
+        if response_mode == "unclear":
+            msg = prompt_builder.unclear_user_message(language)
+            logger.info("[chat:%s] skipping LLM — unclear user input", session_id)
+            return {
+                "response_text": msg,
+                "interpretation": msg,
+                "advice": [],
+                "verse_data": {"fa": "", "en": "", "kr": ""},
+                "verse_id": None,
+                "citations_summary": [],
+                "citation_ids": [],
+                "retrieved_candidates": [],
+                "grounded": False,
+            }
+
         # ── 1. Retrieve context (verses + citations from DB) ──
         context = await self.multilingual_service.prepare_context(
             user_message=user_message,
@@ -77,6 +107,7 @@ class ChatService:
 
         # ── 1b. Fallback to FAISS RAG when DB retrieval yields nothing ──
         rag_sourced = False
+        rag_docs: List[Dict[str, Any]] = []
         if not verses_ctx and not citations_ctx:
             try:
                 from app.services.rag_service import get_rag_service
@@ -111,6 +142,7 @@ class ChatService:
                 )
 
         grounded = bool(verses_ctx or citations_ctx)
+        context_caution = bool(rag_sourced and _rag_retrieval_is_ambiguous(rag_docs))
         top_ids = [v.get("id", "?") for v in verses_ctx[:3]]
 
         logger.info(
@@ -122,7 +154,10 @@ class ChatService:
 
         # ── 2. Build prompts ──
         system_prompt = prompt_builder.build_system_prompt(
-            language, grounded=grounded,
+            language,
+            grounded=grounded,
+            response_mode=response_mode,
+            context_caution=context_caution,
         )
         user_prompt = prompt_builder.build_user_prompt(
             user_message=user_message,
@@ -140,11 +175,17 @@ class ChatService:
         )
 
         # ── 4. Parse response into interpretation / advice ──
-        parsed = prompt_builder.parse_llm_response(raw_text, language)
+        expect_advice = response_mode == "full"
+        parsed = prompt_builder.parse_llm_response(
+            raw_text, language, expect_advice=expect_advice,
+        )
 
         logger.info(
-            "[chat:%s] parsed | interp_len=%d | advice_len=%d",
-            session_id, len(parsed["interpretation"]), len(parsed["advice"]),
+            "[chat:%s] parsed | interp_len=%d | advice_len=%d | structured_ok=%s",
+            session_id,
+            len(parsed["interpretation"]),
+            len(parsed.get("advice", "") or ""),
+            parsed.get("structured_ok", False),
         )
 
         # ── 5. Extract IDs from retrieved context ──
@@ -182,15 +223,19 @@ class ChatService:
         if not retrieved_candidates:
             retrieved_candidates = []
 
-        # Ensure interpretation/advice are never empty / None for schema stability
-        interpretation = parsed["interpretation"] or raw_text.strip()
+        interpretation = (parsed.get("interpretation") or "").strip()
+        if not interpretation:
+            interpretation = prompt_builder.degraded_parse_message(language)
 
-        raw_advice = parsed["advice"]
+        raw_advice = parsed.get("advice", "")
         if isinstance(raw_advice, list):
             advice = [str(x) for x in raw_advice]
         elif isinstance(raw_advice, str):
             advice = [raw_advice] if raw_advice.strip() else []
         else:
+            advice = []
+
+        if response_mode == "explanation":
             advice = []
 
         logger.info(
