@@ -179,31 +179,66 @@ class RAGService:
 
                 page_num = data.get("page", 0)
                 book_num = data.get("book")
-                lines = data.get("lines", [])
+                raw_lines = data.get("lines")
+                if raw_lines is None:
+                    lines: List[Any] = []
+                elif not isinstance(raw_lines, list):
+                    logger.warning(
+                        "book_verse %s: expected lines to be a list, got %s — skipping file",
+                        jf.name,
+                        type(raw_lines).__name__,
+                    )
+                    continue
+                else:
+                    lines = raw_lines
 
                 grouped = defaultdict(list)
-                meta = {}
+                meta: Dict[Any, Dict[str, Any]] = {}
                 for line in lines:
-                    raw_text = line.get("text", "")
-                    text = self.clean_text(raw_text)
-                    if len(text) < 5:
-                        continue
-                    
-                    chapter = line.get("chapter")
-                    verse = line.get("verse")
-                    lang = line.get("lang", "fas")
-                    key= (chapter, verse)
+                    try:
+                        if not isinstance(line, dict):
+                            logger.warning(
+                                "book_verse %s: skipping non-object line (%s)",
+                                jf.name,
+                                type(line).__name__,
+                            )
+                            continue
+                        raw_text = line.get("text")
+                        if raw_text is None:
+                            continue
+                        if not isinstance(raw_text, str):
+                            logger.warning(
+                                "book_verse %s: skipping line with non-string text (%s)",
+                                jf.name,
+                                type(raw_text).__name__,
+                            )
+                            continue
+                        text = self.clean_text(raw_text)
+                        if len(text) < 5:
+                            continue
 
-                    grouped[key].append(text)
-                    if key not in meta:
-                        meta[key] = {
-                            "chapter": chapter,
-                            "verse": verse,
-                            "book": line.get("book", book_num),
-                            "page": page_num,
-                            "lang": lang,
-                            "source_file": jf.name,
-                        }
+                        chapter = line.get("chapter")
+                        verse = line.get("verse")
+                        lang = line.get("lang", "fas")
+                        key = (chapter, verse)
+
+                        grouped[key].append(text)
+                        if key not in meta:
+                            meta[key] = {
+                                "chapter": chapter,
+                                "verse": verse,
+                                "book": line.get("book", book_num),
+                                "page": page_num,
+                                "lang": lang,
+                                "source_file": jf.name,
+                            }
+                    except TypeError as exc:
+                        logger.warning(
+                            "book_verse %s: skipping line (invalid grouping key: %s)",
+                            jf.name,
+                            exc,
+                        )
+                        continue
                 for key, text_parts in grouped.items():
                     full_text = self.clean_text(" ".join(text_parts))
                     if len(full_text) < 5:
