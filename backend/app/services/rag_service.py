@@ -166,8 +166,37 @@ class RAGService:
                 with open(jf, encoding="utf-8") as fh:
                     data = json.load(fh)
                 page_num = data.get("page", 0)
-                for line in data.get("lines", []):
-                    text = line.get("text", "").strip()
+                raw_lines = data.get("lines")
+                if raw_lines is None:
+                    lines: List[Any] = []
+                elif not isinstance(raw_lines, list):
+                    logger.warning(
+                        "book_verse %s: expected lines to be a list, got %s — skipping file",
+                        jf.name,
+                        type(raw_lines).__name__,
+                    )
+                    continue
+                else:
+                    lines = raw_lines
+                for line in lines:
+                    if not isinstance(line, dict):
+                        logger.warning(
+                            "book_verse %s: skipping non-object line (%s)",
+                            jf.name,
+                            type(line).__name__,
+                        )
+                        continue
+                    raw_text = line.get("text")
+                    if raw_text is None:
+                        continue
+                    if not isinstance(raw_text, str):
+                        logger.warning(
+                            "book_verse %s: skipping line with non-string text (%s)",
+                            jf.name,
+                            type(raw_text).__name__,
+                        )
+                        continue
+                    text = raw_text.strip()
                     if len(text) < 5:
                         continue
                     self.documents.append({
