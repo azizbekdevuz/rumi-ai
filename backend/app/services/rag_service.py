@@ -117,7 +117,8 @@ class RAGService:
         """Retrieve the *top_k* most similar documents for *query*.
 
         Returns a list of dicts with keys:
-          text, page, lang, score, source_file, rank
+          text, page, lang, score, source_file, rank,
+          chapter, verse, book (from book_verse JSON when present)
         """
         if faiss is None:
             return []
@@ -142,6 +143,9 @@ class RAGService:
                 "score": float(dist),
                 "source_file": doc.get("source_file", ""),
                 "rank": rank + 1,
+                "chapter": doc.get("chapter"),
+                "verse": doc.get("verse"),
+                "book": doc.get("book"),
             })
 
         logger.info(
