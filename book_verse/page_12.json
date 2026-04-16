@@ -1,0 +1,216 @@
+{
+  "page": 12,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "نورا از جئو ه گی آفر بنش پدیدة‌هما نند ۲ ان که \" در گذشته نگر بسته ۱",
+      "bbox": [
+        130,
+        1209,
+        2075,
+        90
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 78,
+      "book": 1
+    },
+    {
+      "text": "ایم در یا بیم ۰ (۰) ۱ ۱ ۲ \" ۳",
+      "bbox": [
+        293,
+        1317,
+        1909,
+        116
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 78,
+      "book": 1
+    },
+    {
+      "text": "۵ به حیث مثا ل: هنگا می‌که آذ رخش د! می‌نگریم. با‌ید منتظر",
+      "bbox": [
+        388,
+        1439,
+        1976,
+        98
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 79,
+      "book": 1
+    },
+    {
+      "text": "ذهن از یک حکم جز بی به منت. در",
+      "bbox": [
+        291,
+        1876,
+        1915,
+        134
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 80,
+      "book": 1
+    },
+    {
+      "text": "۱ جوبی ازقوا عد عا‌م که درستیآنپاآشکار | با شد. به مخ ۱",
+      "bbox": [
+        96,
+        2114,
+        2245,
+        130
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 81,
+      "book": 1
+    },
+    {
+      "text": "س رو شنی است که ذمن‌به باری‌آن‌پس از دا نستن دو قضیة به قضیا ۱",
+      "bbox": [
+        137,
+        2259,
+        2072,
+        87
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 81,
+      "book": 1
+    },
+    {
+      "text": "سز می‌را ه هییا به و کل دابرمصاد یق آ ن شا مل میساژه: فا",
+      "bbox": [
+        218,
+        2350,
+        1991,
+        116
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 82,
+      "book": 1
+    },
+    {
+      "text": "اهر کیواتر خیوا ن ما ضقرای ما اد",
+      "bbox": [
+        68,
+        2603,
+        2056,
+        136
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 83,
+      "book": 1
+    },
+    {
+      "text": "۱ ۲ هر حیوا ن متنفس است. (مقدما کیری ۲ ۱ ۱ ۲",
+      "bbox": [
+        66,
+        2728,
+        2325,
+        118
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 83,
+      "book": 1
+    },
+    {
+      "text": "ج: استقرا ۶ سرسید ۵ از جزئیات‌به کلی یا به سخن دیگر آشتتناج",
+      "bbox": [
+        313,
+        2973,
+        1826,
+        140
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 84,
+      "book": 1
+    },
+    {
+      "text": ". ازاحکم ها‌ی متعد د استخر اج‌یک‌حکم و سیم ثرا ست ۶۰۰ ۱",
+      "bbox": [
+        122,
+        3111,
+        2208,
+        111
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 84,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 78,
+      "translation": "Light is born from the darkness, like the phenomenon that is seen. In the past, he says, 'Look at the closed door; we are in this sea.'"
+    },
+    {
+      "verse_no": 79,
+      "translation": "As an example: When we see the dawn, we must wait."
+    },
+    {
+      "verse_no": 80,
+      "translation": "The mind, from a specific judgment, awaits."
+    },
+    {
+      "verse_no": 81,
+      "translation": "To seek a general principle whose truth is apparent. The mind shines when, after knowing two premises, it arrives at a conclusion."
+    },
+    {
+      "verse_no": 82,
+      "translation": "It includes all the true premises and makes them a whole: For example:"
+    },
+    {
+      "verse_no": 83,
+      "translation": "Every animal breathes. (Premise 1)"
+    },
+    {
+      "verse_no": 84,
+      "translation": "Induction: From particulars to the general. In other words, deduction. Extracting one judgment from multiple judgments leads to a conclusion."
+    }
+  ]
+}

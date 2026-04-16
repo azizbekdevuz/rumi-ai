@@ -1,5 +1,16 @@
 {
   "page": 5,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        2,
+        3
+      ]
+    }
+  ],
   "lines": [
     {
       "text": "۱ سیما‌ی شکو همند پیر مرد کرباس‌پو شی بر میخو ریم که زرا ندود",
@@ -10,7 +21,11 @@
         111
       ],
       "lang": "fas",
-      "verse": 1
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 2,
+      "book": 1
     },
     {
       "text": "\" ترین چر نیانپا ی‌شعر ما از کار گاه‌اند او بدر آمد. سخن",
@@ -21,7 +36,11 @@
         114
       ],
       "lang": "fas",
-      "verse": 1
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 2,
+      "book": 1
     },
     {
       "text": "در باد ۶ جلال‌الد ین محمد بلخیست که هکل یکی از ستیغ‌ها ی #ندیشه ۱",
@@ -32,7 +51,11 @@
         123
       ],
       "lang": "fas",
-      "verse": 2
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 3,
+      "book": 1
     },
     {
       "text": "فلسفی در چند سبد؛ پسین اورارو می‌بر‌تر خوا‌ند ه است ۰ (",
@@ -43,17 +66,21 @@
         141
       ],
       "lang": "fas",
-      "verse": 2
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 3,
+      "book": 1
     }
   ],
   "translations": [
     {
-      "verse_no": 1,
-      "translation": "The countenance of a proud, aged man, dressed in sackcloth, we accept, for he is not in chains of ignorance. Our poetic journey begins from the workshop; he has come out. The word"
+      "verse_no": 2,
+      "translation": "The face of the wise old man, cloth-clad, we consider. For we are from his workshop; he came out of the loom. Words..."
     },
     {
-      "verse_no": 2,
-      "translation": "is in the wind. Jalal al-Din Muhammad Balkhi, from the peaks of philosophical thought, in a few baskets; he has called the latter superior."
+      "verse_no": 3,
+      "translation": "Jalāl al-Dīn Muḥammad Balkhī is in the wind. He has surpassed others in his philosophical meditations and his poetry. He is considered superior."
     }
   ]
 }

@@ -1,0 +1,361 @@
+{
+  "page": 24,
+  "book": 1,
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": null,
+      "verses": [
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "text": "ای و‌م ۴ ۰: ۱ ۲",
+      "bbox": [
+        98,
+        0,
+        2025,
+        45
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 176,
+      "book": 1
+    },
+    {
+      "text": "۱ ۵ ۳ ۱ ۰ ۱ ۱ ۲",
+      "bbox": [
+        80,
+        236,
+        2235,
+        52
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 177,
+      "book": 1
+    },
+    {
+      "text": "۱ ۲",
+      "bbox": [
+        1319,
+        506,
+        920,
+        26
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 178,
+      "book": 1
+    },
+    {
+      "text": "۵ ۵ ۰ ۳ ۰",
+      "bbox": [
+        374,
+        598,
+        1537,
+        35
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 178,
+      "book": 1
+    },
+    {
+      "text": "۵ ۱ ۱ ۳",
+      "bbox": [
+        217,
+        790,
+        1095,
+        54
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 179,
+      "book": 1
+    },
+    {
+      "text": "۰ ۳ ۱ ۲ ۹",
+      "bbox": [
+        80,
+        856,
+        1202,
+        38
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 179,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱",
+      "bbox": [
+        1552,
+        1144,
+        773,
+        28
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 180,
+      "book": 1
+    },
+    {
+      "text": "عم ۱ ۱",
+      "bbox": [
+        98,
+        1361,
+        1051,
+        53
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 180,
+      "book": 1
+    },
+    {
+      "text": "۹ ۰۵ ۱",
+      "bbox": [
+        98,
+        1469,
+        1243,
+        56
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 181,
+      "book": 1
+    },
+    {
+      "text": "۱ ۲ ۱ ۱",
+      "bbox": [
+        98,
+        1594,
+        2280,
+        29
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 181,
+      "book": 1
+    },
+    {
+      "text": "۲ ۱ ۲۳۹ ۱",
+      "bbox": [
+        28,
+        1674,
+        2388,
+        142
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 182,
+      "book": 1
+    },
+    {
+      "text": "۷ ۱ سم ۱ ۰",
+      "bbox": [
+        20,
+        1806,
+        1446,
+        41
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 182,
+      "book": 1
+    },
+    {
+      "text": "۱ سب سس تس وه سس وس یسم سس ۳۳۹ میب بیع ۱ ۱ لته ۳ ۲",
+      "bbox": [
+        415,
+        1961,
+        1957,
+        96
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 183,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۱ ۱ ۲ تست ۱ ۵ ۱",
+      "bbox": [
+        575,
+        2011,
+        1795,
+        52
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 183,
+      "book": 1
+    },
+    {
+      "text": "۱ ۰ ۲ ۰ / ۱ ۱ ا ۳ ۱ ۰",
+      "bbox": [
+        113,
+        2248,
+        2155,
+        112
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 184,
+      "book": 1
+    },
+    {
+      "text": "/, ۱",
+      "bbox": [
+        16,
+        2889,
+        1363,
+        41
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 185,
+      "book": 1
+    },
+    {
+      "text": "/ ۱ ۱ ۱ ۱ ۱",
+      "bbox": [
+        98,
+        3451,
+        2136,
+        99
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 186,
+      "book": 1
+    },
+    {
+      "text": "۱ ۰ ۱ ۷, ۱ ۲ ۰",
+      "bbox": [
+        25,
+        3557,
+        2234,
+        43
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 186,
+      "book": 1
+    },
+    {
+      "text": "۱ ۱ ۱ ۲",
+      "bbox": [
+        803,
+        3632,
+        1133,
+        27
+      ],
+      "lang": "fas",
+      "is_heading": false,
+      "chapter_title": null,
+      "chapter": 1,
+      "verse": 187,
+      "book": 1
+    }
+  ],
+  "translations": [
+    {
+      "verse_no": 176,
+      "translation": "O, and 4 0: 1 2"
+    },
+    {
+      "verse_no": 177,
+      "translation": "1 5 3 1 0 1 1 2"
+    },
+    {
+      "verse_no": 178,
+      "translation": "1 2 / 5 5 0 3 0"
+    },
+    {
+      "verse_no": 179,
+      "translation": "5 1 1 3 / 0 3 1 2 9"
+    },
+    {
+      "verse_no": 180,
+      "translation": "1 1 / O 1 1"
+    },
+    {
+      "verse_no": 181,
+      "translation": "9 05 1 / 1 2 1 1"
+    },
+    {
+      "verse_no": 182,
+      "translation": "2 1 239 1 / 7 1 S 1 0"
+    },
+    {
+      "verse_no": 183,
+      "translation": "1 S B S S T S W S Y S M S S 339 M Y B Y ' 1 1 L T H 3 2 / 1 1 1 1 2 T S T 1 5 1"
+    },
+    {
+      "verse_no": 184,
+      "translation": "1 0 2 0 / 1 1 A 3 1 0"
+    },
+    {
+      "verse_no": 185,
+      "translation": "/, 1"
+    },
+    {
+      "verse_no": 186,
+      "translation": "/ 1 1 1 1 1 / 1 0 1 7, 1 2 0"
+    },
+    {
+      "verse_no": 187,
+      "translation": "1 1 1 2"
+    }
+  ]
+}
