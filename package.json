@@ -35,7 +35,7 @@
     "jsdom": "^28.1.0",
     "knip": "^5.82.1",
     "next-unused": "^0.0.6",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.23",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8.0.5",
