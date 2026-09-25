@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
 export const runtime = 'nodejs';
 
 export async function GET(
@@ -14,15 +13,16 @@ export async function GET(
     const cookieStore = await cookies();
     const token = cookieStore.get('rumi_token')?.value;
 
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...clientIpHeaders(request),
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
     const backendResponse = await fetch(
-      `${BACKEND_URL}/api/books/${bookId}/pages/${page}`,
+      `${getBackendUrl()}/api/books/${bookId}/pages/${page}`,
       {
         method: 'GET',
         headers,

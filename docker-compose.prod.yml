@@ -1,0 +1,159 @@
+# Production stack for a Linux host with Docker Engine.
+# Local development stays on backend/docker-compose.yml.
+#
+# Usage (from the repository root):
+#   docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+#
+# .env.production is used only for ${...} interpolation below. Each service
+# receives an explicit list of variables; nothing is loaded wholesale.
+#
+# Only the Next.js server is published, and only on the host loopback.
+# The ingress (Caddy by default) must set X-Real-IP; see deploy/PRODUCTION.md.
+# Postgres, the API, and Ollama are not published.
+
+name: rumi
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: rumi_prod_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is required}
+      POSTGRES_USER: ${DB_USER:?DB_USER is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init-scripts/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - rumi
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: rumi-api:prod
+    container_name: rumi_prod_api
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      DEBUG: "false"
+      USE_MOCK: "false"
+      # The API port is unpublished; only the web container can set this header.
+      TRUST_PROXY: "true"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:?DB_NAME is required}
+      DB_USER: ${DB_USER:?DB_USER is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:?ALLOWED_HOSTS is required}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      LLM_API_URL: ${LLM_API_URL:-http://host.docker.internal:11434}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-qwen2.5:3b}
+      EMBED_MODEL: ${EMBED_MODEL:-nomic-embed-text:latest}
+      BOOK_VERSE_DIR: /app/book_verse
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      KAKAO_REST_API_KEY: ${KAKAO_REST_API_KEY:-}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
+      KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI:-}
+    extra_hosts:
+      # Docker Engine on Linux does not provide this name. host-gateway does.
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./book_verse:/app/book_verse:ro
+      - api_media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    stop_grace_period: 20s
+    networks:
+      - rumi
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rumi-web:prod
+    container_name: rumi_prod_web
+    restart: unless-stopped
+    # Server-side Next.js needs only these. Provider client IDs are public
+    # (they appear in the authorize URL); client secrets stay in the API.
+    environment:
+      NODE_ENV: production
+      APP_ENV: production
+      BACKEND_URL: http://api:8000
+      APP_BASE_URL: ${APP_BASE_URL:?APP_BASE_URL is required}
+      TRUSTED_CLIENT_IP_HEADER: ${TRUSTED_CLIENT_IP_HEADER:-x-real-ip}
+      PORT: "3003"
+      HOSTNAME: 0.0.0.0
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      KAKAO_REST_API_KEY: ${KAKAO_REST_API_KEY:-}
+      KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI:-}
+    ports:
+      # Loopback only. The trusted client-IP header is safe because only the
+      # local ingress can reach this port.
+      - "127.0.0.1:${WEB_PORT:-3003}:3003"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3003/').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    stop_grace_period: 15s
+    networks:
+      - rumi
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  rumi:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${RUMI_DOCKER_SUBNET:?RUMI_DOCKER_SUBNET is required}
+
+volumes:
+  postgres_data:
+    name: rumi_prod_postgres_data
+  api_media:
+    name: rumi_prod_api_media

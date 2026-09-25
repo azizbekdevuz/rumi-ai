@@ -4,10 +4,13 @@ Uses in-memory storage (can be replaced with Redis for distributed systems).
 """
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 from datetime import datetime, timedelta
 from collections import defaultdict
+import ipaddress
 import time
+
+from app.config import settings
 
 
 class RateLimiter:
@@ -42,7 +45,7 @@ class RateLimiter:
         if hasattr(request.state, "user_id"):
             return f"user:{request.state.user_id}"
         # Fall back to IP address
-        client_ip = request.client.host if request.client else "unknown"
+        client_ip = resolve_rate_limit_ip(request, settings.TRUST_PROXY)
         return f"ip:{client_ip}"
     
     def check_rate_limit(
@@ -83,6 +86,35 @@ class RateLimiter:
 # Global rate limiter instance
 rate_limiter = RateLimiter()
 
+def _parse_ip(value: str) -> Optional[str]:
+    try:
+        return str(ipaddress.ip_address(value.strip()))
+    except ValueError:
+        return None
+
+
+def resolve_rate_limit_ip(request: Request, trust_proxy: bool) -> str:
+    """Client address for rate limiting.
+
+    The Next.js BFF sends exactly one validated client address in
+    X-Forwarded-For. It is honored only when TRUST_PROXY is on and the TCP
+    peer is a private or loopback address (the in-network BFF). Anything else,
+    including lists and malformed values, falls back to the TCP peer.
+    """
+    peer = request.client.host if request.client and request.client.host else ""
+    peer_ip = _parse_ip(peer) if peer else None
+
+    if trust_proxy and peer_ip is not None:
+        peer_addr = ipaddress.ip_address(peer_ip)
+        if peer_addr.is_private or peer_addr.is_loopback:
+            values = request.headers.getlist("x-forwarded-for")
+            if len(values) == 1 and "," not in values[0]:
+                forwarded = _parse_ip(values[0])
+                if forwarded is not None:
+                    return forwarded
+
+    return peer_ip or peer or "unknown"
+
 
 async def rate_limit_middleware(request: Request, call_next):
     """Rate limiting middleware.
@@ -93,7 +125,7 @@ async def rate_limit_middleware(request: Request, call_next):
     here would surface as a raw 500 to the client.
     """
     # Skip rate limiting for health checks & docs
-    if request.url.path in ["/health", "/docs", "/openapi.json", "/redoc"]:
+    if request.url.path in {"/health", "/health/ready", "/docs", "/openapi.json", "/redoc"}:
         return await call_next(request)
 
     # ── Per-endpoint limits ──────────────────────────────────────

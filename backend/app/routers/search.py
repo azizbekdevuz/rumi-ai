@@ -12,8 +12,10 @@ from app.models import Verse, Book, Citation
 from app.schemas import SearchResponse, VerseSummary
 from app.middleware.auth import get_optional_user
 from app.services.search_service import SearchService
+import logging
 
 router = APIRouter(prefix="/api/search", tags=["search"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("", response_model=SearchResponse)
@@ -73,5 +75,6 @@ async def search(
         
         return SearchResponse(results=verse_summaries)
         
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error searching verses: {str(e)}")
+    except Exception:
+        logger.exception("Verse search failed")
+        raise HTTPException(status_code=500, detail="Error searching verses.")

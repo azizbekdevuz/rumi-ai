@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
 export const runtime = 'nodejs';
 
 /**
@@ -11,7 +10,7 @@ export const runtime = 'nodejs';
  * Requires authentication.
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -31,14 +30,15 @@ export async function GET(
       return jsonError('Unauthorized', 401);
     }
 
-    const headers: HeadersInit = {
-      'Authorization': `Bearer ${token}`,
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+      ...clientIpHeaders(request),
     };
 
     // Use encodeURIComponent for additional safety
     const encodedId = encodeURIComponent(id);
     const resp = await fetch(
-      `${BACKEND_URL}/api/chat/sessions/${encodedId}/messages`,
+      `${getBackendUrl()}/api/chat/sessions/${encodedId}/messages`,
       { headers },
     );
 

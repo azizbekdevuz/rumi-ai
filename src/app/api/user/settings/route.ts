@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
 
 export const runtime = 'nodejs';
 
@@ -23,11 +22,12 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json();
 
-    const backendResp = await fetch(`${BACKEND_URL}/api/user/settings`, {
+    const backendResp = await fetch(`${getBackendUrl()}/api/user/settings`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
+        ...clientIpHeaders(request),
       },
       body: JSON.stringify(body),
     });

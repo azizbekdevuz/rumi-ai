@@ -20,8 +20,8 @@ from app.config import settings
 # access to the values within the .ini file in use.
 config = context.config
 
-# Set database URL from settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# ConfigParser treats "%" as interpolation. Percent-encoded passwords must be escaped.
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

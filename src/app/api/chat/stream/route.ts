@@ -2,9 +2,10 @@ import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { ChatRequest, HistoryTurn } from '../../../../types/chat';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 /** Build the backend-shaped payload from the frontend request */
 function buildBackendPayload(body: ChatRequest): Record<string, unknown> {
@@ -34,15 +35,16 @@ export async function POST(request: NextRequest) {
     const token = cookieStore.get('rumi_token')?.value;
 
     // Prepare headers
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...clientIpHeaders(request),
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
     // Call backend streaming endpoint
-    const backendResponse = await fetch(`${BACKEND_URL}/api/chat/stream`, {
+    const backendResponse = await fetch(`${getBackendUrl()}/api/chat/stream`, {
       method: 'POST',
       headers,
       body: JSON.stringify(buildBackendPayload(body)),
@@ -57,8 +59,9 @@ export async function POST(request: NextRequest) {
     return new Response(backendResponse.body, {
       headers: {
         'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
+        'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no',
       },
     });
   } catch (error) {
