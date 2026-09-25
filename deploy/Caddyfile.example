@@ -1,0 +1,21 @@
+# Default ingress. Replace example.com with the public hostname.
+# Caddy terminates TLS and proxies to the Next.js server on loopback.
+#
+# Client-IP contract: X-Real-IP is overwritten with the TCP peer address, so a
+# client-supplied X-Real-IP never reaches the app. The web container reads only
+# this header (TRUSTED_CLIENT_IP_HEADER=x-real-ip).
+# If another proxy or CDN sits in front of Caddy, {remote_host} is that proxy;
+# configure Caddy trusted_proxies and use {client_ip} instead.
+#
+# SSE needs an unbuffered proxy and a long read timeout.
+
+example.com {
+	reverse_proxy 127.0.0.1:3003 {
+		header_up X-Real-IP {remote_host}
+		flush_interval -1
+		transport http {
+			read_timeout 300s
+			write_timeout 300s
+		}
+	}
+}

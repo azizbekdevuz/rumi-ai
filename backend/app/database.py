@@ -7,11 +7,10 @@ from sqlalchemy.orm import sessionmaker
 import os
 from typing import Generator
 
-# Database URL from environment variable (set by load_dotenv in main.py)
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://rumi_user:rumi_password@localhost:5432/rumi_ai"
-)
+from app.config import settings
+
+# Single source of truth with the rest of the app (pydantic-settings).
+DATABASE_URL = settings.DATABASE_URL
 
 # Create SQLAlchemy engine
 # Use a standard connection pool instead of NullPool so that connections

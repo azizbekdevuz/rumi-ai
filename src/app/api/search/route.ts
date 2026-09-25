@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
@@ -19,14 +18,15 @@ export async function GET(request: NextRequest) {
     const cookieStore = await cookies();
     const token = cookieStore.get('rumi_token')?.value;
 
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...clientIpHeaders(request),
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const url = new URL(`${BACKEND_URL}/api/search`);
+    const url = new URL(`${getBackendUrl()}/api/search`);
     url.searchParams.set('query', query);
     url.searchParams.set('lang', lang);
     if (bookId) {

@@ -12,21 +12,13 @@
 import { randomBytes } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBackendError } from '@/lib/api/bff';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
+import { publicUrl } from '@/lib/auth/public-url';
+import { sessionCookieOptions } from '@/lib/auth/session-cookie';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-function getBackendUrl(): string {
-  const env = process.env.BACKEND_URL;
-  const nodeEnv = process.env.NODE_ENV;
-  if (nodeEnv && nodeEnv !== 'development' && !env) {
-    throw new Error(
-      'BACKEND_URL is required in non-development environments for OAuth callbacks'
-    );
-  }
-  return env ?? 'http://localhost:8000';
-}
 
 /** Cookie name prefix for per-attempt CSRF state (full name: prefix + state). */
 const STATE_COOKIE_PREFIX = 'oauth_state_';
@@ -66,14 +58,8 @@ export interface OAuthCallbackConfig {
 // Shared cookie helper
 // ---------------------------------------------------------------------------
 
-function stateCookieOptions(isProduction: boolean, maxAge: number) {
-  return {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: 'lax' as const,
-    path: '/',
-    maxAge,
-  };
+function stateCookieOptions(maxAge: number) {
+  return sessionCookieOptions(maxAge);
 }
 
 // ---------------------------------------------------------------------------
@@ -91,7 +77,7 @@ export function createOAuthStartHandler(cfg: OAuthStartConfig) {
     try {
       if (!cfg.clientId || !cfg.redirectUri) {
         console.error(`[${cfg.providerName} OAuth] Missing environment variables`);
-        return NextResponse.redirect(new URL('/login?error=oauth_config', request.url));
+        return NextResponse.redirect(publicUrl(request, '/login?error=oauth_config'));
       }
 
       // Generate an unguessable state value for CSRF protection
@@ -113,14 +99,13 @@ export function createOAuthStartHandler(cfg: OAuthStartConfig) {
 
       // Persist the state in a short-lived, httpOnly cookie (per-attempt name)
       // so the callback can verify it and reject forged requests.
-      const isProduction = process.env.NODE_ENV === 'production';
       const response = NextResponse.redirect(authUrl.toString());
-      response.cookies.set(`${STATE_COOKIE_PREFIX}${state}`, state, stateCookieOptions(isProduction, STATE_TTL_SECONDS));
+      response.cookies.set(`${STATE_COOKIE_PREFIX}${state}`, state, stateCookieOptions(STATE_TTL_SECONDS));
 
       return response;
     } catch (error) {
       console.error(`[${cfg.providerName} OAuth] Start error:`, error);
-      return NextResponse.redirect(new URL('/login?error=oauth_failed', request.url));
+      return NextResponse.redirect(publicUrl(request, '/login?error=oauth_failed'));
     }
   };
 }
@@ -147,7 +132,7 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
       // Forward any provider-side errors (e.g. user denied access)
       if (error) {
         console.error(`[${cfg.providerName} OAuth] Callback error from provider:`, error);
-        return NextResponse.redirect(new URL('/login?error=oauth_denied', request.url));
+        return NextResponse.redirect(publicUrl(request, '/login?error=oauth_denied'));
       }
 
       // --- CSRF state verification ---
@@ -159,17 +144,17 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
 
       if (!state || !storedState || state !== storedState) {
         console.error(`[${cfg.providerName} OAuth] State mismatch — possible CSRF attack`);
-        return NextResponse.redirect(new URL('/login?error=oauth_state_mismatch', request.url));
+        return NextResponse.redirect(publicUrl(request, '/login?error=oauth_state_mismatch'));
       }
 
       if (!code) {
         console.error(`[${cfg.providerName} OAuth] No authorization code received`);
-        return NextResponse.redirect(new URL('/login?error=oauth_no_code', request.url));
+        return NextResponse.redirect(publicUrl(request, '/login?error=oauth_no_code'));
       }
 
       if (!cfg.redirectUri) {
         console.error(`[${cfg.providerName} OAuth] Missing redirect URI env var`);
-        return NextResponse.redirect(new URL('/login?error=oauth_config', request.url));
+        return NextResponse.redirect(publicUrl(request, '/login?error=oauth_config'));
       }
 
       // Exchange the authorization code for a JWT via the backend (with timeout)
@@ -179,7 +164,10 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
       try {
         backendResponse = await fetch(`${getBackendUrl()}${cfg.backendPath}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...clientIpHeaders(request),
+          },
           body: JSON.stringify({ code, redirect_uri: cfg.redirectUri }),
           signal: controller.signal,
         });
@@ -190,7 +178,7 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
         } else {
           console.error(`[${cfg.providerName} OAuth] Backend request failed:`, err);
         }
-        return NextResponse.redirect(new URL('/login?error=oauth_failed', request.url));
+        return NextResponse.redirect(publicUrl(request, '/login?error=oauth_failed'));
       }
       clearTimeout(timeoutId);
 
@@ -200,12 +188,12 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
 
         if (backendResponse.status === 409) {
           return NextResponse.redirect(
-            new URL(`/login?error=email_exists&message=${encodeURIComponent(errorMessage)}`, request.url)
+            publicUrl(request, `/login?error=email_exists&message=${encodeURIComponent(errorMessage)}`)
           );
         }
 
         return NextResponse.redirect(
-          new URL(`/login?error=oauth_failed&message=${encodeURIComponent(errorMessage)}`, request.url)
+          publicUrl(request, `/login?error=oauth_failed&message=${encodeURIComponent(errorMessage)}`)
         );
       }
 
@@ -214,32 +202,25 @@ export function createOAuthCallbackHandler(cfg: OAuthCallbackConfig) {
 
       if (!token) {
         console.error(`[${cfg.providerName} OAuth] No token received from backend`);
-        return NextResponse.redirect(new URL('/login?error=oauth_no_token', request.url));
+        return NextResponse.redirect(publicUrl(request, '/login?error=oauth_no_token'));
       }
 
-      const isProduction = process.env.NODE_ENV === 'production';
-      const response = NextResponse.redirect(new URL('/chat', request.url));
+      const response = NextResponse.redirect(publicUrl(request, '/chat'));
       // TODO(auth, follow-up): Support carrying a safe internal `next` path through the OAuth start -> callback flow
       // and use it as the post-login redirect target for all providers.
       // This should be implemented centrally here instead of per-provider route duplication.
       // Only allow validated internal relative paths; otherwise fall back to `/chat`.
 
       // Persist the session JWT
-      response.cookies.set('rumi_token', token, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24, // 24 hours — matches backend JWT_EXPIRATION_HOURS
-      });
+      response.cookies.set('rumi_token', token, sessionCookieOptions());
 
       // Clear the per-attempt state cookie
-      response.cookies.set(stateCookieName, '', stateCookieOptions(isProduction, 0));
+      response.cookies.set(stateCookieName, '', stateCookieOptions(0));
 
       return response;
     } catch (error) {
       console.error(`[${cfg.providerName} OAuth] Callback exception:`, error);
-      return NextResponse.redirect(new URL('/login?error=oauth_exception', request.url));
+      return NextResponse.redirect(publicUrl(request, '/login?error=oauth_exception'));
     }
   };
 }

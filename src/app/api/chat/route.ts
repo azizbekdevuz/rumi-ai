@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ChatRequest, ChatResponse, Citation, RetrievedCandidate } from '../../../types/chat';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
-
-// Server-only environment variable
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
 
 // Ensure Node.js runtime for cookie support
 export const runtime = 'nodejs';
@@ -111,20 +109,16 @@ function transformResponse(backendResponse: BackendChatResponse): ChatResponse {
 export async function POST(request: NextRequest) {
   try {
     const body: ChatRequest = await request.json();
-    console.log('[BFF Chat] Request received:', { message: body.message?.substring(0, 50), language: body.language });
 
-    // Transform frontend request to backend format
     const backendRequest = transformRequest(body);
-    console.log('[BFF Chat] Backend request:', backendRequest);
 
     // Get auth token from httpOnly cookie
     const cookieStore = await cookies();
     const token = cookieStore.get('rumi_token')?.value;
-    console.log('[BFF Chat] Token present:', !!token);
 
-    // Prepare headers for backend request
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...clientIpHeaders(request),
     };
 
     // Add Authorization header if token exists
@@ -133,43 +127,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Call backend API
-    const backendUrl = `${BACKEND_URL}/api/chat`;
-    console.log('[BFF Chat] Calling backend:', backendUrl);
-    console.log('[BFF Chat] BACKEND_URL env:', process.env.BACKEND_URL || 'NOT SET (using default)');
-    
+    const backendUrl = `${getBackendUrl()}/api/chat`;
     const backendResponse = await fetch(backendUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(backendRequest),
     });
 
-    console.log('[BFF Chat] Backend response status:', backendResponse.status);
-
-    // Handle non-2xx responses
     if (!backendResponse.ok) {
       const errorMessage = await parseBackendError(backendResponse);
-      console.log('[BFF Chat] Backend error:', errorMessage);
       return jsonError(errorMessage, backendResponse.status);
     }
 
-    // Parse backend response
     const backendData = await backendResponse.json();
-    console.log('[BFF Chat] Backend response keys:', Object.keys(backendData));
-    {
-      const a = backendData.advice;
-      const advicePreview =
-        typeof a === 'string'
-          ? a.slice(0, 100)
-          : Array.isArray(a)
-            ? `[array len=${a.length}] ${String(a[0] ?? '').slice(0, 80)}`
-            : String(a ?? '').slice(0, 100);
-      console.log('[BFF Chat] Backend advice (preview):', advicePreview);
-    }
 
     // Transform backend response to frontend format
     const frontendResponse = transformResponse(backendData);
-    console.log('[BFF Chat] Frontend response prepared, advice array length:', frontendResponse.advice.length);
-
     return NextResponse.json(frontendResponse);
   } catch (error) {
     console.error('[BFF Chat] Exception:', error);
