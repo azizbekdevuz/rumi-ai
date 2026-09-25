@@ -120,8 +120,8 @@ rumi-ai2/
 
 ### Prerequisites
 
-- **Node.js** ≥ 20 and **pnpm** ≥ 10
-- **Python** ≥ 3.9
+- **Node.js** 20.19+ or 22.12+ and **pnpm** ≥ 10
+- **Python** ≥ 3.10
 - **Docker** and **Docker Compose** (for PostgreSQL)
 
 ### 1. Start the Database

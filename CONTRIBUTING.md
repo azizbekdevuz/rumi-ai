@@ -31,8 +31,8 @@ This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDU
 
 ### Prerequisites
 
-- **Node.js** ≥ 20, **pnpm** ≥ 10
-- **Python** ≥ 3.9
+- **Node.js** 20.19+ or 22.12+, **pnpm** ≥ 10
+- **Python** ≥ 3.10
 - **Docker** and **Docker Compose** (for PostgreSQL)
 
 ### Backend
