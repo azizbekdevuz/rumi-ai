@@ -4,7 +4,7 @@ FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # Hoisted linker so Next standalone tracing can see real files, not pnpm symlinks.
 # This .npmrc exists only in the image and does not change local installs.
 RUN printf 'node-linker=hoisted\n' > .npmrc \
