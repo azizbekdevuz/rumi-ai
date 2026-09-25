@@ -148,6 +148,9 @@ services:
 networks:
   rumi:
     driver: bridge
+    ipam:
+      config:
+        - subnet: ${RUMI_DOCKER_SUBNET:?RUMI_DOCKER_SUBNET is required}
 
 volumes:
   postgres_data:
