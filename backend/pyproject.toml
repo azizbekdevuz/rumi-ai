@@ -7,7 +7,7 @@ license = "MIT"
 # Docker/CI/prod install via requirements.txt (pip). Keep runtime deps in sync when both exist.
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.10,<4.0"
 fastapi = "^0.68.0"
 uvicorn = {extras = ["standard"], version = "^0.15.0"}
 sqlalchemy = "^1.4.22"
@@ -16,7 +16,7 @@ pydantic = "^1.8.2"
 python-multipart = "^0.0.5"
 python-jose = {extras = ["cryptography"], version = "^3.4.0"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-python-dotenv = "^0.18.0"
+python-dotenv = ">=1.2.3,<2.0.0"
 alembic = "^1.7.1"
 celery = {extras = ["redis"], version = "^5.1.2"}
 requests = "^2.26.0"
