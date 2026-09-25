@@ -51,7 +51,7 @@ def get_rag_service() -> "RAGService":
 def get_rag_status() -> Dict[str, Any]:
     """Return current RAG service status for health-check endpoints."""
     if _rag_instance is None:
-        return {"ready": False, "documents": 0, "faiss_available": faiss is not None}
+        return {"ready": False, "documents": 0, "faiss_available": faiss is not None, "index_error": None}
     return {
         "ready": _rag_instance.is_ready,
         "documents": (
@@ -60,6 +60,7 @@ def get_rag_status() -> Dict[str, Any]:
             else 0
         ),
         "faiss_available": faiss is not None,
+        "index_error": _rag_instance._index_error,
     }
 
 
@@ -75,7 +76,7 @@ class RAGService:
     """FAISS-backed retrieval service that embeds book_verse JSON via Ollama."""
 
     def __init__(self) -> None:
-        self._ollama_url: str = settings.OLLAMA_BASE_URL
+        self._ollama_url: str = settings.OLLAMA_BASE_URL.rstrip("/")
         self._embed_model: str = settings.EMBED_MODEL
         self._book_verse_dir: str = settings.BOOK_VERSE_DIR or _default_book_verse_dir()
 
@@ -83,6 +84,7 @@ class RAGService:
         self.index: Optional[Any] = None  # faiss.IndexFlatL2 once built
         self.dimension: int = 0
         self._ready = threading.Event()
+        self._index_error: Optional[str] = None
 
         # If faiss is not installed, mark as ready-but-empty immediately
         # so callers don't block forever on is_ready.
@@ -324,6 +326,7 @@ class RAGService:
             )
         except Exception as exc:
             logger.error("FAISS index build failed: %s", exc, exc_info=True)
+            self._index_error = type(exc).__name__
         finally:
             # Always mark ready so callers don't block forever.
             self._ready.set()

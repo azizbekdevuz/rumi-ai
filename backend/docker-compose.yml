@@ -1,3 +1,7 @@
+# Local development stack.
+# This file publishes Postgres, the API, nginx, and Adminer for developer machines.
+# Do not use it on a public host. Production is docker-compose.prod.yml at the repo root.
+
 services:
   # ── NOTE: Ollama runs on the HOST machine (not in Docker) ───────
   # Install via: https://ollama.com/download
@@ -46,6 +50,9 @@ services:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
       - EMBED_MODEL=${EMBED_MODEL:-nomic-embed-text:latest}
       - BOOK_VERSE_DIR=/app/book_verse
+    extra_hosts:
+      # Linux Docker Engine does not define this name. host-gateway works on Engine and Desktop.
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy
@@ -54,7 +61,7 @@ services:
       - ./media:/app/media
       - ../book_verse:/app/book_verse:ro
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/ready"]
       interval: 30s
       timeout: 10s
       start_period: 120s

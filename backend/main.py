@@ -7,16 +7,21 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 import uvicorn
 from dotenv import load_dotenv
 import os
 import logging
 
 # ------------------------------------------------------------------
-# 1. Load .env FIRST (override=True so the .env always wins
-#    over stale / leftover system env vars)
+# 1. Load .env before application imports.
+#    Development lets .env override stale shell variables.
+#    Production lets the orchestrator environment win.
 # ------------------------------------------------------------------
-load_dotenv(override=True)
+# Development: a project .env wins over stale shell variables.
+# Production: the orchestrator environment wins over any stray .env in the image.
+_app_env = os.environ.get("APP_ENV", "development").strip().lower()
+load_dotenv(override=_app_env not in {"production", "prod"})
 
 # ------------------------------------------------------------------
 # 2. Now import the rest of the application (settings, DB, routers)
@@ -41,8 +46,27 @@ logger = logging.getLogger(__name__)
 
 # Log key config at startup (never log secrets)
 logger.info("Starting %s v%s", settings.APP_NAME, settings.APP_VERSION)
-logger.info("DEBUG=%s, USE_MOCK=%s, LLM_MODEL=%s", settings.DEBUG, settings.USE_MOCK, settings.LLM_MODEL)
+logger.info(
+    "APP_ENV=%s DEBUG=%s USE_MOCK=%s LLM_MODEL=%s",
+    settings.APP_ENV,
+    settings.DEBUG,
+    settings.USE_MOCK,
+    settings.LLM_MODEL,
+)
 logger.info("LLM_API_URL=%s, API_KEY present=%s", settings.LLM_API_URL, bool(settings.LLM_API_KEY))
+logger.info(
+    "OLLAMA_BASE_URL=%s EMBED_MODEL=%s BOOK_VERSE_DIR=%s",
+    settings.OLLAMA_BASE_URL,
+    settings.EMBED_MODEL,
+    settings.BOOK_VERSE_DIR or "(default)",
+)
+if settings.is_production and (
+    "localhost" in settings.OLLAMA_BASE_URL or "127.0.0.1" in settings.OLLAMA_BASE_URL
+):
+    logger.warning(
+        "OLLAMA_BASE_URL points at loopback. Inside a container that address is not the host Ollama service. "
+        "Use http://host.docker.internal:11434 and set OLLAMA_HOST=0.0.0.0:11434 on the host."
+    )
 
 # Note: Database tables are managed by Alembic migrations, not here
 
@@ -65,13 +89,15 @@ async def lifespan(_app: FastAPI):
     yield
 
 
-# Create FastAPI app
+# Create FastAPI app. Interactive docs stay on for local development only.
+_expose_docs = not settings.is_production
 app = FastAPI(
     title="RUMI AI Agent Backend",
     version=settings.APP_VERSION,
     description="Backend API for RUMI AI Agent - Multilingual chat and verse search",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url="/docs" if _expose_docs else None,
+    redoc_url="/redoc" if _expose_docs else None,
+    openapi_url="/openapi.json" if _expose_docs else None,
     lifespan=lifespan,
 )
 
@@ -99,20 +125,46 @@ app.include_router(citation.router)
 app.include_router(user.router)
 
 
-@app.get("/health")
-def health_check():
-    """Health check endpoint (includes RAG readiness)."""
-    rag_status = {"ready": False, "documents": 0, "faiss_available": False}
+def _rag_status():
+    """RAG status for health payloads. Never raises."""
     try:
         from app.services.rag_service import get_rag_status
-        rag_status = get_rag_status()
+        return get_rag_status()
     except Exception:
-        pass
+        return {"ready": False, "documents": 0, "faiss_available": False, "index_error": None}
+
+
+@app.get("/health")
+def health_check():
+    """Liveness: the process is up. Does not check dependencies."""
     return {
         "status": "healthy",
         "service": "RUMI AI Agent Backend",
         "version": settings.APP_VERSION,
-        "rag": rag_status,
+        "rag": _rag_status(),
+    }
+
+
+@app.get("/health/ready")
+def readiness_check():
+    """Readiness: Postgres accepts queries. RAG may still be indexing."""
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+    except Exception as exc:
+        logger.error("Readiness database check failed: %s", type(exc).__name__)
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "not_ready",
+                "database": "unavailable",
+                "rag": _rag_status(),
+            },
+        )
+    return {
+        "status": "ready",
+        "database": "ok",
+        "rag": _rag_status(),
     }
 
 
@@ -122,8 +174,9 @@ def root():
     return {
         "service": "RUMI AI Agent Backend",
         "version": settings.APP_VERSION,
-        "docs": "/docs",
+        "docs": "/docs" if _expose_docs else None,
         "health": "/health",
+        "ready": "/health/ready",
         "endpoints": {
             "auth": "/api/auth",
             "chat": "/api/chat",

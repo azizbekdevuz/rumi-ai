@@ -17,7 +17,7 @@ Supports **Persian (FA)**, **English (EN)**, and **Korean (KR)** — including f
 | Package Manager | pnpm | 10.15.0 |
 | Backend Framework | FastAPI | ≥0.100 |
 | ORM | SQLAlchemy | ≥1.4, <2.0 |
-| Database | PostgreSQL | 13 (Docker) |
+| Database | PostgreSQL | 13 (dev Compose), 17 (production Compose) |
 | Migrations | Alembic | ≥1.7 |
 | Auth | JWT (python-jose) + bcrypt | — |
 | HTTP Client | httpx | ≥0.23 |
@@ -151,6 +151,12 @@ pnpm dev
 ```
 
 Open [http://localhost:3003](http://localhost:3003) (dev server runs on port 3003).
+
+### Production
+
+The local Compose file publishes Postgres, the API, and Adminer. Do not put that file on a public host.
+
+Production on Ubuntu uses `docker-compose.prod.yml` at the repository root. The procedure, including Ollama, TLS, backups, updates, and rollback, is in [deploy/PRODUCTION.md](deploy/PRODUCTION.md).
 
 ## Environment Variables
 

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
-
-// Server-only environment variable
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
+import { sessionCookieOptions } from '@/lib/auth/session-cookie';
 
 // Ensure Node.js runtime for cookie support
 export const runtime = 'nodejs';
@@ -22,10 +21,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Call backend signup endpoint
-    const backendResponse = await fetch(`${BACKEND_URL}/api/auth/signup`, {
+    const backendResponse = await fetch(`${getBackendUrl()}/api/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...clientIpHeaders(request),
       },
       body: JSON.stringify({ email, password }),
     });
@@ -37,10 +37,11 @@ export async function POST(request: NextRequest) {
     }
 
     // After successful signup, automatically log in the user
-    const loginResponse = await fetch(`${BACKEND_URL}/api/auth/login`, {
+    const loginResponse = await fetch(`${getBackendUrl()}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...clientIpHeaders(request),
       },
       body: JSON.stringify({ email, password }),
     });
@@ -52,15 +53,7 @@ export async function POST(request: NextRequest) {
       if (token) {
         // Set httpOnly cookie with secure settings
         const cookieStore = await cookies();
-        const isProduction = process.env.NODE_ENV === 'production';
-        
-        cookieStore.set('rumi_token', token, {
-          httpOnly: true,
-          secure: isProduction,
-          sameSite: 'lax',
-          path: '/',
-          maxAge: 60 * 60 * 24, // 24 hours
-        });
+        cookieStore.set('rumi_token', token, sessionCookieOptions());
       }
     }
 

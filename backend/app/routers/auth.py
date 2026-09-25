@@ -142,7 +142,7 @@ async def kakao_oauth(
             if not access_token:
                 raise HTTPException(status_code=400, detail="Kakao authentication failed")
         except httpx.HTTPStatusError as e:
-            logger.warning("Kakao token exchange failed: %s", e.response.text)
+            logger.warning("Kakao token exchange failed: %s", e.response.status_code)
             raise HTTPException(status_code=400, detail="Kakao authentication failed") from e
         except httpx.RequestError as e:
             logger.warning("Failed to connect to Kakao: %s", e)
@@ -159,7 +159,7 @@ async def kakao_oauth(
             user_info_response.raise_for_status()
             kakao_user_data = user_info_response.json()
         except httpx.HTTPStatusError as e:
-            logger.warning("Kakao user info fetch failed: %s", e.response.text)
+            logger.warning("Kakao user info fetch failed: %s", e.response.status_code)
             raise HTTPException(status_code=400, detail="Kakao authentication failed") from e
         except httpx.RequestError as e:
             logger.warning("Failed to connect to Kakao: %s", e)
@@ -285,7 +285,7 @@ async def google_oauth(
             if not google_access_token:
                 raise HTTPException(status_code=400, detail="Google authentication failed")
         except httpx.HTTPStatusError as e:
-            logger.warning("Google token exchange failed: %s", e.response.text)
+            logger.warning("Google token exchange failed: %s", e.response.status_code)
             raise HTTPException(status_code=400, detail="Google authentication failed") from e
         except httpx.RequestError as e:
             logger.warning("Failed to connect to Google: %s", e)
@@ -302,7 +302,7 @@ async def google_oauth(
             user_info_response.raise_for_status()
             google_user_data = user_info_response.json()
         except httpx.HTTPStatusError as e:
-            logger.warning("Google user info fetch failed: %s", e.response.text)
+            logger.warning("Google user info fetch failed: %s", e.response.status_code)
             raise HTTPException(status_code=400, detail="Google authentication failed") from e
         except httpx.RequestError as e:
             logger.warning("Failed to connect to Google: %s", e)

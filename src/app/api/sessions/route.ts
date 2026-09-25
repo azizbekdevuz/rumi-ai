@@ -1,15 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jsonError, parseBackendError } from '@/lib/api/bff';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+import { clientIpHeaders, getBackendUrl } from '@/lib/api/server-backend';
 export const runtime = 'nodejs';
 
 /**
  * GET /api/sessions — list chat sessions for the current user.
  * Proxies to backend GET /api/chat/sessions.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('rumi_token')?.value;
@@ -19,11 +18,12 @@ export async function GET() {
       return jsonError('Unauthorized', 401);
     }
 
-    const headers: HeadersInit = {
-      'Authorization': `Bearer ${token}`,
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+      ...clientIpHeaders(request),
     };
 
-    const resp = await fetch(`${BACKEND_URL}/api/chat/sessions?limit=50`, {
+    const resp = await fetch(`${getBackendUrl()}/api/chat/sessions?limit=50`, {
       headers,
     });
 

@@ -174,9 +174,11 @@ async def chat(
         raise
     except RuntimeError as exc:
         db.rollback()
-        error_msg = str(exc)
-        logger.error("Chat processing error: %s", error_msg, exc_info=True)
-        raise HTTPException(status_code=502, detail=f"LLM error: {error_msg}")
+        logger.error("Chat processing error: %s", exc, exc_info=True)
+        raise HTTPException(
+            status_code=502,
+            detail="The language model is unavailable. Please try again.",
+        )
     except Exception as exc:
         db.rollback()
         logger.error("Unexpected chat error: %s", exc, exc_info=True)
