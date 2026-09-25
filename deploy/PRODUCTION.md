@@ -15,10 +15,10 @@ This is the supported production layout:
 
 The API container entrypoint waits for Postgres, runs `alembic upgrade head`, then starts Uvicorn as a non-root user. A reboot brings the stack back through the restart policy. The Docker daemon does not apply Compose `depends_on` on reboot; the entrypoint covers that race.
 
-All commands below run from the repository root, for example `/opt/rumi-ai`. To shorten them:
+All commands below run from the repository root, for example `/srv/rumi-ai`. To shorten them:
 
 ```bash
-alias dcp='docker compose --env-file .env.production -f docker-compose.prod.yml'
+alias rumic='docker compose --env-file .env.production -f docker-compose.prod.yml'
 ```
 
 ## 1. Install host packages
@@ -72,10 +72,10 @@ Install Caddy: https://caddyserver.com/docs/install#debian-ubuntu-raspberry-pi-o
 
 ## 2. Configure
 
-Clone the repository to `/opt/rumi-ai`. The `book_verse` directory must be present next to `docker-compose.prod.yml`.
+Clone the repository to `/srv/rumi-ai`. The `book_verse` directory must be present next to `docker-compose.prod.yml`.
 
 ```bash
-cd /opt/rumi-ai
+cd /srv/rumi-ai
 cp .env.production.example .env.production
 chmod 600 .env.production
 openssl rand -hex 24   # DB_PASSWORD
@@ -127,41 +127,41 @@ Do not put a CDN or another proxy in front of this Caddy without also configurin
 
 Use this instead of Caddy, not in addition to it. Point `cloudflared` at `http://127.0.0.1:3003` and set `TRUSTED_CLIENT_IP_HEADER=cf-connecting-ip`. Cloudflare's edge overwrites `CF-Connecting-IP`. Do not run a second ingress to port 3003 at the same time, because it would pass a client-supplied `CF-Connecting-IP` through.
 
-After changing `TRUSTED_CLIENT_IP_HEADER`, recreate web with `dcp up -d --no-deps --force-recreate web`.
+After changing `TRUSTED_CLIENT_IP_HEADER`, recreate web with `rumic up -d --no-deps --force-recreate web`.
 
 ## 4. Start
 
 ```bash
-dcp up -d --build
-dcp ps
-dcp exec -T api curl -fsS http://127.0.0.1:8000/health/ready
+rumic up -d --build
+rumic ps
+rumic exec -T api curl -fsS http://127.0.0.1:8000/health/ready
 curl -fsS http://127.0.0.1:3003/ >/dev/null && echo web-ok
 ```
 
-`/health` only means the process is up. `/health/ready` means Postgres answered `SELECT 1`. `rag.ready` can stay false while embeddings build; the site still serves, and chat runs without RAG until the index is ready. If `rag.index_error` is set, Ollama or the embedding model name is wrong.
+`/health` only means the process is up. `/health/ready` means Postgres answered `SELECT 1`. `rag.ready == true` means the indexing attempt finished, including a failed attempt. Operational success requires `rag.ready == true`, `rag.documents > 0`, and `rag.index_error == null`. While `rag.ready` is false the site still serves, and chat runs without RAG.
 
 Confirm Postgres 17 and the migration head:
 
 ```bash
-dcp exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "show server_version"'
-dcp exec -T api alembic current
+rumic exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "show server_version"'
+rumic exec -T db sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT version_num FROM alembic_version;"'
 ```
 
-`alembic current` should print `a1b2c3d4e5f6 (head)` for this revision of the repository.
+That query prints `a1b2c3d4e5f6` for this revision of the repository. `docker compose exec` does not inherit `DATABASE_URL`; the API entrypoint builds it only for the server process, so do not run `alembic current` via `exec`.
 
 ## 5. Update
 
 ```bash
-cd /opt/rumi-ai
-dcp exec -T api alembic current | tee pre-deploy-alembic.txt
+cd /srv/rumi-ai
+rumic exec -T db sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT version_num FROM alembic_version;"' | tee pre-deploy-alembic.txt
 docker tag rumi-api:prod rumi-api:previous
 docker tag rumi-web:prod rumi-web:previous
-dcp exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' \
+rumic exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' \
   > "rumi-$(date -u +%Y%m%dT%H%M%SZ).dump"
 git rev-parse HEAD > pre-deploy-commit.txt
 git pull
-dcp up -d --build
-dcp exec -T api alembic current
+rumic up -d --build
+rumic exec -T db sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT version_num FROM alembic_version;"'
 ```
 
 The API entrypoint runs `alembic upgrade head` before it listens. Store the dump somewhere other than this host as well.
@@ -170,15 +170,15 @@ The API entrypoint runs `alembic upgrade head` before it listens. Store the dump
 
 Retagging images alone does not replace running containers, so every rollback ends with `--force-recreate`. `--no-deps` keeps `db` untouched.
 
-Check whether the failed release changed the schema. Compare `dcp exec -T api alembic current` (or the API logs, if it will not start) with `pre-deploy-alembic.txt`.
+Check whether the failed release changed the schema. Compare `rumic exec -T db sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT version_num FROM alembic_version;"'` with `pre-deploy-alembic.txt`.
 
 ### A. Schema unchanged
 
 ```bash
 docker tag rumi-api:previous rumi-api:prod
 docker tag rumi-web:previous rumi-web:prod
-dcp up -d --no-build --no-deps --force-recreate api web
-dcp exec -T api alembic current
+rumic up -d --no-build --no-deps --force-recreate api web
+rumic exec -T db sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT version_num FROM alembic_version;"'
 ```
 
 ### B. The failed release applied a migration
@@ -186,21 +186,21 @@ dcp exec -T api alembic current
 Restore the database first. The previous image runs `alembic upgrade head` on start and would fail against a revision it does not know.
 
 ```bash
-dcp stop api web
-dcp exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' \
+rumic stop api web
+rumic exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' \
   > "rumi-failed-$(date -u +%Y%m%dT%H%M%SZ).dump"
-dcp exec -T db sh -c 'dropdb -U "$POSTGRES_USER" --if-exists --force "$POSTGRES_DB" && createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'
-dcp exec -T db sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner' \
+rumic exec -T db sh -c 'dropdb -U "$POSTGRES_USER" --if-exists --force "$POSTGRES_DB" && createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'
+rumic exec -T db sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner' \
   < rumi-YYYYMMDDTHHMMSSZ.dump
 docker tag rumi-api:previous rumi-api:prod
 docker tag rumi-web:previous rumi-web:prod
-dcp up -d --no-build --no-deps --force-recreate api web
-dcp exec -T api alembic current
+rumic up -d --no-build --no-deps --force-recreate api web
+rumic exec -T db sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT version_num FROM alembic_version;"'
 ```
 
 Dropping and recreating the database, instead of `pg_restore --clean`, also removes tables that only the failed migration created. The `rumi-failed-*.dump` keeps whatever was written during the failed release. Check `pg_restore` output for errors before starting the API.
 
-Also reset the checkout so the next `dcp up --build` does not rebuild the failed release:
+Also reset the checkout so the next `rumic up --build` does not rebuild the failed release:
 
 ```bash
 git checkout "$(cat pre-deploy-commit.txt)"
@@ -208,7 +208,7 @@ git checkout "$(cat pre-deploy-commit.txt)"
 
 Do not use `alembic downgrade` as the primary rollback. The pre-deploy `pg_dump` is the database rollback point.
 
-The Postgres data volume is `rumi_prod_postgres_data`. `dcp down -v` deletes it.
+The Postgres data volume is `rumi_prod_postgres_data`. `rumic down -v` deletes it.
 
 ## 7. What stays private
 
@@ -220,6 +220,6 @@ The Postgres data volume is `rumi_prod_postgres_data`. `dcp down -v` deletes it.
 | Ollama | host port 11434, firewalled, reachable from the Docker bridge |
 | Adminer / dev nginx | not in this Compose file |
 
-Logs go to stdout (`dcp logs api web db`) with rotation. The API does not log the database URL.
+Logs go to stdout (`rumic logs api web db`) with rotation. The API does not log the database URL.
 
 FAISS is rebuilt in memory on each API start from the mounted `book_verse` files. Persisting the index is optional later work, not required for a correct deploy. Run a single API container; each replica builds its own index.
