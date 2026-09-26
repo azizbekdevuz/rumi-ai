@@ -107,3 +107,5 @@ backend/alembic/versions/*.pyc
 # OS
 backend/.DS_Store
 backend/Thumbs.db
+
+changes.diff
