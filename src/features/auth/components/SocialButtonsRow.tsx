@@ -37,10 +37,14 @@ export default function SocialButtonsRow({
   }, [toastMessage]);
 
   const handleGoogleClick = () => {
+    // Full navigation so the start route can set the OAuth state cookie and redirect to the provider.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign('/api/auth/google/start');
   };
 
   const handleKakaoClick = () => {
+    // Full navigation so the start route can set the OAuth state cookie and redirect to the provider.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign('/api/auth/kakao/start');
   };
 
