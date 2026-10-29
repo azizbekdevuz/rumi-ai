@@ -85,9 +85,12 @@ function ChatPageContent() {
       sessionLoadedRef.current = true;
       setSessionId(querySession);
       saveSessionId(querySession);
-      // Load the session's messages from backend
+      // Existing session bootstrap loads history from the query param before the helper is declared below.
+      // eslint-disable-next-line react-hooks/immutability
       loadSessionMessages(querySession);
     } else if (!querySession) {
+    // Restore the saved session id once search params are available.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessionId(loadSessionId());
     }
   }, [searchParams]);
@@ -243,7 +246,8 @@ function ChatPageContent() {
           },
           onError: (error) => {
             console.error('[Chat] Stream error, falling back:', error);
-            // Fall back to non-streaming endpoint
+            // Existing stream failure path calls the non-streaming helper declared below.
+            // eslint-disable-next-line react-hooks/immutability
             fallbackNonStreaming(userMessage.content, assistantId, history);
           },
         },

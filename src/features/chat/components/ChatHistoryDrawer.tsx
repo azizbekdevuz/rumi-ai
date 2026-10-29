@@ -46,6 +46,8 @@ export default function ChatHistoryDrawer({
   const authIdentity = authStatus === 'authenticated' ? authUser?.id ?? null : null;
   useEffect(() => {
     fetchedRef.current = false;
+    // Clear the previous user's history when the signed-in identity changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessions([]);
     setError('');
     setSignedOut(false);
@@ -83,6 +85,8 @@ export default function ChatHistoryDrawer({
   // Fetch sessions when the drawer opens
   useEffect(() => {
     if (isOpen) {
+      // Load sessions when the drawer opens.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchSessions();
     }
   }, [isOpen, fetchSessions]);

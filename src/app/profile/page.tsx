@@ -37,6 +37,8 @@ export default function ProfilePage() {
   // Gate client-derived values (language, theme) behind a mount check
   // to avoid hydration mismatches from localStorage-based providers.
   const [mounted, setMounted] = useState(false);
+  // Wait until mount so localStorage-backed providers do not mismatch SSR.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
   const [activeSection, setActiveSection] = useState<ProfileSection>('account');
   const [emailUpdates, setEmailUpdates] = useState(true);

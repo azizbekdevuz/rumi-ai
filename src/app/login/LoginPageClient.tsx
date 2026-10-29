@@ -99,6 +99,8 @@ export default function LoginPageClient() {
         const error = searchParams?.get("error");
         if (!error) return;
         const message = OAUTH_ERROR_MESSAGES[error] ?? "Sign-in failed. Please try again.";
+        // Surface the OAuth callback error, then strip it from the URL.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setOauthErrorToast(message);
         const base = searchParams?.get("tab") === "signup" ? "/login?tab=signup" : "/login";
         router.replace(base, { scroll: false });

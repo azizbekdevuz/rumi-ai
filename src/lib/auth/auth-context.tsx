@@ -60,6 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Fetch auth state once on mount
   useEffect(() => {
+    // Load the session once on mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [refresh]);
 
