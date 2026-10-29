@@ -19,7 +19,7 @@ Supports **Persian (FA)**, **English (EN)**, and **Korean (KR)** — including f
 | ORM | SQLAlchemy | ≥1.4, <2.0 |
 | Database | PostgreSQL | 13 (dev Compose), 17 (production Compose) |
 | Migrations | Alembic | ≥1.7 |
-| Auth | JWT (python-jose) + bcrypt | — |
+| Auth | JWT (PyJWT) + bcrypt | — |
 | HTTP Client | httpx | ≥0.23 |
 | LLM | OpenAI-compatible / Ollama | configurable |
 | Containerization | Docker + Docker Compose | — |

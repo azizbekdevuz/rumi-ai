@@ -3,7 +3,8 @@ JWT Authentication middleware for API Gateway.
 """
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError, jwt
+import jwt
+from jwt.exceptions import PyJWTError
 from datetime import datetime, timedelta
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -32,7 +33,7 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Security(secu
         token = credentials.credentials
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         return payload
-    except JWTError:
+    except PyJWTError:
         raise HTTPException(
             status_code=401,
             detail="Invalid authentication credentials",

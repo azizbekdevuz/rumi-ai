@@ -10,7 +10,7 @@ FastAPI backend for the Rumi AI Agent: a multilingual RAG-powered chat system th
 | ORM | SQLAlchemy | ≥1.4, <2.0 |
 | Database | PostgreSQL | 13 (Docker) |
 | Migrations | Alembic | ≥1.7 |
-| Auth | python-jose (JWT) + bcrypt | 3.3.0 / ≥4.0 |
+| Auth | PyJWT + bcrypt | 2.15.1 / ≥4.0 |
 | Validation | Pydantic v2 + pydantic-settings | ≥2.0 |
 | HTTP Client | httpx (async) | ≥0.23 |
 | ASGI Server | Uvicorn | ≥0.20 |

@@ -877,7 +877,7 @@ Language Codes:
   │  Depends(get_optional_user) or           │
   │  Depends(get_current_user)               │
   │  → Reads Authorization header            │
-  │  → Verifies JWT (python-jose)            │
+  │  → Verifies JWT (PyJWT, HS256 only)      │
   │  → Returns User or None                  │
   └──────────────────────────────────────────┘
 ```
